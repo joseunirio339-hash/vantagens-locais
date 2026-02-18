@@ -144,26 +144,29 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
             <p className="text-sm text-slate-400">Adicione seu primeiro produto com desconto</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map(product => (
               <div key={product.id} className="relative group">
                 <ProductCard product={product} showViews />
-                <div className="absolute top-2 left-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Buttons always visible on mobile, hover on desktop */}
+                <div className="absolute top-2 left-2 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <Button
                     size="icon"
                     variant="secondary"
-                    className="w-8 h-8"
+                    className="w-9 h-9 shadow"
                     onClick={() => handleEdit(product)}
                     disabled={isBlocked}
+                    title="Editar produto"
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
                   <Button
                     size="icon"
                     variant="destructive"
-                    className="w-8 h-8"
+                    className="w-9 h-9 shadow"
                     onClick={() => handleDelete(product.id)}
                     disabled={isBlocked}
+                    title="Excluir produto"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
