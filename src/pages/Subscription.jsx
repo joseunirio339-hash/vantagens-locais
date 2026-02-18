@@ -139,7 +139,7 @@ export default function Subscription() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 rounded-full px-4 py-2 mb-4">
             <Crown className="w-4 h-4" />
-            <span className="text-sm font-medium">Planos Semestrais</span>
+            <span className="text-sm font-medium">Planos Mensais</span>
           </div>
           <h1 className="text-4xl font-bold text-slate-800 mb-4">
             Escolha seu Plano
@@ -262,7 +262,7 @@ export default function Subscription() {
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-8">
-          Pagamento único válido por 6 meses. Sem renovação automática.
+          Pagamento único válido por 1 mês. Sem renovação automática.
         </p>
       </div>
     </div>
