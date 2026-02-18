@@ -1,0 +1,270 @@
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
+import { Check, CreditCard, Store, Users, Loader2, Crown, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { createPageUrl } from '@/utils';
+
+const plans = [
+  {
+    type: 'user',
+    name: 'Usuário',
+    price: 4.99,
+    period: 'semestre',
+    icon: Users,
+    color: 'emerald',
+    features: [
+      'Acesso a todos os descontos',
+      'Geração ilimitada de vouchers',
+      'Busca de produtos e lojas',
+      'Histórico de compras',
+      'Suporte por email'
+    ]
+  },
+  {
+    type: 'partner',
+    name: 'Lojista Parceiro',
+    price: 149.99,
+    period: 'semestre',
+    icon: Store,
+    color: 'violet',
+    popular: true,
+    features: [
+      'Cadastro de até 20 produtos',
+      'Painel de gestão completo',
+      'Análises de vendas e acessos',
+      'Logo e perfil da loja',
+      'Validação de vouchers',
+      'Suporte prioritário'
+    ]
+  }
+];
+
+export default function Subscription() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [existingSubscriptions, setExistingSubscriptions] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(createPageUrl('Subscription'));
+        return;
+      }
+
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+
+      const subs = await base44.entities.Subscription.filter({
+        user_email: currentUser.email
+      });
+      setExistingSubscriptions(subs);
+    };
+    loadData();
+  }, []);
+
+  const getSubscriptionStatus = (type) => {
+    const sub = existingSubscriptions.find(s => s.type === type);
+    if (!sub) return null;
+    
+    const isExpired = new Date(sub.expires_at) < new Date();
+    return {
+      ...sub,
+      status: isExpired ? 'expired' : sub.status
+    };
+  };
+
+  const handleSubscribe = async (planType) => {
+    if (!user) {
+      base44.auth.redirectToLogin(createPageUrl('Subscription'));
+      return;
+    }
+
+    setSelectedPlan(planType);
+    setLoading(true);
+
+    const plan = plans.find(p => p.type === planType);
+    const startsAt = new Date();
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + 6);
+
+    const existingSub = existingSubscriptions.find(s => s.type === planType);
+
+    if (existingSub) {
+      await base44.entities.Subscription.update(existingSub.id, {
+        status: 'active',
+        price: plan.price,
+        starts_at: startsAt.toISOString().split('T')[0],
+        expires_at: expiresAt.toISOString().split('T')[0]
+      });
+    } else {
+      const newSub = {
+        user_email: user.email,
+        type: planType,
+        status: 'active',
+        price: plan.price,
+        starts_at: startsAt.toISOString().split('T')[0],
+        expires_at: expiresAt.toISOString().split('T')[0]
+      };
+
+      await base44.entities.Subscription.create(newSub);
+
+      if (planType === 'partner') {
+        await base44.entities.Partner.create({
+          business_name: user.full_name || 'Minha Loja',
+          owner_email: user.email,
+          subscription_status: 'active',
+          subscription_expires_at: expiresAt.toISOString().split('T')[0]
+        });
+      }
+    }
+
+    setLoading(false);
+    toast.success('Assinatura ativada com sucesso!');
+    
+    if (planType === 'partner') {
+      window.location.href = createPageUrl('PartnerDashboard');
+    } else {
+      window.location.href = createPageUrl('Home');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-5xl mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 rounded-full px-4 py-2 mb-4">
+            <Crown className="w-4 h-4" />
+            <span className="text-sm font-medium">Planos Semestrais</span>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+            Escolha seu Plano
+          </h1>
+          <p className="text-lg text-slate-500 max-w-xl mx-auto">
+            Acesse descontos exclusivos do comércio local ou cadastre sua loja como parceiro
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {plans.map(plan => {
+            const sub = getSubscriptionStatus(plan.type);
+            const isActive = sub?.status === 'active';
+            const isExpired = sub?.status === 'expired';
+            const Icon = plan.icon;
+
+            return (
+              <Card 
+                key={plan.type}
+                className={`relative overflow-hidden border-2 transition-all ${
+                  plan.popular 
+                    ? 'border-violet-300 shadow-lg shadow-violet-100' 
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-0 right-0">
+                    <Badge className="rounded-none rounded-bl-lg bg-violet-500 hover:bg-violet-500">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Popular
+                    </Badge>
+                  </div>
+                )}
+
+                <CardHeader className="pb-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
+                    plan.color === 'emerald' ? 'bg-emerald-100' : 'bg-violet-100'
+                  }`}>
+                    <Icon className={`w-7 h-7 ${
+                      plan.color === 'emerald' ? 'text-emerald-600' : 'text-violet-600'
+                    }`} />
+                  </div>
+                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardDescription>
+                    {plan.type === 'user' 
+                      ? 'Para consumidores que querem economizar'
+                      : 'Para lojistas que querem vender mais'}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-slate-800">
+                      R$ {plan.price.toFixed(2).replace('.', ',')}
+                    </span>
+                    <span className="text-slate-500">/{plan.period}</span>
+                  </div>
+
+                  {isActive && sub?.expires_at && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-6">
+                      <p className="text-sm text-emerald-700">
+                        <Check className="w-4 h-4 inline mr-1" />
+                        Ativo até {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  )}
+
+                  {isExpired && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
+                      <p className="text-sm text-amber-700">
+                        Expirado em {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  )}
+
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          plan.color === 'emerald' ? 'bg-emerald-100' : 'bg-violet-100'
+                        }`}>
+                          <Check className={`w-3 h-3 ${
+                            plan.color === 'emerald' ? 'text-emerald-600' : 'text-violet-600'
+                          }`} />
+                        </div>
+                        <span className="text-slate-600">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    onClick={() => handleSubscribe(plan.type)}
+                    disabled={loading || isActive}
+                    className={`w-full h-12 text-base font-semibold ${
+                      plan.color === 'emerald'
+                        ? 'bg-emerald-600 hover:bg-emerald-700'
+                        : 'bg-violet-600 hover:bg-violet-700'
+                    } ${isActive ? 'opacity-50' : ''}`}
+                  >
+                    {loading && selectedPlan === plan.type ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isActive ? (
+                      'Plano Ativo'
+                    ) : isExpired ? (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Renovar Assinatura
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Assinar Agora
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        <p className="text-center text-sm text-slate-500 mt-8">
+          Pagamento único válido por 6 meses. Sem renovação automática.
+        </p>
+      </div>
+    </div>
+  );
+}
