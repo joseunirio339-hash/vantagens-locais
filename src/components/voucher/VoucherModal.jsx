@@ -65,6 +65,16 @@ export default function VoucherModal({
       expires_at: expiresAt.toISOString().split('T')[0]
     });
 
+    // Notify partner
+    await base44.entities.Notification.create({
+      partner_id: partner.id,
+      type: 'new_voucher',
+      title: 'Novo Voucher Gerado!',
+      message: `${user?.full_name || 'Um cliente'} gerou um voucher para "${product.name}" (R$ ${product.discount_price?.toFixed(2).replace('.', ',')})`,
+      is_read: false,
+      reference_id: newVoucher.id
+    });
+
     setVoucher(newVoucher);
     setLoading(false);
     toast.success('Voucher gerado com sucesso!');
