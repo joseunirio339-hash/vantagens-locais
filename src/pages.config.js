@@ -54,6 +54,7 @@ import PartnerStore from './pages/PartnerStore';
 import Subscription from './pages/Subscription';
 import PartnerDashboard from './pages/PartnerDashboard';
 import MyVouchers from './pages/MyVouchers';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -69,4 +70,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Home",
     Pages: PAGES,
+    Layout: __Layout,
 };
