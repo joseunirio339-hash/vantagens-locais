@@ -144,25 +144,26 @@ export default function PartnerDashboard() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center overflow-hidden">
-                {partner?.logo_url ? (
-                  <img
-                    src={partner.logo_url}
-                    alt={partner.business_name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Store className="w-7 h-7 text-violet-600" />
-                )}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800">
-                  {partner?.business_name}
-                </h1>
-                <p className="text-slate-500">Painel do Parceiro</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center overflow-hidden">
+              {partner?.logo_url ? (
+                <img
+                  src={partner.logo_url}
+                  alt={partner.business_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Store className="w-7 h-7 text-violet-600" />
+              )}
             </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">
+                {partner?.business_name}
+              </h1>
+              <p className="text-slate-500">Painel do Parceiro</p>
+            </div>
+          </div>
+          <NotificationBell partnerId={partner?.id} />
           </div>
         </div>
       </div>
