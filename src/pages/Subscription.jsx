@@ -12,7 +12,7 @@ const plans = [
     type: 'user',
     name: 'Usuário',
     price: 4.99,
-    period: 'semestre',
+    period: 'mês',
     icon: Users,
     color: 'emerald',
     features: [
