@@ -221,7 +221,7 @@ export default function PartnerDashboard() {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="bg-white border">
+          <TabsList className="bg-white border flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Produtos
@@ -230,9 +230,17 @@ export default function PartnerDashboard() {
               <Ticket className="w-4 h-4" />
               Vouchers
             </TabsTrigger>
+            <TabsTrigger value="sales" className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Vendas
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Análises
+            </TabsTrigger>
+            <TabsTrigger value="reviews" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Avaliações
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -257,12 +265,20 @@ export default function PartnerDashboard() {
             />
           </TabsContent>
 
+          <TabsContent value="sales">
+            <SalesOverview vouchers={vouchers} products={products} />
+          </TabsContent>
+
           <TabsContent value="analytics">
             <PartnerAnalytics 
               products={products}
               vouchers={vouchers}
               views={views}
             />
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <PartnerReviews partnerId={partner?.id} />
           </TabsContent>
 
           <TabsContent value="settings">
