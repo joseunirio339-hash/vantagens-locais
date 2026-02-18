@@ -27,7 +27,7 @@ const plans = [
     type: 'partner',
     name: 'Lojista Parceiro',
     price: 149.99,
-    period: 'semestre',
+    period: 'mês',
     icon: Store,
     color: 'violet',
     popular: true,
