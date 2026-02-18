@@ -3,8 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
-  Store, Package, Eye, Ticket, TrendingUp, Plus, 
-  Settings, BarChart3, AlertTriangle, Calendar
+  Store, Package, Eye, Ticket, TrendingUp, 
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,9 @@ import ProductManagement from '@/components/partner/ProductManagement';
 import PartnerAnalytics from '@/components/partner/PartnerAnalytics';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 import VoucherManagement from '@/components/partner/VoucherManagement';
+import NotificationBell from '@/components/partner/NotificationBell';
+import PartnerReviews from '@/components/partner/PartnerReviews';
+import SalesOverview from '@/components/partner/SalesOverview';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
