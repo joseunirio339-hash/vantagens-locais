@@ -90,7 +90,7 @@ export default function Subscription() {
     const plan = plans.find(p => p.type === planType);
     const startsAt = new Date();
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 6);
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
 
     const existingSub = existingSubscriptions.find(s => s.type === planType);
 
