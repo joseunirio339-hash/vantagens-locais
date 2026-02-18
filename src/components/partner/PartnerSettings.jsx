@@ -196,7 +196,7 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
 
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Valor</span>
-              <span className="font-medium">R$ 149,99 / semestre</span>
+              <span className="font-medium">R$ 149,99 / mês</span>
             </div>
 
             {subscription?.expires_at && (

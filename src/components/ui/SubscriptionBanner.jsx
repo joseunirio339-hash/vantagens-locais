@@ -9,7 +9,7 @@ export default function SubscriptionBanner({ type, status, expiresAt }) {
 
   const isExpired = status === 'expired';
   const price = type === 'partner' ? 'R$ 149,99' : 'R$ 4,99';
-  const period = 'semestre';
+  const period = 'mês';
 
   return (
     <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-4 rounded-2xl mb-6 shadow-lg">
