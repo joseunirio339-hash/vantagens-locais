@@ -175,7 +175,7 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
       </CardContent>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingProduct ? 'Editar Produto' : 'Novo Produto'}
@@ -183,30 +183,46 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Image Upload */}
             <div className="space-y-2">
-              <Label>Imagem do Produto</Label>
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden">
-                  {formData.image_url ? (
+              <Label>Foto do Produto</Label>
+              <div className="relative w-full aspect-video rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-slate-300 hover:border-emerald-400 transition-colors cursor-pointer"
+                onClick={() => document.getElementById('product-image-input').click()}
+              >
+                {formData.image_url ? (
+                  <>
                     <img
                       src={formData.image_url}
                       alt="Preview"
                       className="w-full h-full object-cover"
                     />
-                  ) : (
-                    <Image className="w-8 h-8 text-slate-400" />
-                  )}
-                </div>
-                <div>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="w-full"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">PNG, JPG até 5MB</p>
-                </div>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <p className="text-white font-medium text-sm flex items-center gap-2">
+                        <Image className="w-4 h-4" /> Trocar foto
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center p-6">
+                    {loading ? (
+                      <Loader2 className="w-10 h-10 text-slate-400 mx-auto animate-spin" />
+                    ) : (
+                      <>
+                        <Image className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500 font-medium">Clique para adicionar foto</p>
+                        <p className="text-xs text-slate-400 mt-1">PNG, JPG até 5MB</p>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
+              <input
+                id="product-image-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
 
             <div className="space-y-2">
