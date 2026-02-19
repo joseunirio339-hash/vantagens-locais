@@ -15,12 +15,15 @@ const plans = [
     period: 'mês',
     icon: Users,
     color: 'emerald',
+    trialDays: 30,
     features: [
+      '🎁 1º mês GRÁTIS (período de teste)',
       'Acesso a todos os descontos',
       'Geração ilimitada de vouchers',
       'Busca de produtos e lojas',
       'Histórico de compras',
-      'Suporte por email'
+      'Suporte por email',
+      'Renovação via ticket de acesso'
     ]
   },
   {
