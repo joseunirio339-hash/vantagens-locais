@@ -4,24 +4,21 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 
 const categoryLabels = {
-  restaurante: 'Restaurante',
-  moda: 'Moda',
-  eletronicos: 'Eletrônicos',
-  beleza: 'Beleza',
-  saude: 'Saúde',
-  mercado: 'Mercado',
-  servicos: 'Serviços',
-  outros: 'Outros'
+  restaurante: 'Restaurante', moda: 'Moda', eletronicos: 'Eletrônicos',
+  beleza: 'Beleza', saude: 'Saúde', mercado: 'Mercado', servicos: 'Serviços',
+  doceria: '🍰 Doceria', hamburgueria: '🍔 Hamburgueria', trailer_food: '🚚 Trailer',
+  artesanato: '🎨 Artesanato', confeitaria: '🎂 Confeitaria', salgados: '🥟 Salgados',
+  costura: '🧵 Costura', outros: 'Outros'
 };
 
 const categoryColors = {
-  restaurante: 'bg-orange-100 text-orange-700',
-  moda: 'bg-pink-100 text-pink-700',
-  eletronicos: 'bg-blue-100 text-blue-700',
-  beleza: 'bg-purple-100 text-purple-700',
-  saude: 'bg-green-100 text-green-700',
-  mercado: 'bg-yellow-100 text-yellow-700',
-  servicos: 'bg-indigo-100 text-indigo-700',
+  restaurante: 'bg-orange-100 text-orange-700', moda: 'bg-pink-100 text-pink-700',
+  eletronicos: 'bg-blue-100 text-blue-700', beleza: 'bg-purple-100 text-purple-700',
+  saude: 'bg-green-100 text-green-700', mercado: 'bg-yellow-100 text-yellow-700',
+  servicos: 'bg-indigo-100 text-indigo-700', doceria: 'bg-rose-100 text-rose-700',
+  hamburgueria: 'bg-orange-100 text-orange-700', trailer_food: 'bg-amber-100 text-amber-700',
+  artesanato: 'bg-teal-100 text-teal-700', confeitaria: 'bg-pink-100 text-pink-700',
+  salgados: 'bg-yellow-100 text-yellow-700', costura: 'bg-purple-100 text-purple-700',
   outros: 'bg-slate-100 text-slate-700'
 };
 
