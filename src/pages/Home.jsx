@@ -250,7 +250,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
-                {partners.slice(0, 4).map(partner => (
+                {partners.filter(p => p.partner_type !== 'empreendedor').slice(0, 4).map(partner => (
                   <Link key={partner.id} to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
                     <PartnerCard
                       partner={partner}
