@@ -176,57 +176,58 @@ export default function Subscription() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-6">
           {plans.map(plan => {
             const sub = getSubscriptionStatus(plan.type);
             const isActive = sub?.status === 'active';
             const isExpired = sub?.status === 'expired';
             const Icon = plan.icon;
 
+            const colorMap = {
+              emerald: { border: 'border-emerald-200', icon: 'bg-emerald-100', iconText: 'text-emerald-600', btn: 'bg-emerald-600 hover:bg-emerald-700', check: 'bg-emerald-100 text-emerald-600', badge: 'bg-emerald-500' },
+              amber:   { border: 'border-amber-300 shadow-lg shadow-amber-100', icon: 'bg-amber-100', iconText: 'text-amber-600', btn: 'bg-amber-500 hover:bg-amber-600', check: 'bg-amber-100 text-amber-600', badge: 'bg-amber-500' },
+              violet:  { border: 'border-violet-200', icon: 'bg-violet-100', iconText: 'text-violet-600', btn: 'bg-violet-600 hover:bg-violet-700', check: 'bg-violet-100 text-violet-600', badge: 'bg-violet-500' }
+            };
+            const c = colorMap[plan.color];
+
+            const descriptions = {
+              user: 'Para consumidores que querem economizar',
+              empreendedor: 'Autônomos e empreendedores individuais sem CNPJ',
+              partner: 'Para lojistas estabelecidos com CNPJ'
+            };
+
             return (
-              <Card 
+              <Card
                 key={plan.type}
-                className={`relative overflow-hidden border-2 transition-all ${
-                  plan.popular 
-                    ? 'border-violet-300 shadow-lg shadow-violet-100' 
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
+                className={`relative overflow-hidden border-2 transition-all ${c.border}`}
               >
                 {plan.popular && (
                   <div className="absolute top-0 right-0">
-                    <Badge className="rounded-none rounded-bl-lg bg-violet-500 hover:bg-violet-500">
+                    <Badge className={`rounded-none rounded-bl-lg ${c.badge} hover:${c.badge} text-white`}>
                       <Sparkles className="w-3 h-3 mr-1" />
-                      Popular
+                      {plan.badge || 'Popular'}
                     </Badge>
                   </div>
                 )}
 
                 <CardHeader className="pb-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
-                    plan.color === 'emerald' ? 'bg-emerald-100' : 'bg-violet-100'
-                  }`}>
-                    <Icon className={`w-7 h-7 ${
-                      plan.color === 'emerald' ? 'text-emerald-600' : 'text-violet-600'
-                    }`} />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${c.icon}`}>
+                    <Icon className={`w-7 h-7 ${c.iconText}`} />
                   </div>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription>
-                    {plan.type === 'user' 
-                      ? 'Para consumidores que querem economizar'
-                      : 'Para lojistas que querem vender mais'}
-                  </CardDescription>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardDescription>{descriptions[plan.type]}</CardDescription>
                 </CardHeader>
 
                 <CardContent>
                   <div className="mb-6">
-                    <span className="text-4xl font-bold text-slate-800">
+                    <span className="text-3xl font-bold text-slate-800">
                       R$ {plan.price.toFixed(2).replace('.', ',')}
                     </span>
                     <span className="text-slate-500">/{plan.period}</span>
                   </div>
 
                   {isActive && sub?.expires_at && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-6">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4">
                       <p className="text-sm text-emerald-700">
                         <Check className="w-4 h-4 inline mr-1" />
                         Ativo até {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
@@ -235,24 +236,20 @@ export default function Subscription() {
                   )}
 
                   {isExpired && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
                       <p className="text-sm text-amber-700">
                         Expirado em {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                   )}
 
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2.5 mb-6">
                     {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          plan.color === 'emerald' ? 'bg-emerald-100' : 'bg-violet-100'
-                        }`}>
-                          <Check className={`w-3 h-3 ${
-                            plan.color === 'emerald' ? 'text-emerald-600' : 'text-violet-600'
-                          }`} />
+                      <li key={i} className="flex items-start gap-2.5">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${c.check}`}>
+                          <Check className="w-3 h-3" />
                         </div>
-                        <span className="text-slate-600">{feature}</span>
+                        <span className="text-sm text-slate-600">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -260,26 +257,16 @@ export default function Subscription() {
                   <Button
                     onClick={() => handleSubscribe(plan.type)}
                     disabled={loading || isActive}
-                    className={`w-full h-12 text-base font-semibold ${
-                      plan.color === 'emerald'
-                        ? 'bg-emerald-600 hover:bg-emerald-700'
-                        : 'bg-violet-600 hover:bg-violet-700'
-                    } ${isActive ? 'opacity-50' : ''}`}
+                    className={`w-full h-11 text-sm font-semibold text-white ${c.btn} ${isActive ? 'opacity-50' : ''}`}
                   >
                     {loading && selectedPlan === plan.type ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : isActive ? (
                       'Plano Ativo'
                     ) : isExpired ? (
-                      <>
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Renovar Assinatura
-                      </>
+                      <><CreditCard className="w-4 h-4 mr-2" />Renovar</>
                     ) : (
-                      <>
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Assinar Agora
-                      </>
+                      <><CreditCard className="w-4 h-4 mr-2" />Assinar Agora</>
                     )}
                   </Button>
                 </CardContent>
