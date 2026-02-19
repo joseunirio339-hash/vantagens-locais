@@ -236,14 +236,27 @@ export default function Home() {
         )}
       </div>
 
-      <VoucherModal
-        open={voucherModalOpen}
-        onClose={() => setVoucherModalOpen(false)}
-        product={selectedProduct}
-        partner={selectedPartner}
-        user={user}
-        onSuccess={() => {}}
-      />
-    </div>
+      {selectedPartner?.partner_type === 'empreendedor' ? (
+        <EntrepreneurVoucherModal
+          open={voucherModalOpen}
+          onClose={() => setVoucherModalOpen(false)}
+          product={selectedProduct}
+          partner={selectedPartner}
+          user={user}
+          onSuccess={() => {}}
+        />
+      ) : (
+        <VoucherModal
+          open={voucherModalOpen}
+          onClose={() => setVoucherModalOpen(false)}
+          product={selectedProduct}
+          partner={selectedPartner}
+          user={user}
+          onSuccess={() => {}}
+        />
+      )}
+
+      {/* Seção de empreendedores na home */}
+      </div>
   );
 }
