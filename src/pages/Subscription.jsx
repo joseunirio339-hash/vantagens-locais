@@ -99,6 +99,9 @@ export default function Subscription() {
     };
   };
 
+  // Verifica se o usuário já usou o trial
+  const hasUsedTrial = existingSubscriptions.some(s => s.type === 'user' && s.is_trial === true);
+
   const handleSubscribe = async (planType) => {
     if (!user) {
       base44.auth.redirectToLogin(createPageUrl('Subscription'));
