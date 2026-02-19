@@ -243,22 +243,41 @@ export default function Subscription() {
 
                 <CardContent>
                   <div className="mb-6">
-                    <span className="text-3xl font-bold text-slate-800">
-                      R$ {plan.price.toFixed(2).replace('.', ',')}
-                    </span>
-                    <span className="text-slate-500">/{plan.period}</span>
+                    {isFreeTrial ? (
+                      <div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-bold text-emerald-600">GRÁTIS</span>
+                          <span className="text-slate-400 line-through text-sm">R$ {plan.price.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        <p className="text-xs text-emerald-600 mt-1">1º mês de teste • depois R$ {plan.price.toFixed(2).replace('.', ',')}/mês via ticket</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-3xl font-bold text-slate-800">
+                          R$ {plan.price.toFixed(2).replace('.', ',')}
+                        </span>
+                        <span className="text-slate-500">/{plan.period}</span>
+                      </div>
+                    )}
                   </div>
 
                   {isActive && sub?.expires_at && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4">
+                    <div className={`border rounded-xl p-3 mb-4 ${isTrial ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-50 border-emerald-200'}`}>
                       <p className="text-sm text-emerald-700">
                         <Check className="w-4 h-4 inline mr-1" />
-                        Ativo até {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
+                        {isTrial ? '🎁 Teste gratuito' : 'Ativo'} até {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                   )}
 
-                  {isExpired && (
+                  {isTrialExpired && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+                      <p className="text-sm text-amber-700 font-medium">Período de teste encerrado</p>
+                      <p className="text-xs text-amber-600 mt-1">Para continuar, use um ticket de acesso</p>
+                    </div>
+                  )}
+
+                  {isExpired && !isTrial && (
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
                       <p className="text-sm text-amber-700">
                         Expirado em {new Date(sub.expires_at).toLocaleDateString('pt-BR')}
