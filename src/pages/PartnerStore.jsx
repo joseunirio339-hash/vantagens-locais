@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
+import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 
 const categoryLabels = {
   restaurante: 'Restaurante',
@@ -18,6 +19,13 @@ const categoryLabels = {
   saude: 'Saúde',
   mercado: 'Mercado',
   servicos: 'Serviços',
+  doceria: '🍰 Doceria',
+  hamburgueria: '🍔 Hamburgueria',
+  trailer_food: '🚚 Trailer / Food Truck',
+  artesanato: '🎨 Artesanato',
+  confeitaria: '🎂 Confeitaria',
+  salgados: '🥟 Salgados',
+  costura: '🧵 Costura',
   outros: 'Outros'
 };
 
@@ -210,14 +218,25 @@ export default function PartnerStore() {
         )}
       </div>
 
-      <VoucherModal
-        open={voucherModalOpen}
-        onClose={() => setVoucherModalOpen(false)}
-        product={selectedProduct}
-        partner={partner}
-        user={user}
-        onSuccess={() => {}}
-      />
+      {partner?.partner_type === 'empreendedor' ? (
+        <EntrepreneurVoucherModal
+          open={voucherModalOpen}
+          onClose={() => setVoucherModalOpen(false)}
+          product={selectedProduct}
+          partner={partner}
+          user={user}
+          onSuccess={() => {}}
+        />
+      ) : (
+        <VoucherModal
+          open={voucherModalOpen}
+          onClose={() => setVoucherModalOpen(false)}
+          product={selectedProduct}
+          partner={partner}
+          user={user}
+          onSuccess={() => {}}
+        />
+      )}
     </div>
   );
 }
