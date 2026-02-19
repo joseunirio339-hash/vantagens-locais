@@ -23,12 +23,13 @@ const categoryColors = {
 };
 
 export default function PartnerCard({ partner, productCount = 0, onClick }) {
+  const isEmpreendedor = partner?.partner_type === 'empreendedor';
   return (
     <motion.div
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow p-4"
+      className={`bg-white rounded-2xl shadow-sm border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow p-4 ${isEmpreendedor ? 'border-amber-200' : 'border-slate-100'}`}
     >
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
