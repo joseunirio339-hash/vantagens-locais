@@ -118,7 +118,16 @@ export default function Subscription() {
 
     const existingSub = existingSubscriptions.find(s => s.type === planType);
 
+    // Para plano user sem assinatura anterior, ativar trial gratuito de 1 mês
+    const isFreeTrialEligible = planType === 'user' && !existingSub && !hasUsedTrial;
+
     if (existingSub) {
+      // Após trial expirado, só permite renovação via ticket (bloquear aqui)
+      if (existingSub.is_trial && existingSub.status !== 'active') {
+        setLoading(false);
+        toast.error('Seu período de teste expirou. Renove com um ticket de acesso.');
+        return;
+      }
       await base44.entities.Subscription.update(existingSub.id, {
         status: 'active',
         price: plan.price,
@@ -130,7 +139,8 @@ export default function Subscription() {
         user_email: user.email,
         type: planType,
         status: 'active',
-        price: plan.price,
+        price: isFreeTrialEligible ? 0 : plan.price,
+        is_trial: isFreeTrialEligible,
         starts_at: startsAt.toISOString().split('T')[0],
         expires_at: expiresAt.toISOString().split('T')[0]
       };
