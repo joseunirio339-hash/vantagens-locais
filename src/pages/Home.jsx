@@ -256,7 +256,6 @@ export default function Home() {
         />
       )}
 
-      {/* Seção de empreendedores na home */}
-      </div>
+    </div>
   );
 }
