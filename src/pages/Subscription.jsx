@@ -172,7 +172,7 @@ export default function Subscription() {
             Escolha seu Plano
           </h1>
           <p className="text-lg text-slate-500 max-w-xl mx-auto">
-            Acesse descontos exclusivos do comércio local ou cadastre sua loja como parceiro
+            Acesse descontos exclusivos do comércio local, cadastre seu negócio ou loja parceira
           </p>
         </div>
 
