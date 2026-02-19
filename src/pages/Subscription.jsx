@@ -135,6 +135,15 @@ export default function Subscription() {
         await base44.entities.Partner.create({
           business_name: user.full_name || 'Minha Loja',
           owner_email: user.email,
+          partner_type: 'lojista',
+          subscription_status: 'active',
+          subscription_expires_at: expiresAt.toISOString().split('T')[0]
+        });
+      } else if (planType === 'empreendedor') {
+        await base44.entities.Partner.create({
+          business_name: user.full_name || 'Meu Negócio',
+          owner_email: user.email,
+          partner_type: 'empreendedor',
           subscription_status: 'active',
           subscription_expires_at: expiresAt.toISOString().split('T')[0]
         });
@@ -144,7 +153,7 @@ export default function Subscription() {
     setLoading(false);
     toast.success('Assinatura ativada com sucesso!');
     
-    if (planType === 'partner') {
+    if (planType === 'partner' || planType === 'empreendedor') {
       window.location.href = createPageUrl('PartnerDashboard');
     } else {
       window.location.href = createPageUrl('Home');
