@@ -11,6 +11,7 @@ import ProductCard from '@/components/products/ProductCard';
 import PartnerCard from '@/components/partners/PartnerCard';
 import SubscriptionBanner from '@/components/ui/SubscriptionBanner';
 import VoucherModal from '@/components/voucher/VoucherModal';
+import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 
 export default function Home() {
   const [user, setUser] = useState(null);
