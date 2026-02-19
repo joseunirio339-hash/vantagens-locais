@@ -296,21 +296,32 @@ export default function Subscription() {
                     ))}
                   </ul>
 
-                  <Button
-                    onClick={() => handleSubscribe(plan.type)}
-                    disabled={loading || isActive}
-                    className={`w-full h-11 text-sm font-semibold text-white ${c.btn} ${isActive ? 'opacity-50' : ''}`}
-                  >
-                    {loading && selectedPlan === plan.type ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : isActive ? (
-                      'Plano Ativo'
-                    ) : isExpired ? (
-                      <><CreditCard className="w-4 h-4 mr-2" />Renovar</>
-                    ) : (
-                      <><CreditCard className="w-4 h-4 mr-2" />Assinar Agora</>
-                    )}
-                  </Button>
+                  {isTrialExpired ? (
+                    <div className="space-y-2">
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+                        <Ticket className="w-5 h-5 text-slate-400 mx-auto mb-1" />
+                        <p className="text-xs text-slate-500">Entre em contato para obter seu ticket de acesso e continuar usando o plano.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handleSubscribe(plan.type)}
+                      disabled={loading || isActive}
+                      className={`w-full h-11 text-sm font-semibold text-white ${c.btn} ${isActive ? 'opacity-50' : ''}`}
+                    >
+                      {loading && selectedPlan === plan.type ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : isActive ? (
+                        isTrial ? '🎁 Teste Ativo' : 'Plano Ativo'
+                      ) : isFreeTrial ? (
+                        <><Gift className="w-4 h-4 mr-2" />Ativar Mês Grátis</>
+                      ) : isExpired ? (
+                        <><CreditCard className="w-4 h-4 mr-2" />Renovar</>
+                      ) : (
+                        <><CreditCard className="w-4 h-4 mr-2" />Assinar Agora</>
+                      )}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );
