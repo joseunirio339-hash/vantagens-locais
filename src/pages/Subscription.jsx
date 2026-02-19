@@ -24,13 +24,31 @@ const plans = [
     ]
   },
   {
+    type: 'empreendedor',
+    name: 'Empreendedor Individual',
+    price: 49.99,
+    period: 'mês',
+    icon: Sparkles,
+    color: 'amber',
+    popular: true,
+    badge: '🤝 Sem CNPJ',
+    features: [
+      'Para doceiras, hamburguerias, trailers',
+      'Artesãos e trabalhadores autônomos',
+      'Cadastro de até 20 produtos/serviços',
+      'Painel completo de gestão',
+      'Vouchers e análises de vendas',
+      'Avaliações de clientes',
+      'Sem necessidade de CNPJ'
+    ]
+  },
+  {
     type: 'partner',
     name: 'Lojista Parceiro',
     price: 149.99,
     period: 'mês',
     icon: Store,
     color: 'violet',
-    popular: true,
     features: [
       'Cadastro de até 20 produtos',
       'Painel de gestão completo',
