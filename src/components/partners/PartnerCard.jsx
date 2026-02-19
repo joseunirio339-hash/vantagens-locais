@@ -48,9 +48,12 @@ export default function PartnerCard({ partner, productCount = 0, onClick }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-slate-800 truncate">
-              {partner.business_name}
-            </h3>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="font-semibold text-slate-800 truncate">{partner.business_name}</h3>
+              {isEmpreendedor && (
+                <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-1.5 py-0.5 whitespace-nowrap flex-shrink-0">🤝 Autônomo</span>
+              )}
+            </div>
             {partner.category && (
               <Badge className={`${categoryColors[partner.category]} text-xs flex-shrink-0`}>
                 {categoryLabels[partner.category]}
