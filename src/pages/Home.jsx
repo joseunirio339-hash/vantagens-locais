@@ -199,6 +199,34 @@ export default function Home() {
           </section>
         )}
 
+        {/* Empreendedores */}
+        {!searchTerm && (() => {
+          const empreendedores = partners.filter(p => p.partner_type === 'empreendedor');
+          if (empreendedores.length === 0) return null;
+          return (
+            <section className="mb-12">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">🤝 Empreendedores Locais</h2>
+                  <p className="text-slate-500">Autônomos e pequenos negócios sem CNPJ</p>
+                </div>
+                <Link to={createPageUrl('Partners')}>
+                  <Button variant="ghost" className="text-amber-600">
+                    Ver todos <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                {empreendedores.slice(0, 4).map(partner => (
+                  <Link key={partner.id} to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
+                    <PartnerCard partner={partner} productCount={getProductCount(partner.id)} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+
         {/* Partners */}
         {!searchTerm && (
           <section>
