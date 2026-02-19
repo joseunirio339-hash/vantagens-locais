@@ -167,7 +167,11 @@ export default function Subscription() {
     }
 
     setLoading(false);
-    toast.success('Assinatura ativada com sucesso!');
+    if (isFreeTrialEligible) {
+      toast.success('🎁 Período de teste gratuito ativado por 1 mês!');
+    } else {
+      toast.success('Assinatura ativada com sucesso!');
+    }
     
     if (planType === 'partner' || planType === 'empreendedor') {
       window.location.href = createPageUrl('PartnerDashboard');
