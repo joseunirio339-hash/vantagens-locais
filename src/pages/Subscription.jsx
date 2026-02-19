@@ -201,6 +201,9 @@ export default function Subscription() {
             const sub = getSubscriptionStatus(plan.type);
             const isActive = sub?.status === 'active';
             const isExpired = sub?.status === 'expired';
+            const isTrial = sub?.is_trial === true;
+            const isTrialExpired = isTrial && isExpired;
+            const isFreeTrial = plan.type === 'user' && !sub && !hasUsedTrial;
             const Icon = plan.icon;
 
             const colorMap = {
