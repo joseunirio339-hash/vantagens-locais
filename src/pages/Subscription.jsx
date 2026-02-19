@@ -328,9 +328,12 @@ export default function Subscription() {
           })}
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-8">
-          Pagamento único válido por 1 mês. Sem renovação automática.
-        </p>
+        <div className="mt-8 text-center space-y-1">
+          <p className="text-sm text-slate-500">Pagamento único válido por 1 mês. Sem renovação automática.</p>
+          <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
+            <Gift className="w-3 h-3" /> Plano Usuário inclui 1 mês gratuito para novos usuários. Renovação via ticket de acesso.
+          </p>
+        </div>
       </div>
     </div>
   );
