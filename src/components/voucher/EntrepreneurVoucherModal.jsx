@@ -32,6 +32,7 @@ export default function EntrepreneurVoucherModal({
 }) {
   const [cpf, setCpf] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [singleVoucher, setSingleVoucher] = useState(false);
   const [loading, setLoading] = useState(false);
   const [vouchers, setVouchers] = useState([]);
 
