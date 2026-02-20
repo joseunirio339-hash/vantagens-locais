@@ -49,7 +49,10 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     const createdVouchers = [];
-    for (let i = 0; i < quantity; i++) {
+    const isSingle = showSingleVoucherOption && useSingleVoucher;
+
+    if (isSingle) {
+      // 1 voucher único representando todas as unidades
       const v = await base44.entities.Voucher.create({
         code: generateVoucherCode(),
         product_id: product.id,
@@ -57,13 +60,30 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
         user_cpf: cleanCPF,
         user_name: user?.full_name || '',
         user_email: user?.email || '',
-        product_name: product.name,
-        original_price: product.original_price,
-        discount_price: product.discount_price,
+        product_name: `${product.name} (${quantity}x)`,
+        original_price: product.original_price * quantity,
+        discount_price: product.discount_price * quantity,
         status: 'pending',
         expires_at: expiresAt.toISOString().split('T')[0]
       });
       createdVouchers.push(v);
+    } else {
+      for (let i = 0; i < quantity; i++) {
+        const v = await base44.entities.Voucher.create({
+          code: generateVoucherCode(),
+          product_id: product.id,
+          partner_id: partner.id,
+          user_cpf: cleanCPF,
+          user_name: user?.full_name || '',
+          user_email: user?.email || '',
+          product_name: product.name,
+          original_price: product.original_price,
+          discount_price: product.discount_price,
+          status: 'pending',
+          expires_at: expiresAt.toISOString().split('T')[0]
+        });
+        createdVouchers.push(v);
+      }
     }
 
     await base44.entities.Notification.create({
