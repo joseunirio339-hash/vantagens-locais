@@ -121,11 +121,11 @@ export default function EntrepreneurVoucherModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <ShoppingBag className="w-5 h-5 text-amber-500" />
-            {voucher ? 'Voucher Gerado com Sucesso!' : 'Garantir Desconto'}
+            {vouchers.length > 0 ? 'Vouchers Gerados com Sucesso!' : 'Garantir Desconto'}
           </DialogTitle>
         </DialogHeader>
 
-        {!voucher ? (
+        {vouchers.length === 0 ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Card do empreendedor */}
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
@@ -159,11 +159,7 @@ export default function EntrepreneurVoucherModal({
             {/* Produto */}
             <div className="bg-white border border-slate-200 rounded-xl p-4">
               {product?.image_url && (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-32 object-cover rounded-lg mb-3"
-                />
+                <img src={product.image_url} alt={product.name} className="w-full h-28 object-cover rounded-lg mb-3" />
               )}
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -174,21 +170,44 @@ export default function EntrepreneurVoucherModal({
                 </div>
                 {discountPct > 0 && (
                   <Badge className="bg-emerald-500 text-white border-0 flex-shrink-0">
-                    <Tag className="w-3 h-3 mr-1" />
-                    -{discountPct}%
+                    <Tag className="w-3 h-3 mr-1" />-{discountPct}%
                   </Badge>
                 )}
               </div>
-              <div className="flex items-baseline gap-2 mt-3">
-                <span className="text-2xl font-bold text-emerald-600">
-                  R$ {product?.discount_price?.toFixed(2).replace('.', ',')}
-                </span>
-                <span className="text-sm text-slate-400 line-through">
-                  R$ {product?.original_price?.toFixed(2).replace('.', ',')}
-                </span>
-                <span className="text-sm text-emerald-600 font-medium">
-                  economia de R$ {((product?.original_price || 0) - (product?.discount_price || 0)).toFixed(2).replace('.', ',')}
-                </span>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-xl font-bold text-emerald-600">R$ {product?.discount_price?.toFixed(2).replace('.', ',')}</span>
+                <span className="text-sm text-slate-400 line-through">R$ {product?.original_price?.toFixed(2).replace('.', ',')}</span>
+                <span className="text-xs text-emerald-600 font-medium">por unidade</span>
+              </div>
+            </div>
+
+            {/* Quantidade */}
+            <div className="space-y-2">
+              <Label>Quantidade</Label>
+              <div className="flex items-center gap-3">
+                <Button type="button" variant="outline" size="icon" onClick={() => setQuantity(q => Math.max(1, q - 1))}>
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <span className="text-xl font-bold text-slate-800 w-10 text-center">{quantity}</span>
+                <Button type="button" variant="outline" size="icon" onClick={() => setQuantity(q => Math.min(20, q + 1))}>
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Resumo do total */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 text-sm">
+              <div className="flex justify-between text-slate-500">
+                <span>Subtotal original ({quantity}x)</span>
+                <span className="line-through">R$ {totalOriginal.toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div className="flex justify-between text-emerald-700 font-medium">
+                <span>Economia total</span>
+                <span>- R$ {economia.toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div className="border-t border-emerald-200 pt-2 flex justify-between font-bold text-slate-800 text-base">
+                <span>Total com desconto</span>
+                <span className="text-emerald-600">R$ {totalDesconto.toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
 
@@ -203,9 +222,7 @@ export default function EntrepreneurVoucherModal({
                 maxLength={14}
                 required
               />
-              <p className="text-xs text-slate-500">
-                O CPF identifica seu voucher na hora da compra
-              </p>
+              <p className="text-xs text-slate-500">O CPF identifica seu voucher na hora da compra</p>
             </div>
 
             <Button
@@ -218,22 +235,29 @@ export default function EntrepreneurVoucherModal({
               ) : (
                 <Ticket className="w-5 h-5 mr-2" />
               )}
-              Gerar Meu Voucher de Desconto
+              {quantity > 1 ? `Gerar ${quantity} Vouchers` : 'Gerar Meu Voucher de Desconto'}
             </Button>
           </form>
         ) : (
           <div className="space-y-4">
             {/* Sucesso */}
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-300 rounded-2xl p-6 text-center">
-              <CheckCircle className="w-14 h-14 text-emerald-500 mx-auto mb-3" />
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-300 rounded-2xl p-5 text-center">
+              <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
               <p className="text-sm text-slate-600 mb-1 font-medium">{partner?.business_name}</p>
-              <p className="text-xs text-slate-400 mb-3">{categoryLabel}</p>
-              <p className="text-sm text-slate-600 mb-2">Código do Voucher</p>
-              <p className="text-4xl font-bold text-emerald-600 tracking-widest font-mono">
-                {voucher.code}
-              </p>
+              <p className="text-xs text-slate-400 mb-2">{categoryLabel}</p>
+              {vouchers.length === 1 ? (
+                <p className="text-4xl font-bold text-emerald-600 tracking-widest font-mono">{vouchers[0].code}</p>
+              ) : (
+                <div className="flex flex-wrap gap-2 justify-center mt-1">
+                  {vouchers.map((v, i) => (
+                    <span key={i} className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
+                      {v.code}
+                    </span>
+                  ))}
+                </div>
+              )}
               <p className="text-xs text-slate-500 mt-3">
-                Válido por 7 dias • até {new Date(voucher.expires_at).toLocaleDateString('pt-BR')}
+                Válido por 7 dias • até {new Date(vouchers[0].expires_at).toLocaleDateString('pt-BR')}
               </p>
             </div>
 
@@ -241,32 +265,32 @@ export default function EntrepreneurVoucherModal({
             <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Produto</span>
-                <span className="font-medium text-right max-w-[60%]">{voucher.product_name}</span>
+                <span className="font-medium text-right max-w-[60%]">{vouchers[0].product_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Quantidade</span>
+                <span className="font-medium">{vouchers.length}x</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Preço original</span>
-                <span className="line-through text-slate-400">
-                  R$ {voucher.original_price?.toFixed(2).replace('.', ',')}
-                </span>
+                <span className="line-through text-slate-400">R$ {(vouchers[0].original_price * vouchers.length).toFixed(2).replace('.', ',')}</span>
               </div>
               <div className="flex justify-between border-t pt-2 mt-2">
-                <span className="text-slate-700 font-semibold">Você paga</span>
+                <span className="text-slate-700 font-semibold">Total com desconto</span>
                 <span className="font-bold text-emerald-600 text-base">
-                  R$ {voucher.discount_price?.toFixed(2).replace('.', ',')}
+                  R$ {(vouchers[0].discount_price * vouchers.length).toFixed(2).replace('.', ',')}
                 </span>
               </div>
             </div>
 
             {/* Instrução */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-              <p className="text-xs text-amber-700 text-center flex items-center justify-center gap-1">
-                <Star className="w-3 h-3" />
-                Apresente este código ao empreendedor e informe seu CPF para usar o desconto
+              <p className="text-xs text-amber-700 text-center">
+                Apresente os códigos ao empreendedor e informe seu CPF para usar o desconto
               </p>
               {partner?.phone && (
                 <p className="text-xs text-amber-600 text-center mt-1 flex items-center justify-center gap-1">
-                  <Phone className="w-3 h-3" />
-                  Contato: {partner.phone}
+                  <Phone className="w-3 h-3" /> Contato: {partner.phone}
                 </p>
               )}
             </div>
