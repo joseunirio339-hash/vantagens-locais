@@ -3,13 +3,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Ticket, CheckCircle, Loader2, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { Ticket, CheckCircle, Loader2, ShoppingCart, Plus, Minus, Package } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
 export default function VoucherModal({ open, onClose, product, partner, user, onSuccess }) {
   const [cpf, setCpf] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [singleVoucher, setSingleVoucher] = useState(false);
   const [loading, setLoading] = useState(false);
   const [vouchers, setVouchers] = useState([]);
 
