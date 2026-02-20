@@ -62,9 +62,26 @@ export default function Home() {
     p.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const featuredProducts = [...activeProducts]
-    .sort((a, b) => (b.views_count || 0) - (a.views_count || 0))
-    .slice(0, 6);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShuffleSeed(s => s + 1);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const featuredProducts = React.useMemo(() => {
+    const sorted = [...activeProducts].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
+    const top = sorted.slice(0, 8);
+    // embaralha aleatoriamente a cada tick
+    for (let i = top.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [top[i], top[j]] = [top[j], top[i]];
+    }
+    return top.slice(0, 6);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shuffleSeed, activeProducts.length]);
 
   const handleProductClick = async (product) => {
     if (!user) {
