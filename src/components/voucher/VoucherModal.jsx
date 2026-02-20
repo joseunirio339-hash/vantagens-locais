@@ -160,6 +160,33 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
               </div>
             </div>
 
+            {/* Opção voucher único (acima de 3 itens) */}
+            {showSingleVoucherOption && (
+              <div
+                onClick={() => setUseSingleVoucher(v => !v)}
+                className={`cursor-pointer flex items-start gap-3 border-2 rounded-xl p-3 transition-all ${
+                  useSingleVoucher
+                    ? 'border-violet-400 bg-violet-50'
+                    : 'border-slate-200 bg-white hover:border-violet-200'
+                }`}
+              >
+                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                  useSingleVoucher ? 'border-violet-500 bg-violet-500' : 'border-slate-300'
+                }`}>
+                  {useSingleVoucher && <div className="w-2 h-2 rounded-full bg-white" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Package className="w-4 h-4 text-violet-600" />
+                    <span className="text-sm font-semibold text-slate-800">Voucher Único de Compra</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Gera 1 código único para todas as {quantity} unidades. Ideal para compras em lote — apresente um só código na loja.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Resumo do total */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between text-slate-500">
