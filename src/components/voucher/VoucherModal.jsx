@@ -104,6 +104,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
   const handleClose = () => {
     setCpf('');
     setQuantity(1);
+    setUseSingleVoucher(false);
     setVouchers([]);
     onClose();
   };
