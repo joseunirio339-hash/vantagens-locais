@@ -217,6 +217,29 @@ export default function EntrepreneurVoucherModal({
               </div>
             </div>
 
+            {/* Voucher único — aparece só a partir de 3 unidades */}
+            {quantity >= 3 && (
+              <div
+                onClick={() => setSingleVoucher(v => !v)}
+                className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  singleVoucher
+                    ? 'border-amber-500 bg-amber-50'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${singleVoucher ? 'bg-amber-500' : 'bg-slate-100'}`}>
+                  <Package className={`w-5 h-5 ${singleVoucher ? 'text-white' : 'text-slate-400'}`} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-800">Voucher único para {quantity} unidades</p>
+                  <p className="text-xs text-slate-500">Um código só para toda a compra — ideal para retirada em lote</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${singleVoucher ? 'border-amber-500 bg-amber-500' : 'border-slate-300'}`}>
+                  {singleVoucher && <div className="w-2 h-2 rounded-full bg-white" />}
+                </div>
+              </div>
+            )}
+
             {/* Resumo do total */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between text-slate-500">
