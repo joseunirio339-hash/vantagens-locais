@@ -34,6 +34,8 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
   const totalDesconto = (product?.discount_price || 0) * quantity;
   const economia = totalOriginal - totalDesconto;
 
+  const useUnified = singleVoucher && quantity >= 3;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cleanCPF = cpf.replace(/\D/g, '');
@@ -47,7 +49,9 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     const createdVouchers = [];
-    for (let i = 0; i < quantity; i++) {
+
+    if (useUnified) {
+      // Voucher único representando toda a quantidade
       const v = await base44.entities.Voucher.create({
         code: generateVoucherCode(),
         product_id: product.id,
@@ -55,33 +59,51 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
         user_cpf: cleanCPF,
         user_name: user?.full_name || '',
         user_email: user?.email || '',
-        product_name: product.name,
-        original_price: product.original_price,
-        discount_price: product.discount_price,
+        product_name: `${product.name} (x${quantity})`,
+        original_price: product.original_price * quantity,
+        discount_price: product.discount_price * quantity,
         status: 'pending',
         expires_at: expiresAt.toISOString().split('T')[0]
       });
       createdVouchers.push(v);
+    } else {
+      for (let i = 0; i < quantity; i++) {
+        const v = await base44.entities.Voucher.create({
+          code: generateVoucherCode(),
+          product_id: product.id,
+          partner_id: partner.id,
+          user_cpf: cleanCPF,
+          user_name: user?.full_name || '',
+          user_email: user?.email || '',
+          product_name: product.name,
+          original_price: product.original_price,
+          discount_price: product.discount_price,
+          status: 'pending',
+          expires_at: expiresAt.toISOString().split('T')[0]
+        });
+        createdVouchers.push(v);
+      }
     }
 
     await base44.entities.Notification.create({
       partner_id: partner.id,
       type: 'new_voucher',
       title: 'Novo Voucher Gerado!',
-      message: `${user?.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
+      message: `${user?.full_name || 'Um cliente'} gerou ${useUnified ? 'voucher único' : `${quantity} vouchers`} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
       is_read: false,
       reference_id: createdVouchers[0].id
     });
 
     setVouchers(createdVouchers);
     setLoading(false);
-    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
+    toast.success(useUnified ? 'Voucher único gerado com sucesso!' : `${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
     onSuccess?.(createdVouchers[0]);
   };
 
   const handleClose = () => {
     setCpf('');
     setQuantity(1);
+    setSingleVoucher(false);
     setVouchers([]);
     onClose();
   };
@@ -136,6 +158,29 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
                 </Button>
               </div>
             </div>
+
+            {/* Voucher único — aparece só a partir de 3 unidades */}
+            {quantity >= 3 && (
+              <div
+                onClick={() => setSingleVoucher(v => !v)}
+                className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                  singleVoucher
+                    ? 'border-emerald-500 bg-emerald-50'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${singleVoucher ? 'bg-emerald-500' : 'bg-slate-100'}`}>
+                  <Package className={`w-5 h-5 ${singleVoucher ? 'text-white' : 'text-slate-400'}`} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-800">Voucher único para {quantity} unidades</p>
+                  <p className="text-xs text-slate-500">Um código só para toda a compra — ideal para retirada em lote</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${singleVoucher ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>
+                  {singleVoucher && <div className="w-2 h-2 rounded-full bg-white" />}
+                </div>
+              </div>
+            )}
 
             {/* Resumo do total */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 text-sm">
