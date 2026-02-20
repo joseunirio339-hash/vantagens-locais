@@ -7,14 +7,7 @@ import { Ticket, CheckCircle, Loader2, ShoppingCart, Plus, Minus } from 'lucide-
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
-export default function VoucherModal({ 
-  open, 
-  onClose, 
-  product, 
-  partner,
-  user,
-  onSuccess 
-}) {
+export default function VoucherModal({ open, onClose, product, partner, user, onSuccess }) {
   const [cpf, setCpf] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -32,15 +25,16 @@ export default function VoucherModal({
   const generateVoucherCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
-    for (let i = 0; i < 8; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
     return code;
   };
 
+  const totalOriginal = (product?.original_price || 0) * quantity;
+  const totalDesconto = (product?.discount_price || 0) * quantity;
+  const economia = totalOriginal - totalDesconto;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const cleanCPF = cpf.replace(/\D/g, '');
     if (cleanCPF.length !== 11) {
       toast.error('CPF inválido. Digite os 11 dígitos.');
@@ -48,43 +42,46 @@ export default function VoucherModal({
     }
 
     setLoading(true);
-
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    const newVoucher = await base44.entities.Voucher.create({
-      code: generateVoucherCode(),
-      product_id: product.id,
-      partner_id: partner.id,
-      user_cpf: cleanCPF,
-      user_name: user?.full_name || '',
-      user_email: user?.email || '',
-      product_name: product.name,
-      original_price: product.original_price,
-      discount_price: product.discount_price,
-      status: 'pending',
-      expires_at: expiresAt.toISOString().split('T')[0]
-    });
+    const createdVouchers = [];
+    for (let i = 0; i < quantity; i++) {
+      const v = await base44.entities.Voucher.create({
+        code: generateVoucherCode(),
+        product_id: product.id,
+        partner_id: partner.id,
+        user_cpf: cleanCPF,
+        user_name: user?.full_name || '',
+        user_email: user?.email || '',
+        product_name: product.name,
+        original_price: product.original_price,
+        discount_price: product.discount_price,
+        status: 'pending',
+        expires_at: expiresAt.toISOString().split('T')[0]
+      });
+      createdVouchers.push(v);
+    }
 
-    // Notify partner
     await base44.entities.Notification.create({
       partner_id: partner.id,
       type: 'new_voucher',
       title: 'Novo Voucher Gerado!',
-      message: `${user?.full_name || 'Um cliente'} gerou um voucher para "${product.name}" (R$ ${product.discount_price?.toFixed(2).replace('.', ',')})`,
+      message: `${user?.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
       is_read: false,
-      reference_id: newVoucher.id
+      reference_id: createdVouchers[0].id
     });
 
-    setVoucher(newVoucher);
+    setVouchers(createdVouchers);
     setLoading(false);
-    toast.success('Voucher gerado com sucesso!');
-    onSuccess?.(newVoucher);
+    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
+    onSuccess?.(createdVouchers[0]);
   };
 
   const handleClose = () => {
     setCpf('');
-    setVoucher(null);
+    setQuantity(1);
+    setVouchers([]);
     onClose();
   };
 
@@ -93,26 +90,69 @@ export default function VoucherModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Ticket className="w-5 h-5 text-emerald-600" />
-            {voucher ? 'Voucher Gerado!' : 'Gerar Voucher de Desconto'}
+            <ShoppingCart className="w-5 h-5 text-emerald-600" />
+            {vouchers.length > 0 ? 'Vouchers Gerados!' : 'Gerar Voucher de Desconto'}
           </DialogTitle>
         </DialogHeader>
 
-        {!voucher ? (
+        {vouchers.length === 0 ? (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Produto */}
             <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-sm text-slate-600 mb-1">{partner?.business_name}</p>
+              <p className="text-sm text-slate-500 mb-1">{partner?.business_name}</p>
               <h3 className="font-semibold text-slate-800">{product?.name}</h3>
-              <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-xl font-bold text-emerald-600">
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-lg font-bold text-emerald-600">
                   R$ {product?.discount_price?.toFixed(2).replace('.', ',')}
                 </span>
                 <span className="text-sm text-slate-400 line-through">
                   R$ {product?.original_price?.toFixed(2).replace('.', ',')}
                 </span>
+                <span className="text-xs text-emerald-600 font-medium">por unidade</span>
               </div>
             </div>
 
+            {/* Quantidade */}
+            <div className="space-y-2">
+              <Label>Quantidade</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+                <span className="text-xl font-bold text-slate-800 w-10 text-center">{quantity}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(q => Math.min(20, q + 1))}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Resumo do total */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2 text-sm">
+              <div className="flex justify-between text-slate-500">
+                <span>Subtotal original ({quantity}x)</span>
+                <span className="line-through">R$ {totalOriginal.toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div className="flex justify-between text-emerald-700 font-medium">
+                <span>Economia total</span>
+                <span>- R$ {economia.toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div className="border-t border-emerald-200 pt-2 flex justify-between font-bold text-slate-800 text-base">
+                <span>Total com desconto</span>
+                <span className="text-emerald-600">R$ {totalDesconto.toFixed(2).replace('.', ',')}</span>
+              </div>
+            </div>
+
+            {/* CPF */}
             <div className="space-y-2">
               <Label htmlFor="cpf">CPF do Comprador</Label>
               <Input
@@ -123,14 +163,12 @@ export default function VoucherModal({
                 maxLength={14}
                 required
               />
-              <p className="text-xs text-slate-500">
-                O CPF será usado para identificar o voucher na loja
-              </p>
+              <p className="text-xs text-slate-500">O CPF será usado para identificar o voucher na loja</p>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
+            <Button
+              type="submit"
+              className="w-full h-11 bg-emerald-600 hover:bg-emerald-700"
               disabled={loading}
             >
               {loading ? (
@@ -138,42 +176,54 @@ export default function VoucherModal({
               ) : (
                 <Ticket className="w-4 h-4 mr-2" />
               )}
-              Gerar Voucher
+              {quantity > 1 ? `Gerar ${quantity} Vouchers` : 'Gerar Voucher'}
             </Button>
           </form>
         ) : (
           <div className="space-y-4">
-            <div className="bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-xl p-6 text-center">
-              <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-              <p className="text-sm text-slate-600 mb-1">Código do Voucher</p>
-              <p className="text-3xl font-bold text-emerald-600 tracking-wider">
-                {voucher.code}
+            <div className="bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-xl p-5 text-center">
+              <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
+              <p className="text-sm text-slate-600 mb-1 font-medium">
+                {vouchers.length} Voucher{vouchers.length > 1 ? 's' : ''} gerado{vouchers.length > 1 ? 's' : ''}!
               </p>
+              {vouchers.length === 1 ? (
+                <p className="text-3xl font-bold text-emerald-600 tracking-wider">{vouchers[0].code}</p>
+              ) : (
+                <div className="flex flex-wrap gap-2 justify-center mt-2">
+                  {vouchers.map((v, i) => (
+                    <span key={i} className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
+                      {v.code}
+                    </span>
+                  ))}
+                </div>
+              )}
               <p className="text-xs text-slate-500 mt-2">
-                Válido até {new Date(voucher.expires_at).toLocaleDateString('pt-BR')}
+                Válido até {new Date(vouchers[0].expires_at).toLocaleDateString('pt-BR')}
               </p>
             </div>
 
             <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Produto</span>
-                <span className="font-medium">{voucher.product_name}</span>
+                <span className="font-medium">{vouchers[0].product_name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Quantidade</span>
+                <span className="font-medium">{vouchers.length}x</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">CPF</span>
-                <span className="font-medium">{formatCPF(voucher.user_cpf)}</span>
+                <span className="font-medium">{formatCPF(vouchers[0].user_cpf)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Valor com Desconto</span>
-                <span className="font-bold text-emerald-600">
-                  R$ {voucher.discount_price?.toFixed(2).replace('.', ',')}
+              <div className="border-t pt-2 flex justify-between font-bold text-base">
+                <span className="text-slate-700">Total com Desconto</span>
+                <span className="text-emerald-600">
+                  R$ {(vouchers[0].discount_price * vouchers.length).toFixed(2).replace('.', ',')}
                 </span>
               </div>
             </div>
 
-            <p className="text-xs text-center text-slate-500">
-              Apresente este código na loja para usar o desconto
-            </p>
+            <p className="text-xs text-center text-slate-500">Apresente os códigos na loja para usar o desconto</p>
 
             <Button onClick={handleClose} className="w-full" variant="outline">
               Fechar
