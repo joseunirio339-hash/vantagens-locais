@@ -227,7 +227,9 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
               ) : (
                 <Ticket className="w-4 h-4 mr-2" />
               )}
-              {quantity > 1 ? `Gerar ${quantity} Vouchers` : 'Gerar Voucher'}
+              {showSingleVoucherOption && useSingleVoucher
+                ? `Gerar 1 Voucher Único (${quantity}x)`
+                : quantity > 1 ? `Gerar ${quantity} Vouchers` : 'Gerar Voucher'}
             </Button>
           </form>
         ) : (
