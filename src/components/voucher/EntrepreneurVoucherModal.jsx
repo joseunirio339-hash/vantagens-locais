@@ -31,8 +31,9 @@ export default function EntrepreneurVoucherModal({
   onSuccess
 }) {
   const [cpf, setCpf] = useState('');
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [voucher, setVoucher] = useState(null);
+  const [vouchers, setVouchers] = useState([]);
 
   const formatCPF = (value) => {
     const numbers = value.replace(/\D/g, '');
