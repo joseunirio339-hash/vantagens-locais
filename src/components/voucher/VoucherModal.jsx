@@ -34,8 +34,6 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
   const totalDesconto = (product?.discount_price || 0) * quantity;
   const economia = totalOriginal - totalDesconto;
 
-  const useUnified = singleVoucher && quantity >= 3;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cleanCPF = cpf.replace(/\D/g, '');
@@ -49,9 +47,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
     expiresAt.setDate(expiresAt.getDate() + 7);
 
     const createdVouchers = [];
-
-    if (useUnified) {
-      // Voucher único representando toda a quantidade
+    for (let i = 0; i < quantity; i++) {
       const v = await base44.entities.Voucher.create({
         code: generateVoucherCode(),
         product_id: product.id,
@@ -59,51 +55,33 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
         user_cpf: cleanCPF,
         user_name: user?.full_name || '',
         user_email: user?.email || '',
-        product_name: `${product.name} (x${quantity})`,
-        original_price: product.original_price * quantity,
-        discount_price: product.discount_price * quantity,
+        product_name: product.name,
+        original_price: product.original_price,
+        discount_price: product.discount_price,
         status: 'pending',
         expires_at: expiresAt.toISOString().split('T')[0]
       });
       createdVouchers.push(v);
-    } else {
-      for (let i = 0; i < quantity; i++) {
-        const v = await base44.entities.Voucher.create({
-          code: generateVoucherCode(),
-          product_id: product.id,
-          partner_id: partner.id,
-          user_cpf: cleanCPF,
-          user_name: user?.full_name || '',
-          user_email: user?.email || '',
-          product_name: product.name,
-          original_price: product.original_price,
-          discount_price: product.discount_price,
-          status: 'pending',
-          expires_at: expiresAt.toISOString().split('T')[0]
-        });
-        createdVouchers.push(v);
-      }
     }
 
     await base44.entities.Notification.create({
       partner_id: partner.id,
       type: 'new_voucher',
       title: 'Novo Voucher Gerado!',
-      message: `${user?.full_name || 'Um cliente'} gerou ${useUnified ? 'voucher único' : `${quantity} vouchers`} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
+      message: `${user?.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
       is_read: false,
       reference_id: createdVouchers[0].id
     });
 
     setVouchers(createdVouchers);
     setLoading(false);
-    toast.success(useUnified ? 'Voucher único gerado com sucesso!' : `${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
+    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
     onSuccess?.(createdVouchers[0]);
   };
 
   const handleClose = () => {
     setCpf('');
     setQuantity(1);
-    setSingleVoucher(false);
     setVouchers([]);
     onClose();
   };
