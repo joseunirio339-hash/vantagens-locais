@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Ticket, CheckCircle, Loader2, ShoppingCart, Plus, Minus, Package } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function VoucherModal({ open, onClose, product, partner, user, onSuccess }) {
   const [cpf, setCpf] = useState('');
@@ -240,13 +241,21 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
                 {vouchers.length} Voucher{vouchers.length > 1 ? 's' : ''} gerado{vouchers.length > 1 ? 's' : ''}!
               </p>
               {vouchers.length === 1 ? (
-                <p className="text-3xl font-bold text-emerald-600 tracking-wider">{vouchers[0].code}</p>
+                <>
+                  <div className="flex justify-center my-3">
+                    <QRCodeSVG value={vouchers[0].code} size={160} bgColor="#f0fdf4" fgColor="#065f46" level="M" />
+                  </div>
+                  <p className="text-2xl font-bold text-emerald-600 tracking-wider font-mono">{vouchers[0].code}</p>
+                </>
               ) : (
                 <div className="flex flex-wrap gap-2 justify-center mt-2">
                   {vouchers.map((v, i) => (
-                    <span key={i} className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
-                      {v.code}
-                    </span>
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <QRCodeSVG value={v.code} size={100} bgColor="#f0fdf4" fgColor="#065f46" level="M" />
+                      <span className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
+                        {v.code}
+                      </span>
+                    </div>
                   ))}
                 </div>
               )}

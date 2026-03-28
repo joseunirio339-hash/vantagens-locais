@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Ticket, CheckCircle, Loader2, ShoppingBag, MapPin, Phone, Tag, Plus, Minus, Package } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { QRCodeSVG } from 'qrcode.react';
 
 const categoryLabels = {
   doceria: '🍰 Doceria',
@@ -291,13 +292,21 @@ export default function EntrepreneurVoucherModal({
               <p className="text-sm text-slate-600 mb-1 font-medium">{partner?.business_name}</p>
               <p className="text-xs text-slate-400 mb-2">{categoryLabel}</p>
               {vouchers.length === 1 ? (
-                <p className="text-4xl font-bold text-emerald-600 tracking-widest font-mono">{vouchers[0].code}</p>
+                <>
+                  <div className="flex justify-center my-3">
+                    <QRCodeSVG value={vouchers[0].code} size={160} bgColor="#fffbeb" fgColor="#92400e" level="M" />
+                  </div>
+                  <p className="text-3xl font-bold text-emerald-600 tracking-widest font-mono">{vouchers[0].code}</p>
+                </>
               ) : (
                 <div className="flex flex-wrap gap-2 justify-center mt-1">
                   {vouchers.map((v, i) => (
-                    <span key={i} className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
-                      {v.code}
-                    </span>
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <QRCodeSVG value={v.code} size={100} bgColor="#fffbeb" fgColor="#92400e" level="M" />
+                      <span className="bg-white border border-emerald-300 rounded-lg px-3 py-1 text-sm font-bold text-emerald-700 tracking-wider">
+                        {v.code}
+                      </span>
+                    </div>
                   ))}
                 </div>
               )}
