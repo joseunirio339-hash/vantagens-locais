@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
   Store, Package, Eye, Ticket, TrendingUp, 
-  Settings, BarChart3, AlertTriangle, Star, ShoppingBag
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import VoucherManagement from '@/components/partner/VoucherManagement';
 import NotificationBell from '@/components/partner/NotificationBell';
 import PartnerReviews from '@/components/partner/PartnerReviews';
 import SalesOverview from '@/components/partner/SalesOverview';
+import QRScanner from '@/components/partner/QRScanner';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -241,6 +242,10 @@ export default function PartnerDashboard() {
               <Star className="w-4 h-4" />
               Avaliações
             </TabsTrigger>
+            <TabsTrigger value="qrscanner" className="flex items-center gap-2">
+              <QrCode className="w-4 h-4" />
+              Ler QR Code
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -278,6 +283,13 @@ export default function PartnerDashboard() {
 
           <TabsContent value="reviews">
             <PartnerReviews partnerId={partner?.id} />
+          </TabsContent>
+
+          <TabsContent value="qrscanner">
+            <QRScanner
+              partner={partner}
+              onValidated={() => queryClient.invalidateQueries(['partnerVouchers'])}
+            />
           </TabsContent>
 
           <TabsContent value="settings">
