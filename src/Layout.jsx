@@ -60,7 +60,7 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-fuchsia-500 rounded-xl flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="font-bold text-xl text-slate-800 hidden sm:block">
@@ -78,7 +78,7 @@ export default function Layout({ children }) {
                     to={createPageUrl(item.href)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                       isActive(item.href)
-                        ? 'bg-emerald-100 text-emerald-700'
+                        ? 'bg-violet-100 text-violet-700'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -145,7 +145,7 @@ export default function Layout({ children }) {
               ) : (
                 <Button
                   onClick={() => base44.auth.redirectToLogin()}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white border-0"
                 >
                   <User className="w-4 h-4 mr-2" />
                   Entrar
@@ -182,7 +182,7 @@ export default function Layout({ children }) {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-3 ${
                       isActive(item.href)
-                        ? 'bg-emerald-100 text-emerald-700'
+                        ? 'bg-violet-100 text-violet-700'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -204,7 +204,7 @@ export default function Layout({ children }) {
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-fuchsia-500 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold text-slate-700">Descontos Locais</span>

@@ -25,6 +25,7 @@ export default function PartnerDashboard() {
   const [partner, setPartner] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('products');
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -189,6 +190,25 @@ export default function PartnerDashboard() {
           </div>
         )}
 
+        {/* QR Scanner Destaque */}
+        <div
+          className="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-5 mb-6 flex items-center justify-between cursor-pointer hover:from-violet-700 hover:to-fuchsia-700 transition-all shadow-lg"
+          onClick={() => setActiveTab('qrscanner')}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+              <QrCode className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg">Validar Voucher do Cliente</h3>
+              <p className="text-violet-100 text-sm">Escaneie o QR Code para confirmar o desconto na hora</p>
+            </div>
+          </div>
+          <div className="bg-white text-violet-700 font-semibold text-sm px-5 py-2.5 rounded-xl shadow hidden sm:block">
+            Abrir Scanner →
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, i) => {
             const Icon = stat.icon;
@@ -220,7 +240,7 @@ export default function PartnerDashboard() {
           })}
         </div>
 
-        <Tabs defaultValue="products" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border flex-wrap h-auto gap-1 p-1">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="w-4 h-4" />

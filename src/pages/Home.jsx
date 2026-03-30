@@ -124,29 +124,39 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white">
+      <div className="bg-gradient-to-br from-violet-700 via-fuchsia-600 to-pink-500 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12 md:py-20">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 mb-4">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">Descontos exclusivos</span>
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            {/* Text side */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 mb-4">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-medium">Descontos exclusivos</span>
+              </div>
+              <h1 className="text-3xl md:text-5xl font-bold mb-4">
+                Economize no comércio local
+              </h1>
+              <p className="text-lg text-pink-100 max-w-xl mb-8">
+                Descubra ofertas incríveis dos melhores estabelecimentos da sua região
+              </p>
+              <div className="max-w-xl relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input
+                  placeholder="Buscar produtos ou lojas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 h-14 rounded-2xl border-0 shadow-lg text-slate-800"
+                />
+              </div>
             </div>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">
-              Economize no comércio local
-            </h1>
-            <p className="text-lg text-emerald-100 max-w-xl mx-auto">
-              Descubra ofertas incríveis dos melhores estabelecimentos da sua região
-            </p>
-          </div>
-
-          <div className="max-w-xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <Input
-              placeholder="Buscar produtos ou lojas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-14 rounded-2xl border-0 shadow-lg text-slate-800"
-            />
+            {/* Image side */}
+            <div className="flex-shrink-0 w-full md:w-80 lg:w-96">
+              <img
+                src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/e7d12a3df_generated_image.png"
+                alt="Família feliz com compras"
+                className="w-full h-64 md:h-80 object-cover rounded-3xl shadow-2xl"
+              />
+            </div>
           </div>
         </div>
       </div>
