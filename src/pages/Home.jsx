@@ -12,6 +12,7 @@ import PartnerCard from '@/components/partners/PartnerCard';
 import SubscriptionBanner from '@/components/ui/SubscriptionBanner';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
+import LocationFilter from '@/components/home/LocationFilter';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -20,6 +21,8 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
 
   useEffect(() => {
     const loadUser = async () => {
@@ -64,7 +67,19 @@ export default function Home() {
   const activePartnerIds = partners.map(p => p.id);
   const activeProducts = products.filter(p => activePartnerIds.includes(p.partner_id));
 
-  const filteredProducts = activeProducts.filter(p =>
+  // Filtro de localidade
+  const locationFilteredPartners = React.useMemo(() => {
+    return partners.filter(p => {
+      if (selectedCity && p.city !== selectedCity) return false;
+      if (selectedNeighborhood && p.neighborhood !== selectedNeighborhood) return false;
+      return true;
+    });
+  }, [partners, selectedCity, selectedNeighborhood]);
+
+  const locationFilteredPartnerIds = locationFilteredPartners.map(p => p.id);
+  const locationFilteredProducts = activeProducts.filter(p => locationFilteredPartnerIds.includes(p.partner_id));
+
+  const filteredProducts = locationFilteredProducts.filter(p =>
     p.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -78,7 +93,7 @@ export default function Home() {
   }, []);
 
   const featuredProducts = React.useMemo(() => {
-    const sorted = [...activeProducts].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
+    const sorted = [...locationFilteredProducts].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
     const top = sorted.slice(0, 8);
     // embaralha aleatoriamente a cada tick
     for (let i = top.length - 1; i > 0; i--) {
@@ -170,6 +185,15 @@ export default function Home() {
           />
         )}
 
+        {/* Location Filter */}
+        <LocationFilter
+          partners={partners}
+          selectedCity={selectedCity}
+          selectedNeighborhood={selectedNeighborhood}
+          onCityChange={setSelectedCity}
+          onNeighborhoodChange={setSelectedNeighborhood}
+        />
+
         {/* Featured Products */}
         {!searchTerm && (
           <section className="mb-12">
@@ -234,7 +258,7 @@ export default function Home() {
 
         {/* Empreendedores */}
         {!searchTerm && (() => {
-          const empreendedores = partners.filter(p => p.partner_type === 'empreendedor');
+          const empreendedores = locationFilteredPartners.filter(p => p.partner_type === 'empreendedor');
           if (empreendedores.length === 0) return null;
           return (
             <section className="mb-12">
@@ -283,7 +307,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
-                {partners.filter(p => p.partner_type !== 'empreendedor').slice(0, 4).map(partner => (
+                {locationFilteredPartners.filter(p => p.partner_type !== 'empreendedor').slice(0, 4).map(partner => (
                   <Link key={partner.id} to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
                     <PartnerCard
                       partner={partner}

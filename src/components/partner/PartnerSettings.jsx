@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Store, Image, Loader2, Save, Calendar } from 'lucide-react';
+import { Store, Image, Loader2, Save, Calendar, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,14 +23,40 @@ const categories = [
 
 export default function PartnerSettings({ partner, subscription, onUpdate }) {
   const [loading, setLoading] = useState(false);
+  const [cepLoading, setCepLoading] = useState(false);
   const [formData, setFormData] = useState({
     business_name: partner?.business_name || '',
     description: partner?.description || '',
     logo_url: partner?.logo_url || '',
     category: partner?.category || '',
     address: partner?.address || '',
+    cep: partner?.cep || '',
+    city: partner?.city || '',
+    neighborhood: partner?.neighborhood || '',
+    state: partner?.state || '',
     phone: partner?.phone || ''
   });
+
+  const handleCepBlur = async (cep) => {
+    const cleanCep = cep.replace(/\D/g, '');
+    if (cleanCep.length !== 8) return;
+    setCepLoading(true);
+    const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+    const data = await res.json();
+    if (!data.erro) {
+      setFormData(prev => ({
+        ...prev,
+        address: `${data.logradouro}${data.complemento ? ', ' + data.complemento : ''}`,
+        neighborhood: data.bairro || '',
+        city: data.localidade || '',
+        state: data.uf || ''
+      }));
+      toast.success('Endereço preenchido automaticamente!');
+    } else {
+      toast.error('CEP não encontrado.');
+    }
+    setCepLoading(false);
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files[0];
@@ -132,12 +158,50 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="address">Endereço</Label>
+              <Label htmlFor="cep" className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-violet-500" />
+                CEP
+                {cepLoading && <Loader2 className="w-3 h-3 animate-spin ml-1 text-violet-500" />}
+              </Label>
+              <Input
+                id="cep"
+                value={formData.cep}
+                onChange={(e) => setFormData(prev => ({ ...prev, cep: e.target.value }))}
+                onBlur={(e) => handleCepBlur(e.target.value)}
+                placeholder="00000-000"
+                maxLength={9}
+              />
+              <p className="text-xs text-slate-400">Digite o CEP para preencher o endereço automaticamente</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="city">Cidade</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="Cidade"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="neighborhood">Bairro</Label>
+                <Input
+                  id="neighborhood"
+                  value={formData.neighborhood}
+                  onChange={(e) => setFormData(prev => ({ ...prev, neighborhood: e.target.value }))}
+                  placeholder="Bairro"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Endereço completo</Label>
               <Input
                 id="address"
                 value={formData.address}
                 onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Rua, número, bairro..."
+                placeholder="Rua, número..."
               />
             </div>
 

@@ -1,0 +1,95 @@
+{
+  "name": "Partner",
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "description": "Nome do com\u00e9rcio ou neg\u00f3cio"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL do logo"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o do neg\u00f3cio"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "restaurante",
+        "moda",
+        "eletronicos",
+        "beleza",
+        "saude",
+        "mercado",
+        "servicos",
+        "doceria",
+        "hamburgueria",
+        "trailer_food",
+        "artesanato",
+        "confeitaria",
+        "salgados",
+        "costura",
+        "outros"
+      ],
+      "description": "Categoria do neg\u00f3cio"
+    },
+    "partner_type": {
+      "type": "string",
+      "enum": [
+        "lojista",
+        "empreendedor"
+      ],
+      "default": "lojista",
+      "description": "Tipo de parceiro: lojista (com CNPJ) ou empreendedor individual (sem CNPJ)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Endere\u00e7o ou localiza\u00e7\u00e3o"
+    },
+    "cep": {
+      "type": "string",
+      "description": "CEP do estabelecimento"
+    },
+    "city": {
+      "type": "string",
+      "description": "Cidade"
+    },
+    "neighborhood": {
+      "type": "string",
+      "description": "Bairro"
+    },
+    "state": {
+      "type": "string",
+      "description": "Estado (UF)"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefone de contato"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Status da assinatura"
+    },
+    "subscription_expires_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de expira\u00e7\u00e3o da assinatura"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Email do propriet\u00e1rio"
+    }
+  },
+  "required": [
+    "business_name",
+    "owner_email"
+  ]
+}
