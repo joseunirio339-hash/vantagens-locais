@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
   Store, Package, Eye, Ticket, TrendingUp, 
-  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import QRScanner from '@/components/partner/QRScanner';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
+  const [allPartners, setAllPartners] = useState([]);
   const [partner, setPartner] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,12 @@ export default function PartnerDashboard() {
         return;
       }
 
-      const partnerData = partners[0];
+      setAllPartners(partners);
+
+      // Check if a specific partner was requested via URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestedId = urlParams.get('partner_id');
+      const partnerData = (requestedId && partners.find(p => p.id === requestedId)) || partners[0];
       setPartner(partnerData);
 
       const subs = await base44.entities.Subscription.filter({
@@ -145,7 +151,7 @@ export default function PartnerDashboard() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden ${partner?.partner_type === 'empreendedor' ? 'bg-amber-100' : 'bg-violet-100'}`}>
                 {partner?.logo_url ? (
@@ -164,7 +170,28 @@ export default function PartnerDashboard() {
                 <p className="text-slate-500">Painel do Parceiro</p>
               </div>
             </div>
-            <NotificationBell partnerId={partner?.id} />
+
+            <div className="flex items-center gap-3">
+              {/* Partner selector */}
+              {allPartners.length > 1 && (
+                <div className="relative">
+                  <select
+                    value={partner?.id || ''}
+                    onChange={(e) => {
+                      const p = allPartners.find(x => x.id === e.target.value);
+                      if (p) { setPartner(p); setActiveTab('products'); }
+                    }}
+                    className="pl-3 pr-8 py-2 rounded-xl border border-violet-200 bg-violet-50 text-violet-800 text-sm font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-pointer"
+                  >
+                    {allPartners.map(p => (
+                      <option key={p.id} value={p.id}>{p.business_name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-500 pointer-events-none" />
+                </div>
+              )}
+              <NotificationBell partnerId={partner?.id} />
+            </div>
           </div>
         </div>
       </div>
