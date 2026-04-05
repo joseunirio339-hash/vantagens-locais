@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { MapPin, Phone, Tag, ArrowLeft } from 'lucide-react';
+import PartnerLocationMap from '@/components/partners/PartnerLocationMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -183,6 +184,8 @@ export default function PartnerStore() {
                   </span>
                 )}
               </div>
+
+              <PartnerLocationMap partner={partner} />
             </div>
           </div>
         </div>
