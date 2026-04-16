@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Store, Image, Loader2, Save, Calendar, MapPin } from 'lucide-react';
+import { Store, Image, Loader2, Save, Calendar, MapPin, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,7 +34,9 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
     city: partner?.city || '',
     neighborhood: partner?.neighborhood || '',
     state: partner?.state || '',
-    phone: partner?.phone || ''
+    phone: partner?.phone || '',
+    whatsapp_business_enabled: partner?.whatsapp_business_enabled || false,
+    whatsapp_business_number: partner?.whatsapp_business_number || ''
   });
 
   const handleCepBlur = async (cep) => {
@@ -213,6 +215,41 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 placeholder="(00) 00000-0000"
               />
+            </div>
+
+            {/* WhatsApp Business */}
+            <div className={`border-2 rounded-xl p-4 space-y-3 transition-all ${formData.whatsapp_business_enabled ? 'border-green-400 bg-green-50' : 'border-slate-200 bg-slate-50'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.whatsapp_business_enabled ? 'bg-green-500' : 'bg-slate-200'}`}>
+                    <MessageCircle className={`w-4 h-4 ${formData.whatsapp_business_enabled ? 'text-white' : 'text-slate-400'}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">WhatsApp Business</p>
+                    <p className="text-xs text-slate-500">Redirecionar clientes após gerar voucher</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, whatsapp_business_enabled: !prev.whatsapp_business_enabled }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${formData.whatsapp_business_enabled ? 'bg-green-500' : 'bg-slate-300'}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.whatsapp_business_enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+              {formData.whatsapp_business_enabled && (
+                <div className="space-y-1">
+                  <Label htmlFor="whatsapp_number" className="text-xs text-green-700">Número do WhatsApp Business</Label>
+                  <Input
+                    id="whatsapp_number"
+                    value={formData.whatsapp_business_number}
+                    onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_business_number: e.target.value.replace(/\D/g, '') }))}
+                    placeholder="5511999999999 (com DDI e DDD)"
+                    className="border-green-300 focus:ring-green-400"
+                  />
+                  <p className="text-xs text-green-600">Ex: 5511999999999 — DDI (55) + DDD + número</p>
+                </div>
+              )}
             </div>
 
             <Button

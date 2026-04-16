@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Ticket, CheckCircle, Loader2, ShoppingBag, MapPin, Phone, Tag, Plus, Minus, Package } from 'lucide-react';
+import { Ticket, CheckCircle, Loader2, ShoppingBag, MapPin, Phone, Tag, Plus, Minus, Package, MessageCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
@@ -348,6 +348,18 @@ export default function EntrepreneurVoucherModal({
                 </p>
               )}
             </div>
+
+            {partner?.whatsapp_business_enabled && partner?.whatsapp_business_number && (
+              <a
+                href={`https://wa.me/${partner.whatsapp_business_number}?text=${encodeURIComponent(`Olá! Gerei o voucher *${vouchers[0]?.code}* para o produto *${vouchers[0]?.product_name}* com desconto. Gostaria de finalizar minha compra!`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 h-11 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Comprar pelo WhatsApp Business
+              </a>
+            )}
 
             <Button onClick={handleClose} className="w-full" variant="outline">
               Fechar
