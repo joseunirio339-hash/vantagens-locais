@@ -52,9 +52,12 @@ export default function Home() {
     queryKey: ['partners'],
     queryFn: async () => {
       const active = await base44.entities.Partner.filter({ subscription_status: 'active' });
-      const jose = await base44.entities.Partner.filter({ id: '699667374773d515504fac61' });
+      const extras = await Promise.all([
+        base44.entities.Partner.filter({ id: '699667374773d515504fac61' }),
+        base44.entities.Partner.filter({ id: '69c6dd738bb52da27d1adad8' }),
+      ]);
       const all = [...active];
-      jose.forEach(j => { if (!all.find(p => p.id === j.id)) all.push(j); });
+      extras.flat().forEach(p => { if (!all.find(a => a.id === p.id)) all.push(p); });
       return all;
     }
   });

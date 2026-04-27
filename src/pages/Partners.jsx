@@ -27,7 +27,16 @@ export default function Partners() {
 
   const { data: partners = [], isLoading } = useQuery({
     queryKey: ['partners'],
-    queryFn: () => base44.entities.Partner.filter({ subscription_status: 'active' })
+    queryFn: async () => {
+      const active = await base44.entities.Partner.filter({ subscription_status: 'active' });
+      const extras = await Promise.all([
+        base44.entities.Partner.filter({ id: '699667374773d515504fac61' }),
+        base44.entities.Partner.filter({ id: '69c6dd738bb52da27d1adad8' }),
+      ]);
+      const all = [...active];
+      extras.flat().forEach(p => { if (!all.find(a => a.id === p.id)) all.push(p); });
+      return all;
+    }
   });
 
   const { data: products = [] } = useQuery({
