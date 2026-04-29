@@ -142,20 +142,22 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-violet-700 via-fuchsia-600 to-pink-500 text-white">
+      <div className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12 md:py-20">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Text side */}
             <div className="flex-1 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 mb-4">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">Descontos exclusivos</span>
+                <span className="text-sm font-medium">🛍️ Ofertas imperdíveis perto de você</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                Economize no comércio local
+              <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight" style={{fontFamily: "'Trebuchet MS', 'Arial Rounded MT Bold', Arial, sans-serif", textShadow: '2px 3px 0px rgba(0,0,0,0.15)'}}>
+                <span className="text-yellow-300">CLUBE</span>{' '}
+                <span className="text-white">MAX</span>{' '}
+                <span className="text-yellow-300">DESCONTOS</span>
               </h1>
-              <p className="text-lg text-pink-100 max-w-xl mb-8">
-                Descubra ofertas incríveis dos melhores estabelecimentos da sua região
+              <p className="text-lg text-orange-100 max-w-xl mb-8 font-medium">
+                Descubra ofertas incríveis dos melhores estabelecimentos da sua região 🔥
               </p>
               <div className="max-w-xl relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
