@@ -153,20 +153,15 @@ export default function PartnerDashboard() {
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden ${partner?.partner_type === 'empreendedor' ? 'bg-amber-100' : 'bg-violet-100'}`}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden bg-violet-100">
                 {partner?.logo_url ? (
                   <img src={partner.logo_url} alt={partner.business_name} className="w-full h-full object-cover" />
                 ) : (
-                  <Store className={`w-7 h-7 ${partner?.partner_type === 'empreendedor' ? 'text-amber-600' : 'text-violet-600'}`} />
+                  <Store className="w-7 h-7 text-violet-600" />
                 )}
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-slate-800">{partner?.business_name}</h1>
-                  {partner?.partner_type === 'empreendedor' && (
-                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">🤝 Empreendedor</span>
-                  )}
-                </div>
+                <h1 className="text-2xl font-bold text-slate-800">{partner?.business_name}</h1>
                 <p className="text-slate-500">Painel do Parceiro</p>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Check, CreditCard, Store, Users, Loader2, Crown, Sparkles, Gift, Ticket } from 'lucide-react';
+import { Check, CreditCard, Store, Users, Loader2, Crown, Gift, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,25 +24,6 @@ const plans = [
       'Histórico de compras',
       'Suporte por email',
       'Renovação via ticket de acesso'
-    ]
-  },
-  {
-    type: 'empreendedor',
-    name: 'Empreendedor Individual',
-    price: 49.99,
-    period: 'mês',
-    icon: Sparkles,
-    color: 'amber',
-    popular: true,
-    badge: '🤝 Sem CNPJ',
-    features: [
-      'Para doceiras, hamburguerias, trailers',
-      'Artesãos e trabalhadores autônomos',
-      'Cadastro de até 20 produtos/serviços',
-      'Painel completo de gestão',
-      'Vouchers e análises de vendas',
-      'Avaliações de clientes',
-      'Sem necessidade de CNPJ'
     ]
   },
   {
