@@ -45,6 +45,7 @@ export default function Layout({ children }) {
     { label: 'Início', href: 'Home', icon: Home },
     { label: 'Parceiros', href: 'Partners', icon: Store },
     { label: 'Produtos', href: 'Products', icon: Tag },
+    ...(!isPartner ? [{ label: 'Seja Parceiro', href: 'PartnerSignup', icon: Store }] : []),
   ];
 
   const isActive = (href) => {
