@@ -55,6 +55,7 @@ import Partners from './pages/Partners';
 import Products from './pages/Products';
 import Subscription from './pages/Subscription';
 import PartnerSignup from './pages/PartnerSignup';
+import AdminDashboard from './pages/AdminDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +68,7 @@ export const PAGES = {
     "Products": Products,
     "Subscription": Subscription,
     "PartnerSignup": PartnerSignup,
+    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {

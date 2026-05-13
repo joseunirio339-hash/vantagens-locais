@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X, 
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -130,6 +130,14 @@ export default function Layout({ children }) {
                         <DropdownMenuItem className="cursor-pointer">
                           <LayoutDashboard className="w-4 h-4 mr-2" />
                           Painel do Parceiro
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                    {user.role === 'admin' && (
+                      <Link to={createPageUrl('AdminDashboard')}>
+                        <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
+                          <ShieldAlert className="w-4 h-4 mr-2" />
+                          Painel Admin
                         </DropdownMenuItem>
                       </Link>
                     )}
