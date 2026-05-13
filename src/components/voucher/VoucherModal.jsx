@@ -96,6 +96,38 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
       reference_id: createdVouchers[0].id
     });
 
+    // E-mail para o cliente
+    if (user?.email) {
+      base44.functions.invoke('sendEmailNotification', {
+        type: 'voucher_generated',
+        data: {
+          user_email: user.email,
+          user_name: user.full_name || 'Cliente',
+          voucher_code: createdVouchers[0].code,
+          product_name: createdVouchers[0].product_name,
+          partner_name: partner.business_name,
+          original_price: totalOriginal.toFixed(2).replace('.', ','),
+          discount_price: totalDesconto.toFixed(2).replace('.', ','),
+          expires_at: new Date(createdVouchers[0].expires_at).toLocaleDateString('pt-BR')
+        }
+      });
+    }
+
+    // E-mail para o parceiro (novo voucher gerado)
+    if (partner?.owner_email) {
+      base44.functions.invoke('sendEmailNotification', {
+        type: 'new_voucher_partner',
+        data: {
+          partner_email: partner.owner_email,
+          partner_name: partner.business_name,
+          user_name: user?.full_name || 'Não informado',
+          product_name: product.name,
+          quantity: quantity,
+          discount_price: totalDesconto.toFixed(2).replace('.', ',')
+        }
+      });
+    }
+
     setVouchers(createdVouchers);
     setLoading(false);
     toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);

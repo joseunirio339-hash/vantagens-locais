@@ -103,6 +103,21 @@ export default function QRScanner({ partner, onValidated }) {
         reference_id: voucher.id
       });
 
+      // E-mail para o parceiro (voucher usado)
+      if (partner?.owner_email) {
+        base44.functions.invoke('sendEmailNotification', {
+          type: 'voucher_used',
+          data: {
+            partner_email: partner.owner_email,
+            partner_name: partner.business_name,
+            voucher_code: voucher.code,
+            user_name: voucher.user_name || 'Não informado',
+            product_name: voucher.product_name,
+            discount_price: voucher.discount_price?.toFixed(2).replace('.', ',')
+          }
+        });
+      }
+
       setResult({ success: true, voucher, message: 'Voucher validado com sucesso!' });
       toast.success('✅ Voucher validado!');
       if (onValidated) onValidated();
