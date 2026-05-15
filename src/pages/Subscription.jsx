@@ -11,7 +11,7 @@ const plans = [
   {
     type: 'user',
     name: 'Usuário',
-    price: 4.99,
+    price: 19.99,
     period: 'mês',
     icon: Users,
     color: 'emerald',
@@ -22,14 +22,13 @@ const plans = [
       'Geração ilimitada de vouchers',
       'Busca de produtos e lojas',
       'Histórico de compras',
-      'Suporte por email',
-      'Renovação via ticket de acesso'
+      'Suporte por email'
     ]
   },
   {
-    type: 'partner',
+    type: 'lojista',
     name: 'Lojista Parceiro',
-    price: 99.00,
+    price: 49.99,
     period: 'mês',
     icon: Store,
     color: 'violet',
@@ -40,6 +39,22 @@ const plans = [
       'Logo e perfil da loja',
       'Validação de vouchers',
       'Suporte prioritário'
+    ]
+  },
+  {
+    type: 'empreendedor',
+    name: 'Empreendedor',
+    price: 29.99,
+    period: 'mês',
+    icon: Sparkles,
+    color: 'amber',
+    features: [
+      'Para autônomos e microempresas',
+      'Cadastro de até 10 produtos',
+      'Painel simplificado',
+      'Análises básicas',
+      'Perfil da loja',
+      'Validação de vouchers'
     ]
   }
 ];
@@ -92,72 +107,51 @@ export default function Subscription() {
     setSelectedPlan(planType);
     setLoading(true);
 
-    const plan = plans.find(p => p.type === planType);
-    const startsAt = new Date();
-    const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
+    const isFreeTrialEligible = planType === 'user' && !existingSubscriptions.find(s => s.type === 'user') && !hasUsedTrial;
 
-    const existingSub = existingSubscriptions.find(s => s.type === planType);
+    try {
+      // Se é trial gratuito do plano user, ativa sem Stripe
+      if (isFreeTrialEligible) {
+        const startsAt = new Date();
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
 
-    // Para plano user sem assinatura anterior, ativar trial gratuito de 1 mês
-    const isFreeTrialEligible = planType === 'user' && !existingSub && !hasUsedTrial;
+        await base44.entities.Subscription.create({
+          user_email: user.email,
+          type: 'user',
+          status: 'active',
+          price: 0,
+          is_trial: true,
+          starts_at: startsAt.toISOString().split('T')[0],
+          expires_at: expiresAt.toISOString().split('T')[0]
+        });
 
-    if (existingSub) {
-      // Após trial expirado, só permite renovação via ticket (bloquear aqui)
-      if (existingSub.is_trial && existingSub.status !== 'active') {
         setLoading(false);
-        toast.error('Seu período de teste expirou. Renove com um ticket de acesso.');
+        toast.success('🎁 Período de teste gratuito ativado por 1 mês!');
+        window.location.href = createPageUrl('Home');
         return;
       }
-      await base44.entities.Subscription.update(existingSub.id, {
-        status: 'active',
-        price: plan.price,
-        starts_at: startsAt.toISOString().split('T')[0],
-        expires_at: expiresAt.toISOString().split('T')[0]
+
+      // Redireciona para checkout do Stripe
+      const response = await base44.functions.invoke('stripeCheckout', {
+        subscriptionType: planType
       });
-    } else {
-      const newSub = {
-        user_email: user.email,
-        type: planType,
-        status: 'active',
-        price: isFreeTrialEligible ? 0 : plan.price,
-        is_trial: isFreeTrialEligible,
-        starts_at: startsAt.toISOString().split('T')[0],
-        expires_at: expiresAt.toISOString().split('T')[0]
-      };
 
-      await base44.entities.Subscription.create(newSub);
-
-      if (planType === 'partner') {
-        await base44.entities.Partner.create({
-          business_name: user.full_name || 'Minha Loja',
-          owner_email: user.email,
-          partner_type: 'lojista',
-          subscription_status: 'active',
-          subscription_expires_at: expiresAt.toISOString().split('T')[0]
-        });
-      } else if (planType === 'empreendedor') {
-        await base44.entities.Partner.create({
-          business_name: user.full_name || 'Meu Negócio',
-          owner_email: user.email,
-          partner_type: 'empreendedor',
-          subscription_status: 'active',
-          subscription_expires_at: expiresAt.toISOString().split('T')[0]
-        });
+      if (response.data.isIframe) {
+        setLoading(false);
+        toast.error('Abra o checkout em uma nova janela (pop-up)');
+        return;
       }
-    }
 
-    setLoading(false);
-    if (isFreeTrialEligible) {
-      toast.success('🎁 Período de teste gratuito ativado por 1 mês!');
-    } else {
-      toast.success('Assinatura ativada com sucesso!');
-    }
-    
-    if (planType === 'partner' || planType === 'empreendedor') {
-      window.location.href = createPageUrl('PartnerDashboard');
-    } else {
-      window.location.href = createPageUrl('Home');
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('Falha ao gerar link de checkout');
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error('Erro ao processar assinatura');
+      console.error(error);
     }
   };
 
@@ -178,27 +172,27 @@ export default function Subscription() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {plans.map(plan => {
-            const sub = getSubscriptionStatus(plan.type);
-            const isActive = sub?.status === 'active';
-            const isExpired = sub?.status === 'expired';
-            const isTrial = sub?.is_trial === true;
-            const isTrialExpired = isTrial && isExpired;
-            const isFreeTrial = plan.type === 'user' && !sub && !hasUsedTrial;
-            const Icon = plan.icon;
+           {plans.map(plan => {
+             const sub = getSubscriptionStatus(plan.type);
+             const isActive = sub?.status === 'active';
+             const isExpired = sub?.status === 'expired';
+             const isTrial = sub?.is_trial === true;
+             const isTrialExpired = isTrial && isExpired;
+             const isFreeTrial = plan.type === 'user' && !sub && !hasUsedTrial;
+             const Icon = plan.icon;
 
-            const colorMap = {
-              emerald: { border: 'border-emerald-200', icon: 'bg-emerald-100', iconText: 'text-emerald-600', btn: 'bg-emerald-600 hover:bg-emerald-700', check: 'bg-emerald-100 text-emerald-600', badge: 'bg-emerald-500' },
-              amber:   { border: 'border-amber-300 shadow-lg shadow-amber-100', icon: 'bg-amber-100', iconText: 'text-amber-600', btn: 'bg-amber-500 hover:bg-amber-600', check: 'bg-amber-100 text-amber-600', badge: 'bg-amber-500' },
-              violet:  { border: 'border-violet-200', icon: 'bg-violet-100', iconText: 'text-violet-600', btn: 'bg-violet-600 hover:bg-violet-700', check: 'bg-violet-100 text-violet-600', badge: 'bg-violet-500' }
-            };
-            const c = colorMap[plan.color];
+             const colorMap = {
+               emerald: { border: 'border-emerald-200', icon: 'bg-emerald-100', iconText: 'text-emerald-600', btn: 'bg-emerald-600 hover:bg-emerald-700', check: 'bg-emerald-100 text-emerald-600', badge: 'bg-emerald-500' },
+               amber:   { border: 'border-amber-300 shadow-lg shadow-amber-100', icon: 'bg-amber-100', iconText: 'text-amber-600', btn: 'bg-amber-500 hover:bg-amber-600', check: 'bg-amber-100 text-amber-600', badge: 'bg-amber-500' },
+               violet:  { border: 'border-violet-200', icon: 'bg-violet-100', iconText: 'text-violet-600', btn: 'bg-violet-600 hover:bg-violet-700', check: 'bg-violet-100 text-violet-600', badge: 'bg-violet-500' }
+             };
+             const c = colorMap[plan.color];
 
-            const descriptions = {
-              user: 'Para consumidores que querem economizar',
-              empreendedor: 'Autônomos e empreendedores individuais sem CNPJ',
-              partner: 'Para lojistas estabelecidos com CNPJ'
-            };
+             const descriptions = {
+               user: 'Para consumidores que querem economizar',
+               empreendedor: 'Autônomos e empreendedores individuais',
+               lojista: 'Para lojistas estabelecidos com CNPJ'
+             };
 
             return (
               <Card
@@ -277,32 +271,23 @@ export default function Subscription() {
                     ))}
                   </ul>
 
-                  {isTrialExpired ? (
-                    <div className="space-y-2">
-                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
-                        <Ticket className="w-5 h-5 text-slate-400 mx-auto mb-1" />
-                        <p className="text-xs text-slate-500">Entre em contato para obter seu ticket de acesso e continuar usando o plano.</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={() => handleSubscribe(plan.type)}
-                      disabled={loading || isActive}
-                      className={`w-full h-11 text-sm font-semibold text-white ${c.btn} ${isActive ? 'opacity-50' : ''}`}
-                    >
-                      {loading && selectedPlan === plan.type ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : isActive ? (
-                        isTrial ? '🎁 Teste Ativo' : 'Plano Ativo'
-                      ) : isFreeTrial ? (
-                        <><Gift className="w-4 h-4 mr-2" />Ativar Mês Grátis</>
-                      ) : isExpired ? (
-                        <><CreditCard className="w-4 h-4 mr-2" />Renovar</>
-                      ) : (
-                        <><CreditCard className="w-4 h-4 mr-2" />Assinar Agora</>
-                      )}
-                    </Button>
-                  )}
+                  <Button
+                    onClick={() => handleSubscribe(plan.type)}
+                    disabled={loading || (isActive && !isExpired)}
+                    className={`w-full h-11 text-sm font-semibold text-white ${c.btn} ${isActive && !isExpired ? 'opacity-50' : ''}`}
+                  >
+                    {loading && selectedPlan === plan.type ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : isActive && !isExpired ? (
+                      isTrial ? '🎁 Teste Ativo' : 'Plano Ativo'
+                    ) : isFreeTrial ? (
+                      <><Gift className="w-4 h-4 mr-2" />Ativar Mês Grátis</>
+                    ) : isExpired ? (
+                      <><CreditCard className="w-4 h-4 mr-2" />Renovar Assinatura</>
+                    ) : (
+                      <><CreditCard className="w-4 h-4 mr-2" />Assinar Agora</>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
             );
@@ -310,11 +295,11 @@ export default function Subscription() {
         </div>
 
         <div className="mt-8 text-center space-y-1">
-          <p className="text-sm text-slate-500">Pagamento único válido por 1 mês. Sem renovação automática.</p>
-          <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
-            <Gift className="w-3 h-3" /> Plano Usuário inclui 1 mês gratuito para novos usuários. Renovação via ticket de acesso.
-          </p>
-        </div>
+           <p className="text-sm text-slate-500">Pagamento mensal recorrente. Cancele a qualquer momento no portal Stripe.</p>
+           <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
+             <Gift className="w-3 h-3" /> Plano Usuário: 1 mês GRÁTIS para novos usuários (depois R$ 19,99/mês).
+           </p>
+         </div>
       </div>
     </div>
   );
