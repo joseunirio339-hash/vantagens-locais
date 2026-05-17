@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { MapPin, Phone, Tag, ArrowLeft } from 'lucide-react';
+import { MapPin, Phone, Tag, ArrowLeft, Star } from 'lucide-react';
 import PartnerLocationMap from '@/components/partners/PartnerLocationMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
+import PartnerReviews from '@/components/partner/PartnerReviews';
 
 const categoryLabels = {
   restaurante: 'Restaurante',
@@ -77,6 +78,16 @@ export default function PartnerStore() {
     queryFn: () => base44.entities.Product.filter({ partner_id: partnerId, is_active: true }),
     enabled: !!partnerId
   });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['partnerReviews', partnerId],
+    queryFn: () => base44.entities.Review.filter({ partner_id: partnerId }, '-created_date', 50),
+    enabled: !!partnerId
+  });
+
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : null;
 
   const handleProductClick = async (product) => {
     if (!user) {
@@ -170,6 +181,14 @@ export default function PartnerStore() {
                 <p className="text-slate-500 mt-2">{partner.description}</p>
               )}
 
+              {avgRating && (
+                <div className="flex items-center gap-1 mt-2">
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  <span className="font-semibold text-slate-700">{avgRating}</span>
+                  <span className="text-slate-400 text-sm">({reviews.length} avaliação{reviews.length !== 1 ? 'ões' : ''})</span>
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-slate-500">
                 {partner.address && (
                   <span className="flex items-center gap-1">
@@ -219,6 +238,15 @@ export default function PartnerStore() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Reviews Section */}
+      <div className="max-w-6xl mx-auto px-4 pb-10">
+        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+          Avaliações dos Clientes
+        </h2>
+        <PartnerReviews partnerId={partnerId} />
       </div>
 
       {partner?.partner_type === 'empreendedor' ? (

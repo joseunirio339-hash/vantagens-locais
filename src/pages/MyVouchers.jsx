@@ -4,11 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
-import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar } from 'lucide-react';
+import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import ReviewModal from '@/components/voucher/ReviewModal';
 
 const statusConfig = {
   pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
@@ -18,6 +20,8 @@ const statusConfig = {
 
 export default function MyVouchers() {
   const [user, setUser] = useState(null);
+  const [reviewingVoucher, setReviewingVoucher] = useState(null);
+  const [reviewedVoucherIds, setReviewedVoucherIds] = useState(new Set());
 
   useEffect(() => {
     const loadUser = async () => {
@@ -43,6 +47,14 @@ export default function MyVouchers() {
     queryFn: () => base44.entities.Partner.list()
   });
 
+  const { data: myReviews = [] } = useQuery({
+    queryKey: ['myReviews', user?.email],
+    queryFn: () => base44.entities.Review.filter({ user_email: user.email }),
+    enabled: !!user?.email
+  });
+
+  const reviewedIds = new Set([...myReviews.map(r => r.voucher_id), ...reviewedVoucherIds]);
+
   const formatCPF = (cpf) => {
     const clean = cpf?.replace(/\D/g, '');
     if (!clean || clean.length !== 11) return cpf;
@@ -59,6 +71,7 @@ export default function MyVouchers() {
     const status = statusConfig[voucher.status] || statusConfig.pending;
     const StatusIcon = status.icon;
     const partner = getPartner(voucher.partner_id);
+    const alreadyReviewed = reviewedIds.has(voucher.id);
 
     return (
       <Card className={`border-2 ${voucher.status === 'pending' ? 'border-emerald-200' : 'border-slate-200'}`}>
@@ -112,6 +125,27 @@ export default function MyVouchers() {
               `Criado em ${format(new Date(voucher.created_date), "dd/MM/yyyy", { locale: ptBR })}`
             )}
           </div>
+
+          {voucher.status === 'used' && (
+            <div className="mt-3 pt-3 border-t">
+              {alreadyReviewed ? (
+                <p className="text-xs text-slate-400 flex items-center gap-1 justify-center">
+                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  Você já avaliou este estabelecimento
+                </p>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-violet-600 border-violet-200 hover:bg-violet-50"
+                  onClick={() => setReviewingVoucher(voucher)}
+                >
+                  <Star className="w-3 h-3 mr-2" />
+                  Avaliar Experiência
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -203,6 +237,17 @@ export default function MyVouchers() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {reviewingVoucher && (
+        <ReviewModal
+          open={!!reviewingVoucher}
+          onClose={() => setReviewingVoucher(null)}
+          voucher={reviewingVoucher}
+          partnerName={getPartner(reviewingVoucher.partner_id)?.business_name || 'Estabelecimento'}
+          user={user}
+          onReviewed={(voucherId) => setReviewedVoucherIds(prev => new Set([...prev, voucherId]))}
+        />
+      )}
     </div>
   );
 }
