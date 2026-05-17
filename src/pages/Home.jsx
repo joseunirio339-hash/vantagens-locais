@@ -13,6 +13,7 @@ import SubscriptionBanner from '@/components/ui/SubscriptionBanner';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import LocationFilter from '@/components/home/LocationFilter';
+import NearbyPartnersMap from '@/components/home/NearbyPartnersMap';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
@@ -214,6 +215,17 @@ export default function Home() {
             <HomeBadgesWidget userEmail={user.email} />
           </div>
         )}
+
+        {/* Nearby Partners Map */}
+        <NearbyPartnersMap
+          partners={partners}
+          avgRatings={avgRatings}
+          productCounts={React.useMemo(() => {
+            const map = {};
+            products.forEach(p => { map[p.partner_id] = (map[p.partner_id] || 0) + 1; });
+            return map;
+          }, [products])}
+        />
 
         {/* Location Filter */}
         <LocationFilter
