@@ -1,0 +1,33 @@
+{
+  "name": "RaffleSpin",
+  "type": "object",
+  "properties": {
+    "raffle_id": {
+      "type": "string",
+      "description": "ID do sorteio"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que girou"
+    },
+    "voucher_id": {
+      "type": "string",
+      "description": "ID do voucher usado para participar"
+    },
+    "prize_won": {
+      "type": "string",
+      "description": "Pr\u00eamio ganho"
+    }
+  },
+  "required": [
+    "raffle_id",
+    "partner_id",
+    "user_email",
+    "voucher_id",
+    "prize_won"
+  ]
+}

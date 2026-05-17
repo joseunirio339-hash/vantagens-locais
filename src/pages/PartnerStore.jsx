@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { MapPin, Phone, Tag, ArrowLeft, Star } from 'lucide-react';
+import { MapPin, Phone, Tag, ArrowLeft, Star, Gift } from 'lucide-react';
 import PartnerLocationMap from '@/components/partners/PartnerLocationMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import PartnerReviews from '@/components/partner/PartnerReviews';
+import RaffleSpinModal from '@/components/raffle/RaffleSpinModal';
 
 const categoryLabels = {
   restaurante: 'Restaurante',
@@ -36,6 +37,8 @@ export default function PartnerStore() {
   const [subscription, setSubscription] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+  const [raffleModalOpen, setRaffleModalOpen] = useState(false);
+  const [selectedRaffle, setSelectedRaffle] = useState(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const partnerId = urlParams.get('id');
@@ -84,6 +87,24 @@ export default function PartnerStore() {
     queryFn: () => base44.entities.Review.filter({ partner_id: partnerId }, '-created_date', 50),
     enabled: !!partnerId
   });
+
+  const { data: raffles = [] } = useQuery({
+    queryKey: ['partnerRaffles', partnerId],
+    queryFn: () => base44.entities.Raffle.filter({ partner_id: partnerId, is_active: true }),
+    enabled: !!partnerId
+  });
+
+  const { data: userVouchers = [] } = useQuery({
+    queryKey: ['userVouchers', user?.email, partnerId],
+    queryFn: () => base44.entities.Voucher.filter({ user_email: user.email, partner_id: partnerId }),
+    enabled: !!user?.email && !!partnerId
+  });
+
+  const handleOpenRaffle = (raffle) => {
+    if (!user) { base44.auth.redirectToLogin(window.location.href); return; }
+    setSelectedRaffle(raffle);
+    setRaffleModalOpen(true);
+  };
 
   const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
@@ -240,6 +261,39 @@ export default function PartnerStore() {
         )}
       </div>
 
+      {/* Raffles Section */}
+      {raffles.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 pb-4">
+          <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-violet-600" />
+            Sorteios de Prêmios
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {raffles.map(raffle => (
+              <div
+                key={raffle.id}
+                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-5 text-white cursor-pointer hover:from-violet-700 hover:to-fuchsia-700 transition-all shadow-lg"
+                onClick={() => handleOpenRaffle(raffle)}
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg">{raffle.title}</h3>
+                    {raffle.description && <p className="text-violet-100 text-sm mt-1">{raffle.description}</p>}
+                    <p className="text-violet-200 text-xs mt-2">{raffle.prizes?.length} prêmios disponíveis</p>
+                  </div>
+                  <div className="bg-white/20 rounded-xl p-3">
+                    <Gift className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <Button size="sm" className="mt-3 bg-white text-violet-700 hover:bg-violet-50 font-semibold">
+                  Girar Roleta →
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Reviews Section */}
       <div className="max-w-6xl mx-auto px-4 pb-10">
         <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -248,6 +302,15 @@ export default function PartnerStore() {
         </h2>
         <PartnerReviews partnerId={partnerId} />
       </div>
+
+      <RaffleSpinModal
+        open={raffleModalOpen}
+        onClose={() => { setRaffleModalOpen(false); setSelectedRaffle(null); }}
+        raffle={selectedRaffle}
+        partner={partner}
+        user={user}
+        availableVouchers={userVouchers}
+      />
 
       {partner?.partner_type === 'empreendedor' ? (
         <EntrepreneurVoucherModal
