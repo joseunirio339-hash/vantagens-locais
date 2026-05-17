@@ -20,6 +20,7 @@ import PartnerReviews from '@/components/partner/PartnerReviews';
 import SalesOverview from '@/components/partner/SalesOverview';
 import QRScanner from '@/components/partner/QRScanner';
 import RaffleManager from '@/components/raffle/RaffleManager';
+import PartnerPerformance from '@/components/partner/PartnerPerformance';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -277,6 +278,10 @@ export default function PartnerDashboard() {
               <ShoppingBag className="w-4 h-4" />
               Vendas
             </TabsTrigger>
+            <TabsTrigger value="performance" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Performance
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Análises
@@ -318,6 +323,15 @@ export default function PartnerDashboard() {
 
           <TabsContent value="sales">
             <SalesOverview vouchers={vouchers} products={products} />
+          </TabsContent>
+
+          <TabsContent value="performance">
+            <PartnerPerformance
+              partner={partner}
+              products={products}
+              vouchers={vouchers}
+              views={views}
+            />
           </TabsContent>
 
           <TabsContent value="analytics">
