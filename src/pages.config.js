@@ -62,6 +62,7 @@ import LojistaManager from './pages/LojistaManager';
 import PurchaseHistory from './pages/PurchaseHistory';
 import ReferralPage from './pages/ReferralPage';
 import ReferralLanding from './pages/ReferralLanding';
+import Leaderboard from './pages/Leaderboard';
 import __Layout from './Layout.jsx';
 
 
@@ -81,6 +82,7 @@ export const PAGES = {
     "PurchaseHistory": PurchaseHistory,
     "ReferralPage": ReferralPage,
     "ReferralLanding": ReferralLanding,
+    "Leaderboard": Leaderboard,
 }
 
 export const pagesConfig = {

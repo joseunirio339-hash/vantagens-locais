@@ -13,6 +13,7 @@ import SubscriptionBanner from '@/components/ui/SubscriptionBanner';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import LocationFilter from '@/components/home/LocationFilter';
+import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -258,6 +259,13 @@ export default function Home() {
                 ))}
               </div>
             )}
+          </section>
+        )}
+
+        {/* Leaderboard Top 10 */}
+        {!searchTerm && (
+          <section className="mb-12">
+            <LeaderboardTop10 />
           </section>
         )}
 
