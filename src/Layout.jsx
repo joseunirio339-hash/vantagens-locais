@@ -218,9 +218,19 @@ export default function Layout({ children }) {
               </div>
               <span className="font-semibold text-slate-700">Descontos Locais</span>
             </div>
-            <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Todos os direitos reservados.
-            </p>
+            <div className="flex flex-col items-center md:items-end gap-1">
+              <p className="text-sm text-slate-500">
+                © {new Date().getFullYear()} Todos os direitos reservados.
+              </p>
+              <div className="flex gap-4">
+                <Link to="/PrivacyPolicy" className="text-xs text-slate-400 hover:text-violet-600 transition-colors">
+                  Política de Privacidade
+                </Link>
+                <Link to="/TermsOfUse" className="text-xs text-slate-400 hover:text-violet-600 transition-colors">
+                  Termos de Uso
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </footer>

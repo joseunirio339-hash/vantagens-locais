@@ -56,6 +56,8 @@ import Products from './pages/Products';
 import Subscription from './pages/Subscription';
 import PartnerSignup from './pages/PartnerSignup';
 import AdminDashboard from './pages/AdminDashboard';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +71,8 @@ export const PAGES = {
     "Subscription": Subscription,
     "PartnerSignup": PartnerSignup,
     "AdminDashboard": AdminDashboard,
+    "PrivacyPolicy": PrivacyPolicy,
+    "TermsOfUse": TermsOfUse,
 }
 
 export const pagesConfig = {
