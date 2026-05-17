@@ -4,13 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
-import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar, Star } from 'lucide-react';
+import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar, Star, Trophy } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReviewModal from '@/components/voucher/ReviewModal';
+import UserProgressCard from '@/components/gamification/UserProgressCard';
 
 const statusConfig = {
   pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
@@ -170,10 +171,23 @@ export default function MyVouchers() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b">
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Meus Vouchers</h1>
-          <p className="text-slate-500">
-            {vouchers.length} voucher{vouchers.length !== 1 ? 's' : ''} no total
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 mb-2">Meus Vouchers</h1>
+              <p className="text-slate-500">
+                {vouchers.length} voucher{vouchers.length !== 1 ? 's' : ''} no total
+              </p>
+            </div>
+            {usedVouchers.length > 0 && (
+              <div className="flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 shrink-0">
+                <Trophy className="w-4 h-4 text-violet-600" />
+                <div className="text-right">
+                  <p className="text-xs text-violet-500 font-medium">Vouchers usados</p>
+                  <p className="text-lg font-black text-violet-700 leading-none">{usedVouchers.length}</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -188,6 +202,10 @@ export default function MyVouchers() {
             </TabsTrigger>
             <TabsTrigger value="expired" className="flex-1">
               Expirados ({expiredVouchers.length})
+            </TabsTrigger>
+            <TabsTrigger value="progress" className="flex-1 gap-1">
+              <Trophy className="w-3.5 h-3.5" />
+              Progresso
             </TabsTrigger>
           </TabsList>
 
@@ -234,6 +252,9 @@ export default function MyVouchers() {
                 ))}
               </div>
             )}
+          </TabsContent>
+          <TabsContent value="progress">
+            <UserProgressCard vouchers={vouchers} />
           </TabsContent>
         </Tabs>
       </div>
