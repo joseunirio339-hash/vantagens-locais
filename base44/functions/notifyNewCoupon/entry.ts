@@ -30,22 +30,36 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'partner_id and product_name are required' }, { status: 400 });
     }
 
-    // Get all users who favorited this partner
-    const favorites = await base44.asServiceRole.entities.FavoritePartner.filter({ partner_id });
-
-    if (favorites.length === 0) {
-      return Response.json({ success: true, notifications_created: 0 });
-    }
-
     // Get partner info
     const partners = await base44.asServiceRole.entities.Partner.filter({ id: partner_id });
     const partner = partners[0];
     const partnerName = partner?.business_name || 'Um parceiro favorito';
 
+    // Collect unique emails: users who favorited OR already used vouchers at this partner
+    const favorites = await base44.asServiceRole.entities.FavoritePartner.filter({ partner_id });
+    const pastVouchers = await base44.asServiceRole.entities.Voucher.filter({ partner_id, status: 'used' });
+
+    const emailSet = new Set([
+      ...favorites.map(f => f.user_email),
+      ...pastVouchers.map(v => v.user_email).filter(Boolean)
+    ]);
+
+    if (emailSet.size === 0) {
+      return Response.json({ success: true, notifications_created: 0 });
+    }
+
     let count = 0;
-    for (const fav of favorites) {
+    for (const userEmail of emailSet) {
+      // Avoid duplicate notifications for same product+user
+      const existing = await base44.asServiceRole.entities.UserNotification.filter({
+        user_email: userEmail,
+        type: 'new_coupon',
+        reference_id: product_id || ''
+      });
+      if (existing.length > 0) continue;
+
       await base44.asServiceRole.entities.UserNotification.create({
-        user_email: fav.user_email,
+        user_email: userEmail,
         type: 'new_coupon',
         title: `🏷️ Novo cupom disponível!`,
         message: `${partnerName} adicionou um novo desconto: "${product_name}". Confira agora!`,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bell, Ticket, Tag, Check, X } from 'lucide-react';
+import { Bell, Ticket, Tag, Check, Trophy, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -42,8 +42,10 @@ export default function UserNotificationBell({ user }) {
   };
 
   const typeConfig = {
-    voucher_expiring: { icon: Ticket, color: 'text-amber-500', bg: 'bg-amber-50' },
-    new_coupon: { icon: Tag, color: 'text-violet-500', bg: 'bg-violet-50' }
+    voucher_expiring: { icon: Ticket,  color: 'text-amber-500',  bg: 'bg-amber-50'  },
+    new_coupon:       { icon: Tag,     color: 'text-violet-500', bg: 'bg-violet-50' },
+    level_up:         { icon: Trophy,  color: 'text-yellow-500', bg: 'bg-yellow-50' },
+    badge_earned:     { icon: Award,   color: 'text-orange-500', bg: 'bg-orange-50' },
   };
 
   if (!user) return null;

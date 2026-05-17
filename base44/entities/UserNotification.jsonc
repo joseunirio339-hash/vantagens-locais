@@ -10,7 +10,9 @@
       "type": "string",
       "enum": [
         "voucher_expiring",
-        "new_coupon"
+        "new_coupon",
+        "level_up",
+        "badge_earned"
       ],
       "description": "Tipo de notifica\u00e7\u00e3o"
     },
@@ -28,7 +30,7 @@
     },
     "reference_id": {
       "type": "string",
-      "description": "ID do voucher ou produto relacionado"
+      "description": "ID do voucher, produto ou conquista relacionada"
     }
   },
   "required": [
