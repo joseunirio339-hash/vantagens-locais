@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bell, Ticket, Tag, Check, Trophy, Award } from 'lucide-react';
@@ -23,8 +23,19 @@ export default function UserNotificationBell({ user }) {
       30
     ),
     enabled: !!user?.email,
-    refetchInterval: 60000
+    refetchInterval: 30000
   });
+
+  // Real-time subscription
+  useEffect(() => {
+    if (!user?.email) return;
+    const unsub = base44.entities.UserNotification.subscribe((event) => {
+      if (event.data?.user_email === user.email) {
+        queryClient.invalidateQueries(['userNotifications', user.email]);
+      }
+    });
+    return unsub;
+  }, [user?.email]);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 

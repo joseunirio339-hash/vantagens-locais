@@ -25,6 +25,17 @@ export default function NotificationBell({ partnerId }) {
     refetchInterval: 30000
   });
 
+  // Real-time subscription
+  useEffect(() => {
+    if (!partnerId) return;
+    const unsub = base44.entities.Notification.subscribe((event) => {
+      if (event.data?.partner_id === partnerId) {
+        queryClient.invalidateQueries(['notifications', partnerId]);
+      }
+    });
+    return unsub;
+  }, [partnerId]);
+
   const unread = notifications.filter(n => !n.is_read).length;
 
   const markAllRead = async () => {
