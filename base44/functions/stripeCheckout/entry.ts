@@ -4,9 +4,9 @@ import Stripe from 'npm:stripe@14.25.0';
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
 const PRICE_MAP = {
-  user: "price_1TY71u68FdxlHlG4NbaBgBgO",
-  lojista: "price_1TY71u68FdxlHlG4vnJNoaYw",
-  empreendedor: "price_1TY71u68FdxlHlG4UkuTeIH6"
+  user: "price_1TY8efLsB3SzuNJItliAzOIn",
+  lojista: "price_1TY8efLsB3SzuNJIgs5Hw2ka",
+  empreendedor: "price_1TY8efLsB3SzuNJIjd10iAOn"
 };
 
 Deno.serve(async (req) => {
