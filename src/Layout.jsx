@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
-  Home, Store, Tag, Ticket, User, LogOut, Menu, X, 
+  Home, Store, Tag, Ticket, User, LogOut, Menu, X,
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -126,12 +126,20 @@ export default function Layout({ children }) {
                       </DropdownMenuItem>
                     </Link>
                     {isPartner && (
-                      <Link to={createPageUrl('PartnerDashboard')}>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
-                          Painel do Parceiro
-                        </DropdownMenuItem>
-                      </Link>
+                      <>
+                        <Link to={createPageUrl('PartnerDashboard')}>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                            Painel do Parceiro
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link to={createPageUrl('LojistaManager')}>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Tag className="w-4 h-4 mr-2" />
+                            Gestão de Descontos
+                          </DropdownMenuItem>
+                        </Link>
+                      </>
                     )}
                     {user.role === 'admin' && (
                       <Link to={createPageUrl('AdminDashboard')}>
