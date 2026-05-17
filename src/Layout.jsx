@@ -115,6 +115,12 @@ export default function Layout({ children }) {
                       <p className="text-xs text-slate-500">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
+                    <Link to="/UserProfile">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <User className="w-4 h-4 mr-2" />
+                        Meu Perfil
+                      </DropdownMenuItem>
+                    </Link>
                     <Link to={createPageUrl('MyVouchers')}>
                       <DropdownMenuItem className="cursor-pointer">
                         <Ticket className="w-4 h-4 mr-2" />
