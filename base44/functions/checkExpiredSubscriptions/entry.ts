@@ -2,15 +2,11 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
-  const user = await base44.auth.me();
 
-  if (user?.role !== 'admin') {
-    return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
-  }
-
+  // Esta função é chamada via automação agendada (sem usuário logado)
+  // Usa apenas service role
   const today = new Date().toISOString().split('T')[0];
 
-  // Busca assinaturas ativas ou trial que já venceram
   const subscriptions = await base44.asServiceRole.entities.Subscription.filter({ status: 'active' });
   const trialSubs = await base44.asServiceRole.entities.Subscription.filter({ status: 'trial' });
   const allActive = [...subscriptions, ...trialSubs];
@@ -30,6 +26,8 @@ Deno.serve(async (req) => {
 
     updatedCount++;
   }
+
+  console.log(`checkExpiredSubscriptions: checked=${allActive.length}, expired=${updatedCount}, date=${today}`);
 
   return Response.json({
     success: true,

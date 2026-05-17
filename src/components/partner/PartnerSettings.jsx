@@ -18,6 +18,13 @@ const categories = [
   { value: 'saude', label: 'Saúde' },
   { value: 'mercado', label: 'Mercado' },
   { value: 'servicos', label: 'Serviços' },
+  { value: 'doceria', label: 'Doceria' },
+  { value: 'hamburgueria', label: 'Hamburgueria' },
+  { value: 'trailer_food', label: 'Trailer Food' },
+  { value: 'artesanato', label: 'Artesanato' },
+  { value: 'confeitaria', label: 'Confeitaria' },
+  { value: 'salgados', label: 'Salgados' },
+  { value: 'costura', label: 'Costura' },
   { value: 'outros', label: 'Outros' }
 ];
 
@@ -356,7 +363,10 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
           </div>
 
           {subscription?.status !== 'active' && (
-            <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => window.location.href = '/Subscription'}
+            >
               Renovar Assinatura
             </Button>
           )}

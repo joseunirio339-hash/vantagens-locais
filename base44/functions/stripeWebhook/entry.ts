@@ -32,33 +32,42 @@ Deno.serve(async (req) => {
 
       const startDate = new Date(subscription.current_period_start * 1000).toISOString().split('T')[0];
       const endDate = new Date(subscription.current_period_end * 1000).toISOString().split('T')[0];
+      const isActive = subscription.status === 'active';
 
-      // Procura por subscription existente
       const existingSubscriptions = await base44.asServiceRole.entities.Subscription.filter({
         user_email: userEmail,
         type: subscriptionType
       });
 
       if (existingSubscriptions.length > 0) {
-        // Atualiza a existente
         await base44.asServiceRole.entities.Subscription.update(existingSubscriptions[0].id, {
-          status: subscription.status === 'active' ? 'active' : 'pending',
+          status: isActive ? 'active' : 'pending',
           starts_at: startDate,
           expires_at: endDate,
         });
       } else {
-        // Cria nova assinatura
         await base44.asServiceRole.entities.Subscription.create({
           user_email: userEmail,
           type: subscriptionType,
-          status: subscription.status === 'active' ? 'active' : 'pending',
+          status: isActive ? 'active' : 'pending',
           starts_at: startDate,
           expires_at: endDate,
           price: subscription.items.data[0]?.price?.unit_amount / 100 || 0,
         });
       }
 
-      console.log(`Subscription ${subscription.id} processed for ${userEmail}`);
+      // Se é assinatura de parceiro e está ativa, atualiza o Partner também
+      if (isActive && (subscriptionType === 'lojista' || subscriptionType === 'empreendedor')) {
+        const partners = await base44.asServiceRole.entities.Partner.filter({ owner_email: userEmail });
+        for (const partner of partners) {
+          await base44.asServiceRole.entities.Partner.update(partner.id, {
+            subscription_status: 'active',
+            subscription_expires_at: endDate
+          });
+        }
+      }
+
+      console.log(`Subscription ${subscription.id} processed for ${userEmail} (${subscriptionType})`);
     }
 
     if (event.type === 'customer.subscription.deleted') {
@@ -76,6 +85,16 @@ Deno.serve(async (req) => {
           await base44.asServiceRole.entities.Subscription.update(subs[0].id, {
             status: 'expired',
           });
+        }
+
+        // Atualiza o Partner para expirado
+        if (subscriptionType === 'lojista' || subscriptionType === 'empreendedor') {
+          const partners = await base44.asServiceRole.entities.Partner.filter({ owner_email: userEmail });
+          for (const partner of partners) {
+            await base44.asServiceRole.entities.Partner.update(partner.id, {
+              subscription_status: 'expired'
+            });
+          }
         }
       }
 

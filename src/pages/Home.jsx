@@ -27,6 +27,7 @@ export default function Home() {
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
+  const [productCounts, setProductCounts] = useState({});
 
   useEffect(() => {
     const loadUser = async () => {
@@ -70,6 +71,14 @@ export default function Home() {
     queryKey: ['products'],
     queryFn: () => base44.entities.Product.filter({ is_active: true })
   });
+
+  React.useEffect(() => {
+    if (products.length > 0) {
+      const counts = {};
+      products.forEach(p => { counts[p.partner_id] = (counts[p.partner_id] || 0) + 1; });
+      setProductCounts(counts);
+    }
+  }, [products]);
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['allReviews'],
@@ -220,11 +229,7 @@ export default function Home() {
         <NearbyPartnersMap
           partners={partners}
           avgRatings={avgRatings}
-          productCounts={React.useMemo(() => {
-            const map = {};
-            products.forEach(p => { map[p.partner_id] = (map[p.partner_id] || 0) + 1; });
-            return map;
-          }, [products])}
+          productCounts={productCounts}
         />
 
         {/* Location Filter */}
