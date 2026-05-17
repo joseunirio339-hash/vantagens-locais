@@ -1,0 +1,59 @@
+{
+  "name": "ScheduleConfig",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "working_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Dias da semana dispon\u00edveis (0=Dom, 1=Seg, ..., 6=S\u00e1b)"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de in\u00edcio (ex: 08:00)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de encerramento (ex: 18:00)"
+    },
+    "slot_duration": {
+      "type": "number",
+      "default": 60,
+      "description": "Dura\u00e7\u00e3o de cada slot em minutos"
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de servi\u00e7os oferecidos"
+    },
+    "blocked_dates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Datas bloqueadas (YYYY-MM-DD)"
+    },
+    "advance_booking_days": {
+      "type": "number",
+      "default": 30,
+      "description": "Quantos dias \u00e0 frente permite agendar"
+    },
+    "scheduling_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se agendamentos est\u00e3o habilitados"
+    }
+  },
+  "required": [
+    "partner_id",
+    "start_time",
+    "end_time"
+  ]
+}

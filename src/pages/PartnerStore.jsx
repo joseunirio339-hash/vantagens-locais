@@ -12,6 +12,7 @@ import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import PartnerReviews from '@/components/partner/PartnerReviews';
+import PartnerSchedulingSection from '@/components/scheduling/PartnerSchedulingSection';
 
 const categoryLabels = {
   restaurante: 'Restaurante',
@@ -239,6 +240,9 @@ export default function PartnerStore() {
           </div>
         )}
       </div>
+
+      {/* Scheduling Section */}
+      <PartnerSchedulingSection partner={partner} user={user} />
 
       {/* Reviews Section */}
       <div className="max-w-6xl mx-auto px-4 pb-10">

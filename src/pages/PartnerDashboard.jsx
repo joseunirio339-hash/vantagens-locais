@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
   Store, Package, Eye, Ticket, TrendingUp, 
-  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, CalendarDays
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,8 @@ import NotificationBell from '@/components/partner/NotificationBell';
 import PartnerReviews from '@/components/partner/PartnerReviews';
 import SalesOverview from '@/components/partner/SalesOverview';
 import QRScanner from '@/components/partner/QRScanner';
+import ScheduleConfigManager from '@/components/scheduling/ScheduleConfigManager';
+import AppointmentManager from '@/components/scheduling/AppointmentManager';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -288,6 +290,10 @@ export default function PartnerDashboard() {
               <QrCode className="w-4 h-4" />
               Ler QR Code
             </TabsTrigger>
+            <TabsTrigger value="appointments" className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4" />
+              Agendamentos
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -332,6 +338,13 @@ export default function PartnerDashboard() {
               partner={partner}
               onValidated={() => queryClient.invalidateQueries(['partnerVouchers'])}
             />
+          </TabsContent>
+
+          <TabsContent value="appointments">
+            <div className="grid md:grid-cols-2 gap-6">
+              <AppointmentManager partner={partner} />
+              <ScheduleConfigManager partner={partner} />
+            </div>
           </TabsContent>
 
           <TabsContent value="settings">
