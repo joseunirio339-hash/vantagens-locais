@@ -1,0 +1,46 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "referrer_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que indicou"
+    },
+    "referrer_code": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico de indica\u00e7\u00e3o do usu\u00e1rio"
+    },
+    "referred_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que se cadastrou pelo link"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "rewarded"
+      ],
+      "default": "pending",
+      "description": "Status da indica\u00e7\u00e3o: pending (cadastrou), completed (assinou), rewarded (recompensa entregue)"
+    },
+    "reward_type": {
+      "type": "string",
+      "enum": [
+        "points",
+        "voucher_credit"
+      ],
+      "default": "points",
+      "description": "Tipo de recompensa"
+    },
+    "points_earned": {
+      "type": "number",
+      "default": 0,
+      "description": "Pontos ganhos pela indica\u00e7\u00e3o"
+    }
+  },
+  "required": [
+    "referrer_email",
+    "referrer_code"
+  ]
+}

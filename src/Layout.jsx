@@ -121,6 +121,12 @@ export default function Layout({ children }) {
                         Meus Vouchers
                       </DropdownMenuItem>
                     </Link>
+                    <Link to={createPageUrl('ReferralPage')}>
+                      <DropdownMenuItem className="cursor-pointer text-fuchsia-600 font-medium">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Indique e Ganhe
+                      </DropdownMenuItem>
+                    </Link>
 
                     <Link to={createPageUrl('PurchaseHistory')}>
                       <DropdownMenuItem className="cursor-pointer">

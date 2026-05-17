@@ -60,6 +60,8 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import LojistaManager from './pages/LojistaManager';
 import PurchaseHistory from './pages/PurchaseHistory';
+import ReferralPage from './pages/ReferralPage';
+import ReferralLanding from './pages/ReferralLanding';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +79,8 @@ export const PAGES = {
     "TermsOfUse": TermsOfUse,
     "LojistaManager": LojistaManager,
     "PurchaseHistory": PurchaseHistory,
+    "ReferralPage": ReferralPage,
+    "ReferralLanding": ReferralLanding,
 }
 
 export const pagesConfig = {
