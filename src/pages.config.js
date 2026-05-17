@@ -59,6 +59,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import LojistaManager from './pages/LojistaManager';
+import PurchaseHistory from './pages/PurchaseHistory';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "PrivacyPolicy": PrivacyPolicy,
     "TermsOfUse": TermsOfUse,
     "LojistaManager": LojistaManager,
+    "PurchaseHistory": PurchaseHistory,
 }
 
 export const pagesConfig = {

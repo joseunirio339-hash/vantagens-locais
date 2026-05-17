@@ -121,6 +121,12 @@ export default function Layout({ children }) {
                         Meus Vouchers
                       </DropdownMenuItem>
                     </Link>
+                    <Link to={createPageUrl('PurchaseHistory')}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Minhas Compras
+                      </DropdownMenuItem>
+                    </Link>
                     <Link to={createPageUrl('Subscription')}>
                       <DropdownMenuItem className="cursor-pointer">
                         <CreditCard className="w-4 h-4 mr-2" />

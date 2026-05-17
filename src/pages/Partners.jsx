@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Search, Store, Filter, Star, MapPin, X } from 'lucide-react';
+import { Search, Store, Filter, Star, MapPin, X, Map, List, Navigation } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PartnerCard from '@/components/partners/PartnerCard';
 import FavoriteButton from '@/components/partners/FavoriteButton';
+import PartnersMap from '@/components/partners/PartnersMap';
 
 const categories = [
   { value: 'all', label: 'Todas Categorias' },
@@ -41,6 +42,9 @@ export default function Partners() {
   const [category, setCategory] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
   const [minRating, setMinRating] = useState('all');
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
+  const [userLocation, setUserLocation] = useState(null);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (auth) => {
@@ -108,6 +112,25 @@ export default function Partners() {
     setCityFilter('all');
     setMinRating('all');
   };
+
+  const handleLocate = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        setViewMode('map');
+        setLocating(false);
+      },
+      () => setLocating(false)
+    );
+  };
+
+  // Build avgRatings map for map component
+  const avgRatingsMap = {};
+  Object.entries(avgRatings).forEach(([id, data]) => {
+    avgRatingsMap[id] = data.sum / data.count;
+  });
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -216,10 +239,38 @@ export default function Partners() {
           </div>
         )}
 
-        {/* Results count */}
-        <p className="text-sm text-slate-500 mb-4">
-          {isLoading ? 'Carregando...' : `${filteredPartners.length} parceiro${filteredPartners.length !== 1 ? 's' : ''} encontrado${filteredPartners.length !== 1 ? 's' : ''}`}
-        </p>
+        {/* Results count + view toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-slate-500">
+            {isLoading ? 'Carregando...' : `${filteredPartners.length} parceiro${filteredPartners.length !== 1 ? 's' : ''} encontrado${filteredPartners.length !== 1 ? 's' : ''}`}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleLocate}
+              disabled={locating}
+            >
+              <Navigation className={`w-4 h-4 ${locating ? 'animate-pulse text-violet-500' : ''}`} />
+              {locating ? 'Localizando...' : 'Perto de mim'}
+            </Button>
+            <div className="flex border rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${viewMode === 'list' ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+              >
+                <List className="w-4 h-4" /> Lista
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${viewMode === 'map' ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+              >
+                <Map className="w-4 h-4" /> Mapa
+              </button>
+            </div>
+          </div>
+        </div>
 
         {isLoading ? (
           <div className="grid md:grid-cols-2 gap-4">
@@ -237,6 +288,12 @@ export default function Partners() {
               </Button>
             )}
           </div>
+        ) : viewMode === 'map' ? (
+          <PartnersMap
+            partners={filteredPartners}
+            avgRatings={avgRatingsMap}
+            userLocation={userLocation}
+          />
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
             {filteredPartners.map(partner => {
@@ -249,14 +306,12 @@ export default function Partners() {
                       productCount={getProductCount(partner.id)}
                     />
                   </Link>
-                  {/* Rating overlay */}
                   {avg !== null && (
                     <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-sm border">
                       <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                       <span className="text-xs font-semibold text-slate-700">{avg.toFixed(1)}</span>
                     </div>
                   )}
-                  {/* Favorite button */}
                   <div className="absolute top-2 right-2">
                     <FavoriteButton partnerId={partner.id} user={user} />
                   </div>

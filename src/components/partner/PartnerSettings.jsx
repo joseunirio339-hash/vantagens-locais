@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Store, Image, Loader2, Save, Calendar, MapPin, MessageCircle } from 'lucide-react';
+import { Store, Image, Loader2, Save, Calendar, MapPin, MessageCircle, Navigation } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,8 +36,22 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
     state: partner?.state || '',
     phone: partner?.phone || '',
     whatsapp_business_enabled: partner?.whatsapp_business_enabled || false,
-    whatsapp_business_number: partner?.whatsapp_business_number || ''
+    whatsapp_business_number: partner?.whatsapp_business_number || '',
+    lat: partner?.lat || '',
+    lng: partner?.lng || ''
   });
+
+  const handleAutoLocate = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setFormData(prev => ({
+        ...prev,
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      }));
+      toast.success('Localização obtida com sucesso!');
+    }, () => toast.error('Não foi possível obter a localização.'));
+  };
 
   const handleCepBlur = async (cep) => {
     const cleanCep = cep.replace(/\D/g, '');
@@ -215,6 +229,35 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 placeholder="(00) 00000-0000"
               />
+            </div>
+
+            {/* Geolocation */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <Navigation className="w-3 h-3 text-violet-500" />
+                Localização no Mapa (opcional)
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  value={formData.lat}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lat: e.target.value }))}
+                  placeholder="Latitude"
+                  type="number"
+                  step="any"
+                />
+                <Input
+                  value={formData.lng}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lng: e.target.value }))}
+                  placeholder="Longitude"
+                  type="number"
+                  step="any"
+                />
+              </div>
+              <Button type="button" variant="outline" size="sm" className="gap-2 w-full" onClick={handleAutoLocate}>
+                <Navigation className="w-3 h-3" />
+                Usar minha localização atual
+              </Button>
+              <p className="text-xs text-slate-400">Preencha para aparecer no mapa interativo de parceiros</p>
             </div>
 
             {/* WhatsApp Business */}
