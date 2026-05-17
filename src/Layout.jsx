@@ -6,6 +6,7 @@ import {
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert
 } from 'lucide-react';
+import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -92,6 +93,7 @@ export default function Layout({ children }) {
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
+              {user && <UserNotificationBell user={user} />}
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

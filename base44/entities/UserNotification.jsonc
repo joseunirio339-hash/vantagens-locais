@@ -1,0 +1,40 @@
+{
+  "name": "UserNotification",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio destinat\u00e1rio"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "voucher_expiring",
+        "new_coupon"
+      ],
+      "description": "Tipo de notifica\u00e7\u00e3o"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensagem"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "ID do voucher ou produto relacionado"
+    }
+  },
+  "required": [
+    "user_email",
+    "type",
+    "title",
+    "message"
+  ]
+}
