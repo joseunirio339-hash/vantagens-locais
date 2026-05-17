@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, CalendarDays
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import { Button } from '@/components/ui/button';
@@ -121,12 +121,7 @@ export default function Layout({ children }) {
                         Meus Vouchers
                       </DropdownMenuItem>
                     </Link>
-                    <Link to={createPageUrl('MyAppointments')}>
-                      <DropdownMenuItem className="cursor-pointer">
-                        <CalendarDays className="w-4 h-4 mr-2" />
-                        Meus Agendamentos
-                      </DropdownMenuItem>
-                    </Link>
+
                     <Link to={createPageUrl('PurchaseHistory')}>
                       <DropdownMenuItem className="cursor-pointer">
                         <CreditCard className="w-4 h-4 mr-2" />
