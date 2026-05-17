@@ -304,14 +304,10 @@ export default function Partners() {
                     <PartnerCard
                       partner={partner}
                       productCount={getProductCount(partner.id)}
+                      avgRating={avg || 0}
+                      reviewCount={avgRatings[partner.id]?.count || 0}
                     />
                   </Link>
-                  {avg !== null && (
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-sm border">
-                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                      <span className="text-xs font-semibold text-slate-700">{avg.toFixed(1)}</span>
-                    </div>
-                  )}
                   <div className="absolute top-2 right-2">
                     <FavoriteButton partnerId={partner.id} user={user} />
                   </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Tag } from 'lucide-react';
+import { MapPin, Tag, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 
@@ -22,7 +22,7 @@ const categoryColors = {
   outros: 'bg-slate-100 text-slate-700'
 };
 
-export default function PartnerCard({ partner, productCount = 0, onClick }) {
+export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick }) {
   const isEmpreendedor = partner?.partner_type === 'empreendedor';
   return (
     <motion.div
@@ -78,6 +78,13 @@ export default function PartnerCard({ partner, productCount = 0, onClick }) {
               <Tag className="w-3 h-3" />
               {productCount} produtos
             </span>
+            {reviewCount > 0 && (
+              <span className="flex items-center gap-1 text-amber-500">
+                <Star className="w-3 h-3 fill-amber-400" />
+                <span className="font-semibold">{avgRating.toFixed(1)}</span>
+                <span className="text-slate-400">({reviewCount})</span>
+              </span>
+            )}
           </div>
         </div>
       </div>

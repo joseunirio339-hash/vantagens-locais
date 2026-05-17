@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReviewModal from '@/components/voucher/ReviewModal';
 import UserProgressCard from '@/components/gamification/UserProgressCard';
+import UserBadgesDisplay from '@/components/badges/UserBadgesDisplay';
 
 const statusConfig = {
   pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
@@ -254,7 +255,10 @@ export default function MyVouchers() {
             )}
           </TabsContent>
           <TabsContent value="progress">
-            <UserProgressCard vouchers={vouchers} />
+            <div className="space-y-6">
+              <UserProgressCard vouchers={vouchers} />
+              <UserBadgesDisplay userEmail={user?.email} />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

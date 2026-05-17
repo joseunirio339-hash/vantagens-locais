@@ -93,6 +93,16 @@ Deno.serve(async (req) => {
       });
 
       if (existing.length === 0) {
+        // Save badge to Badge entity
+        await base44.asServiceRole.entities.Badge.create({
+          user_email: userEmail,
+          badge_id: badge.id,
+          badge_name: badge.name,
+          badge_icon: badge.icon,
+          badge_category: badge.type === 'used' || badge.type === 'partners' ? (badge.type === 'partners' ? 'exploracao' : 'compras') : 'fidelidade',
+          description: `${badge.threshold} ${badge.type === 'used' ? 'vouchers utilizados' : 'parceiros diferentes visitados'}`
+        });
+
         await base44.asServiceRole.entities.UserNotification.create({
           user_email: userEmail,
           type: 'badge_earned',

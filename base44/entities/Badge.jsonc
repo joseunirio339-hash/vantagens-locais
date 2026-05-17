@@ -1,0 +1,42 @@
+{
+  "name": "Badge",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que ganhou a badge"
+    },
+    "badge_id": {
+      "type": "string",
+      "description": "Identificador \u00fanico da badge (ex: first_voucher, top_referrer)"
+    },
+    "badge_name": {
+      "type": "string",
+      "description": "Nome exib\u00edvel da conquista"
+    },
+    "badge_icon": {
+      "type": "string",
+      "description": "Emoji do \u00edcone da badge"
+    },
+    "badge_category": {
+      "type": "string",
+      "enum": [
+        "compras",
+        "indicacoes",
+        "fidelidade",
+        "exploracao"
+      ],
+      "description": "Categoria da conquista"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o de como conquistou"
+    }
+  },
+  "required": [
+    "user_email",
+    "badge_id",
+    "badge_name",
+    "badge_icon"
+  ]
+}

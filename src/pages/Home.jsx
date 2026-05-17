@@ -14,6 +14,8 @@ import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import LocationFilter from '@/components/home/LocationFilter';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
+import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
+import TopRatedPartners from '@/components/home/TopRatedPartners';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -67,6 +69,21 @@ export default function Home() {
     queryKey: ['products'],
     queryFn: () => base44.entities.Product.filter({ is_active: true })
   });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['allReviews'],
+    queryFn: () => base44.entities.Review.list()
+  });
+
+  const avgRatings = React.useMemo(() => {
+    const map = {};
+    reviews.forEach(r => {
+      if (!map[r.partner_id]) map[r.partner_id] = { sum: 0, count: 0 };
+      map[r.partner_id].sum += r.rating;
+      map[r.partner_id].count += 1;
+    });
+    return map;
+  }, [reviews]);
 
   const activePartnerIds = partners.map(p => p.id);
   const activeProducts = products.filter(p => activePartnerIds.includes(p.partner_id));
@@ -191,6 +208,13 @@ export default function Home() {
           />
         )}
 
+        {/* Badges Widget */}
+        {user && (
+          <div className="mb-8">
+            <HomeBadgesWidget userEmail={user.email} />
+          </div>
+        )}
+
         {/* Location Filter */}
         <LocationFilter
           partners={partners}
@@ -199,6 +223,9 @@ export default function Home() {
           onCityChange={setSelectedCity}
           onNeighborhoodChange={setSelectedNeighborhood}
         />
+
+        {/* Top Rated Partners */}
+        {!searchTerm && <TopRatedPartners />}
 
         {/* Featured Products */}
         {!searchTerm && (
@@ -297,6 +324,8 @@ export default function Home() {
                     <PartnerCard
                       partner={partner}
                       productCount={getProductCount(partner.id)}
+                      avgRating={avgRatings[partner.id] ? avgRatings[partner.id].sum / avgRatings[partner.id].count : 0}
+                      reviewCount={avgRatings[partner.id]?.count || 0}
                     />
                   </Link>
                 ))}
