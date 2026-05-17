@@ -2,7 +2,7 @@ import React from 'react';
 import { Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { ptBR } from 'date-fns/locale/pt-BR';
 
 const statusConfig = {
   pending:   { label: 'Aguardando assinatura', color: 'bg-amber-100 text-amber-700' },
