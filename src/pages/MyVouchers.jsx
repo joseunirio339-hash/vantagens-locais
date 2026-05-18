@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReviewModal from '@/components/voucher/ReviewModal';
-import UserProgressCard from '@/components/gamification/UserProgressCard';
-import UserBadgesDisplay from '@/components/badges/UserBadgesDisplay';
+import AchievementsTab from '@/components/gamification/AchievementsTab';
 
 const statusConfig = {
   pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
@@ -204,9 +203,9 @@ export default function MyVouchers() {
             <TabsTrigger value="expired" className="flex-1">
               Expirados ({expiredVouchers.length})
             </TabsTrigger>
-            <TabsTrigger value="progress" className="flex-1 gap-1">
+            <TabsTrigger value="achievements" className="flex-1 gap-1 text-xs">
               <Trophy className="w-3.5 h-3.5" />
-              Progresso
+              Conquistas
             </TabsTrigger>
           </TabsList>
 
@@ -254,11 +253,8 @@ export default function MyVouchers() {
               </div>
             )}
           </TabsContent>
-          <TabsContent value="progress">
-            <div className="space-y-6">
-              <UserProgressCard vouchers={vouchers} />
-              <UserBadgesDisplay userEmail={user?.email} />
-            </div>
+          <TabsContent value="achievements">
+            <AchievementsTab vouchers={vouchers} userEmail={user?.email} />
           </TabsContent>
         </Tabs>
       </div>
