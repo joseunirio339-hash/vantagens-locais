@@ -12,7 +12,9 @@
         "voucher_expiring",
         "new_coupon",
         "level_up",
-        "badge_earned"
+        "badge_earned",
+        "appointment_confirmed",
+        "appointment_cancelled"
       ],
       "description": "Tipo de notifica\u00e7\u00e3o"
     },
@@ -30,7 +32,7 @@
     },
     "reference_id": {
       "type": "string",
-      "description": "ID do voucher, produto ou conquista relacionada"
+      "description": "ID do voucher, produto, conquista ou agendamento relacionado"
     }
   },
   "required": [
