@@ -112,6 +112,9 @@ export default function Home() {
   const locationFilteredPartnerIds = locationFilteredPartners.map(p => p.id);
   const locationFilteredProducts = activeProducts.filter(p => locationFilteredPartnerIds.includes(p.partner_id));
 
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortBy, setSortBy] = useState('');
+
   const filteredProducts = React.useMemo(() => {
     let list = locationFilteredProducts.filter(p =>
       p.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -130,9 +133,6 @@ export default function Home() {
     }
     return list;
   }, [locationFilteredProducts, searchTerm, selectedCategory, sortBy]);
-
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('');
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
 
