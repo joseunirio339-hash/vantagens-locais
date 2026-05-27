@@ -13,6 +13,7 @@ import SubscriptionBanner from '@/components/ui/SubscriptionBanner';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import LocationFilter from '@/components/home/LocationFilter';
+import ProductFilterBar from '@/components/home/ProductFilterBar';
 import NearbyPartnersMap from '@/components/home/NearbyPartnersMap';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
@@ -111,9 +112,27 @@ export default function Home() {
   const locationFilteredPartnerIds = locationFilteredPartners.map(p => p.id);
   const locationFilteredProducts = activeProducts.filter(p => locationFilteredPartnerIds.includes(p.partner_id));
 
-  const filteredProducts = locationFilteredProducts.filter(p =>
-    p.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = React.useMemo(() => {
+    let list = locationFilteredProducts.filter(p =>
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    if (selectedCategory) {
+      list = list.filter(p => p.category === selectedCategory);
+    }
+    if (sortBy === 'price_asc') {
+      list = [...list].sort((a, b) => (a.discount_price || a.original_price) - (b.discount_price || b.original_price));
+    } else if (sortBy === 'discount_desc') {
+      list = [...list].sort((a, b) => {
+        const discA = a.discount_percentage || (a.original_price ? ((a.original_price - a.discount_price) / a.original_price) * 100 : 0);
+        const discB = b.discount_percentage || (b.original_price ? ((b.original_price - b.discount_price) / b.original_price) * 100 : 0);
+        return discB - discA;
+      });
+    }
+    return list;
+  }, [locationFilteredProducts, searchTerm, selectedCategory, sortBy]);
+
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortBy, setSortBy] = useState('');
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
 
@@ -127,16 +146,29 @@ export default function Home() {
   }, []);
 
   const featuredProducts = React.useMemo(() => {
-    const sorted = [...locationFilteredProducts].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
-    const top = sorted.slice(0, 8);
-    // embaralha aleatoriamente a cada tick
+    let pool = [...locationFilteredProducts];
+    if (selectedCategory) pool = pool.filter(p => p.category === selectedCategory);
+
+    if (sortBy === 'price_asc') {
+      pool.sort((a, b) => (a.discount_price || a.original_price) - (b.discount_price || b.original_price));
+      return pool.slice(0, 6);
+    } else if (sortBy === 'discount_desc') {
+      pool.sort((a, b) => {
+        const discA = a.discount_percentage || (a.original_price ? ((a.original_price - a.discount_price) / a.original_price) * 100 : 0);
+        const discB = b.discount_percentage || (b.original_price ? ((b.original_price - b.discount_price) / b.original_price) * 100 : 0);
+        return discB - discA;
+      });
+      return pool.slice(0, 6);
+    }
+
+    const top = pool.sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 8);
     for (let i = top.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [top[i], top[j]] = [top[j], top[i]];
     }
     return top.slice(0, 6);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shuffleSeed, activeProducts.length]);
+  }, [shuffleSeed, activeProducts.length, selectedCategory, sortBy]);
 
   const handleProductClick = async (product) => {
     if (!user) {
@@ -246,6 +278,14 @@ export default function Home() {
 
         {/* Top Rated Partners */}
         {!searchTerm && <TopRatedPartners />}
+
+        {/* Filter Bar */}
+        <ProductFilterBar
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
 
         {/* Meus Favoritos */}
         {!searchTerm && user && favoriteIds.size > 0 && (
