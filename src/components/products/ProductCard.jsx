@@ -2,8 +2,9 @@ import React from 'react';
 import { Tag, Percent, Eye, Star, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import FavoriteButton from './FavoriteButton';
 
-export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount }) {
+export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount, isFavorite, onToggleFavorite }) {
   const discountPercent = Math.round(
     ((product.original_price - product.discount_price) / product.original_price) * 100
   );
@@ -27,11 +28,17 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
             <Tag className="w-12 h-12 text-slate-300" />
           </div>
         )}
-        {/* Discount badge - top right */}
-        <div className="absolute top-3 right-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+        {/* Discount badge - top left */}
+        <div className="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
           <Percent className="w-3 h-3" />
           {discountPercent}% OFF
         </div>
+        {/* Favorite button - top right */}
+        {onToggleFavorite && (
+          <div className="absolute top-3 right-3">
+            <FavoriteButton isFavorite={!!isFavorite} onToggle={onToggleFavorite} />
+          </div>
+        )}
         {/* Bottom glassmorphism strip */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-fuchsia-600/80 to-transparent px-3 py-2">
           <div className="flex items-center gap-1">

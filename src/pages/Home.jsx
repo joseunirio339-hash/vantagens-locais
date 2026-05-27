@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Search, Store, Tag, ChevronRight, Sparkles } from 'lucide-react';
+import { Search, Store, Tag, ChevronRight, Sparkles, Heart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,7 @@ import NearbyPartnersMap from '@/components/home/NearbyPartnersMap';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
+import { useFavorites } from '@/hooks/useFavorites';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -113,6 +114,8 @@ export default function Home() {
   const filteredProducts = locationFilteredProducts.filter(p =>
     p.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const { favoriteIds, toggleFavorite } = useFavorites(user);
 
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
@@ -244,6 +247,35 @@ export default function Home() {
         {/* Top Rated Partners */}
         {!searchTerm && <TopRatedPartners />}
 
+        {/* Meus Favoritos */}
+        {!searchTerm && user && favoriteIds.size > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                  <Heart className="w-6 h-6 fill-rose-500 text-rose-500" />
+                  Meus Favoritos
+                </h2>
+                <p className="text-slate-500 text-sm">{favoriteIds.size} produto{favoriteIds.size !== 1 ? 's' : ''} salvos</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {activeProducts
+                .filter(p => favoriteIds.has(p.id))
+                .map(product => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    partner={partners.find(p => p.id === product.partner_id)}
+                    onClick={() => handleProductClick(product)}
+                    isFavorite={true}
+                    onToggleFavorite={() => toggleFavorite(product, partners.find(p => p.id === product.partner_id))}
+                  />
+                ))}
+            </div>
+          </section>
+        )}
+
         {/* Featured Products */}
         {!searchTerm && (
           <section className="mb-12">
@@ -273,6 +305,8 @@ export default function Home() {
                     product={product}
                     partner={partners.find(p => p.id === product.partner_id)}
                     onClick={() => handleProductClick(product)}
+                    isFavorite={favoriteIds.has(product.id)}
+                    onToggleFavorite={user ? () => toggleFavorite(product, partners.find(p => p.id === product.partner_id)) : null}
                   />
                 ))}
               </div>
@@ -299,6 +333,8 @@ export default function Home() {
                     product={product}
                     partner={partners.find(p => p.id === product.partner_id)}
                     onClick={() => handleProductClick(product)}
+                    isFavorite={favoriteIds.has(product.id)}
+                    onToggleFavorite={user ? () => toggleFavorite(product, partners.find(p => p.id === product.partner_id)) : null}
                   />
                 ))}
               </div>

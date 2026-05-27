@@ -1,0 +1,23 @@
+{
+  "name": "FavoriteProduct",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "ID do produto favoritado"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro do produto"
+    }
+  },
+  "required": [
+    "user_email",
+    "product_id",
+    "partner_id"
+  ]
+}
