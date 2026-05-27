@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
-import PartnerReviews from '@/components/partner/PartnerReviews';
+import ProductReviews from '@/components/reviews/ProductReviews';
 import RaffleSpinModal from '@/components/raffle/RaffleSpinModal';
 
 const categoryLabels = {
@@ -255,6 +255,8 @@ export default function PartnerStore() {
                 key={product.id}
                 product={product}
                 onClick={() => handleProductClick(product)}
+                avgRating={avgRating}
+                reviewCount={reviews.length}
               />
             ))}
           </div>
@@ -300,7 +302,7 @@ export default function PartnerStore() {
           <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
           Avaliações dos Clientes
         </h2>
-        <PartnerReviews partnerId={partnerId} />
+        <ProductReviews partnerId={partnerId} partnerName={partner?.business_name} />
       </div>
 
       <RaffleSpinModal

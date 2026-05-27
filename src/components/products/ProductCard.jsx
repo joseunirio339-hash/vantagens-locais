@@ -1,9 +1,9 @@
 import React from 'react';
-import { Tag, Percent, Eye } from 'lucide-react';
+import { Tag, Percent, Eye, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 
-export default function ProductCard({ product, partner, onClick, showViews = false }) {
+export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount }) {
   const discountPercent = Math.round(
     ((product.original_price - product.discount_price) / product.original_price) * 100
   );
@@ -48,12 +48,23 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
           </span>
         </div>
 
-        {showViews && (
-          <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
-            <Eye className="w-3 h-3" />
-            {product.views_count || 0} visualizações
-          </div>
-        )}
+        <div className="flex items-center justify-between mt-2">
+          {avgRating ? (
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+              <span className="text-xs font-semibold text-slate-700">{Number(avgRating).toFixed(1)}</span>
+              {reviewCount !== undefined && (
+                <span className="text-xs text-slate-400">({reviewCount})</span>
+              )}
+            </div>
+          ) : <span />}
+          {showViews && (
+            <div className="flex items-center gap-1 text-xs text-slate-400">
+              <Eye className="w-3 h-3" />
+              {product.views_count || 0}
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

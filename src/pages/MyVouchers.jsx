@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { createPageUrl } from '@/utils';
-import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar, Star, Trophy } from 'lucide-react';
+import { Ticket, CheckCircle, Clock, XCircle, Store, Calendar, Star, Trophy, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReviewModal from '@/components/voucher/ReviewModal';
 import AchievementsTab from '@/components/gamification/AchievementsTab';
+import MyReviewsList from '@/components/reviews/MyReviewsList';
 
 const statusConfig = {
   pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
@@ -207,6 +208,10 @@ export default function MyVouchers() {
               <Trophy className="w-3.5 h-3.5" />
               Conquistas
             </TabsTrigger>
+            <TabsTrigger value="reviews" className="flex-1 gap-1 text-xs">
+              <MessageSquare className="w-3.5 h-3.5" />
+              Avaliações
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="active">
@@ -255,6 +260,9 @@ export default function MyVouchers() {
           </TabsContent>
           <TabsContent value="achievements">
             <AchievementsTab vouchers={vouchers} userEmail={user?.email} />
+          </TabsContent>
+          <TabsContent value="reviews">
+            <MyReviewsList userEmail={user?.email} />
           </TabsContent>
         </Tabs>
       </div>
