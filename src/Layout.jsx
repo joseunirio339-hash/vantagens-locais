@@ -62,9 +62,7 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-fuchsia-500 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-12 h-12 rounded-lg" />
               <span className="font-bold text-xl text-slate-800 hidden sm:block">
                 Clube Max Descontos
               </span>
@@ -242,9 +240,7 @@ export default function Layout({ children }) {
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-fuchsia-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
+              <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-8 h-8 rounded-lg" />
               <span className="font-semibold text-slate-700">Descontos Locais</span>
             </div>
             <div className="flex flex-col items-center md:items-end gap-1">
