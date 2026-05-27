@@ -1,0 +1,60 @@
+{
+  "name": "Appointment",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nome do usu\u00e1rio"
+    },
+    "voucher_id": {
+      "type": "string",
+      "description": "ID do voucher que ser\u00e1 utilizado"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "ID do produto"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Nome do produto"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do agendamento"
+    },
+    "time_slot": {
+      "type": "string",
+      "description": "Hor\u00e1rio do agendamento (ex: 14:00)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es do usu\u00e1rio"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "Status do agendamento"
+    }
+  },
+  "required": [
+    "partner_id",
+    "user_email",
+    "date",
+    "time_slot"
+  ]
+}

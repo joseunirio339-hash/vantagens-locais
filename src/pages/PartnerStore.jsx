@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { MapPin, Phone, Tag, ArrowLeft, Star, Gift } from 'lucide-react';
+import { MapPin, Phone, Tag, ArrowLeft, Star, Gift, CalendarClock } from 'lucide-react';
 import PartnerLocationMap from '@/components/partners/PartnerLocationMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherMo
 import ProductReviews from '@/components/reviews/ProductReviews';
 import PartnerReviewForm from '@/components/reviews/PartnerReviewForm';
 import RaffleSpinModal from '@/components/raffle/RaffleSpinModal';
+import BookingModal from '@/components/scheduling/BookingModal';
 
 const categoryLabels = {
   restaurante: 'Restaurante',
@@ -40,6 +41,7 @@ export default function PartnerStore() {
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [raffleModalOpen, setRaffleModalOpen] = useState(false);
   const [selectedRaffle, setSelectedRaffle] = useState(null);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const partnerId = urlParams.get('id');
@@ -297,6 +299,30 @@ export default function PartnerStore() {
         </div>
       )}
 
+      {/* Booking Section */}
+      {user && userVouchers.filter(v => v.status === 'pending').length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 pb-6">
+          <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-100 rounded-2xl p-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <CalendarClock className="w-6 h-6 text-violet-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800">Agende seu atendimento</p>
+                <p className="text-sm text-slate-500">Você tem {userVouchers.filter(v => v.status === 'pending').length} voucher(s) disponível(is) — reserve um horário com o parceiro</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => setBookingModalOpen(true)}
+              className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white flex-shrink-0"
+            >
+              <CalendarClock className="w-4 h-4 mr-2" />
+              Agendar
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Reviews Section */}
       <div className="max-w-6xl mx-auto px-4 pb-10">
         <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -312,6 +338,14 @@ export default function PartnerStore() {
           </div>
         </div>
       </div>
+
+      <BookingModal
+        open={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
+        partner={partner}
+        voucher={userVouchers.find(v => v.status === 'pending')}
+        user={user}
+      />
 
       <RaffleSpinModal
         open={raffleModalOpen}

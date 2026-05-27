@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
   Store, Package, Eye, Ticket, TrendingUp, 
-  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, Gift
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, Gift, CalendarDays
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import SalesOverview from '@/components/partner/SalesOverview';
 import QRScanner from '@/components/partner/QRScanner';
 import RaffleManager from '@/components/raffle/RaffleManager';
 import PartnerPerformance from '@/components/partner/PartnerPerformance';
+import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -298,6 +299,10 @@ export default function PartnerDashboard() {
               <Gift className="w-4 h-4" />
               Sorteios
             </TabsTrigger>
+            <TabsTrigger value="appointments" className="flex items-center gap-2">
+              <CalendarDays className="w-4 h-4" />
+              Agendamentos
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -355,6 +360,10 @@ export default function PartnerDashboard() {
 
           <TabsContent value="raffles">
             <RaffleManager partner={partner} />
+          </TabsContent>
+
+          <TabsContent value="appointments">
+            <AppointmentsCalendar partnerId={partner?.id} />
           </TabsContent>
 
           <TabsContent value="settings">
