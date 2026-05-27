@@ -170,39 +170,39 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-12 md:py-20">
+      <div className="relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e8316c 0%, #f4692a 50%, #f59e0b 100%)'}}>
+        <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Text side */}
             <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 mb-4">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">🛍️ Ofertas imperdíveis perto de você</span>
+              <div className="inline-flex items-center gap-2 bg-white/25 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5 border border-white/30">
+                <Sparkles className="w-4 h-4 text-yellow-200" />
+                <span className="text-sm font-semibold text-white">🛍️ Ofertas imperdíveis perto de você</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight" style={{fontFamily: "'Trebuchet MS', 'Arial Rounded MT Bold', Arial, sans-serif", textShadow: '2px 3px 0px rgba(0,0,0,0.15)'}}>
-                <span className="text-yellow-300">CLUBE</span>{' '}
-                <span className="text-white">MAX</span>{' '}
-                <span className="text-yellow-300">DESCONTOS</span>
+              <h1 className="text-5xl md:text-7xl font-black mb-4 tracking-tight leading-none">
+                <span className="text-white drop-shadow-md">CLUBE MAX</span>
+                <br />
+                <span className="text-white drop-shadow-md">DESCONTOS</span>
               </h1>
-              <p className="text-lg text-orange-100 max-w-xl mb-8 font-medium">
+              <p className="text-base text-white/90 max-w-xl mb-8 font-medium">
                 Descubra ofertas incríveis dos melhores estabelecimentos da sua região 🔥
               </p>
-              <div className="max-w-xl relative">
+              <div className="max-w-md relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <Input
                   placeholder="Buscar produtos ou lojas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-14 rounded-2xl border-0 shadow-lg text-slate-800"
+                  className="pl-12 h-12 rounded-2xl border-0 shadow-xl text-slate-800 bg-white"
                 />
               </div>
             </div>
             {/* Image side */}
-            <div className="flex-shrink-0 w-full md:w-80 lg:w-96">
+            <div className="flex-shrink-0 w-full md:w-72 lg:w-80">
               <img
                 src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/e7d12a3df_generated_image.png"
                 alt="Família feliz com compras"
-                className="w-full h-64 md:h-80 object-cover rounded-3xl shadow-2xl"
+                className="w-full h-56 md:h-72 object-cover rounded-3xl shadow-2xl border-4 border-white/20"
               />
             </div>
           </div>
@@ -249,11 +249,11 @@ export default function Home() {
           <section className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">Em Alta</h2>
-                <p className="text-slate-500">Produtos mais acessados</p>
+                <h2 className="text-2xl font-extrabold text-slate-900">Em Alta 🔥</h2>
+                <p className="text-slate-500 text-sm">Produtos mais acessados</p>
               </div>
               <Link to={createPageUrl('Products')}>
-                <Button variant="ghost" className="text-emerald-600">
+                <Button variant="ghost" className="text-fuchsia-600 font-semibold hover:bg-fuchsia-50">
                   Ver todos <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
@@ -318,11 +318,11 @@ export default function Home() {
           <section>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">Parceiros</h2>
-                <p className="text-slate-500">Lojas com descontos exclusivos</p>
+                <h2 className="text-2xl font-extrabold text-slate-900">Parceiros 🏪</h2>
+                <p className="text-slate-500 text-sm">Lojas com descontos exclusivos</p>
               </div>
               <Link to={createPageUrl('Partners')}>
-                <Button variant="ghost" className="text-emerald-600">
+                <Button variant="ghost" className="text-fuchsia-600 font-semibold hover:bg-fuchsia-50">
                   Ver todos <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>

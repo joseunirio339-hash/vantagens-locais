@@ -29,7 +29,7 @@ export default function PartnerCard({ partner, productCount = 0, avgRating = 0, 
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`bg-white rounded-2xl shadow-sm border overflow-hidden cursor-pointer hover:shadow-lg transition-shadow p-4 ${isEmpreendedor ? 'border-amber-200' : 'border-slate-100'}`}
+      className={`bg-white rounded-3xl shadow-md hover:shadow-xl border overflow-hidden cursor-pointer transition-all p-4 ${isEmpreendedor ? 'border-amber-200' : 'border-slate-100'}`}
     >
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
