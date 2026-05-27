@@ -12,6 +12,7 @@ import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import ProductReviews from '@/components/reviews/ProductReviews';
+import PartnerReviewForm from '@/components/reviews/PartnerReviewForm';
 import RaffleSpinModal from '@/components/raffle/RaffleSpinModal';
 
 const categoryLabels = {
@@ -302,7 +303,14 @@ export default function PartnerStore() {
           <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
           Avaliações dos Clientes
         </h2>
-        <ProductReviews partnerId={partnerId} partnerName={partner?.business_name} />
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <ProductReviews partnerId={partnerId} partnerName={partner?.business_name} />
+          </div>
+          <div>
+            <PartnerReviewForm partnerId={partnerId} user={user} />
+          </div>
+        </div>
       </div>
 
       <RaffleSpinModal
