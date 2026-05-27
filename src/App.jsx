@@ -8,6 +8,8 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import UserProfile from './pages/UserProfile';
+import Cart from './pages/Cart';
+import { CartProvider } from '@/context/CartContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -60,6 +62,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/UserProfile" element={<LayoutWrapper currentPageName="UserProfile"><UserProfile /></LayoutWrapper>} />
+      <Route path="/Cart" element={<LayoutWrapper currentPageName="Cart"><Cart /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -70,6 +73,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <CartProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
@@ -77,6 +81,7 @@ function App() {
         </Router>
         <Toaster />
       </QueryClientProvider>
+      </CartProvider>
     </AuthProvider>
   )
 }

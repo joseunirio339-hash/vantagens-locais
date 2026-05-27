@@ -4,9 +4,10 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
+import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function Layout({ children }) {
+  const { totalItems } = useCart();
   const [user, setUser] = useState(null);
   const [isPartner, setIsPartner] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -91,6 +93,15 @@ export default function Layout({ children }) {
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
+              {/* Cart Icon */}
+              <Link to="/Cart" className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                <ShoppingCart className="w-5 h-5 text-slate-600" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-fuchsia-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
+              </Link>
               {user && <UserNotificationBell user={user} />}
               {user ? (
                 <DropdownMenu>

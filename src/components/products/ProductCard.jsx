@@ -1,13 +1,25 @@
 import React from 'react';
-import { Tag, Percent, Eye, Star, Sparkles } from 'lucide-react';
+import { Tag, Percent, Eye, Star, Sparkles, ShoppingCart, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import FavoriteButton from './FavoriteButton';
+import { useCart } from '@/context/CartContext';
 
 export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount, isFavorite, onToggleFavorite }) {
+  const { addItem, items } = useCart();
+  const [added, setAdded] = React.useState(false);
+  const inCart = items.some(i => i.product.id === product.id);
+
   const discountPercent = Math.round(
     ((product.original_price - product.discount_price) / product.original_price) * 100
   );
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    addItem(product, partner);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <motion.div
@@ -78,6 +90,26 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
             {product.views_count || 0}
           </div>
         )}
+
+        {/* Add to cart button */}
+        <button
+          onClick={handleAddToCart}
+          className={`mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            added
+              ? 'bg-emerald-500 text-white'
+              : inCart
+              ? 'bg-violet-100 text-violet-700 hover:bg-violet-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-fuchsia-100 hover:text-fuchsia-700'
+          }`}
+        >
+          {added ? (
+            <><Check className="w-3.5 h-3.5" /> Adicionado!</>
+          ) : inCart ? (
+            <><ShoppingCart className="w-3.5 h-3.5" /> No carrinho</>
+          ) : (
+            <><ShoppingCart className="w-3.5 h-3.5" /> Adicionar</>
+          )}
+        </button>
       </div>
     </motion.div>
   );
