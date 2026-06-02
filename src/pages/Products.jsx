@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { Search, Tag, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, Tag, SlidersHorizontal, MapPin, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +14,8 @@ export default function Products() {
   const [subscription, setSubscription] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [cityFilter, setCityFilter] = useState('');
+  const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
@@ -55,7 +57,28 @@ export default function Products() {
   const activePartnerIds = partners.map(p => p.id);
   const activeProducts = products.filter(p => activePartnerIds.includes(p.partner_id));
 
-  const filteredProducts = activeProducts
+  const cities = React.useMemo(() => {
+    return Array.from(new Set(partners.filter(p => p.city).map(p => p.city))).sort();
+  }, [partners]);
+
+  const neighborhoods = React.useMemo(() => {
+    const filtered = cityFilter ? partners.filter(p => p.city === cityFilter) : partners;
+    return Array.from(new Set(filtered.filter(p => p.neighborhood).map(p => p.neighborhood))).sort();
+  }, [partners, cityFilter]);
+
+  const locationFilteredProducts = React.useMemo(() => {
+    if (!cityFilter && !neighborhoodFilter) return activeProducts;
+    const filteredPartnerIds = partners
+      .filter(p => {
+        if (cityFilter && p.city !== cityFilter) return false;
+        if (neighborhoodFilter && p.neighborhood !== neighborhoodFilter) return false;
+        return true;
+      })
+      .map(p => p.id);
+    return activeProducts.filter(p => filteredPartnerIds.includes(p.partner_id));
+  }, [activeProducts, partners, cityFilter, neighborhoodFilter]);
+
+  const filteredProducts = locationFilteredProducts
     .filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => {
       switch (sortBy) {
@@ -135,6 +158,51 @@ export default function Products() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Filtro de Localização */}
+        {(cities.length > 0) && (
+          <div className="bg-white border border-violet-100 rounded-2xl shadow-sm p-4 mb-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-7 h-7 bg-violet-100 rounded-lg flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-violet-600" />
+              </div>
+              <span className="font-semibold text-slate-700 text-sm">Filtrar por Localidade</span>
+              {(cityFilter || neighborhoodFilter) && (
+                <button
+                  onClick={() => { setCityFilter(''); setNeighborhoodFilter(''); }}
+                  className="ml-auto text-xs text-slate-400 hover:text-red-500 flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" /> Limpar
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <label className="text-xs text-slate-500 mb-1 block font-medium">Cidade</label>
+                <select
+                  value={cityFilter}
+                  onChange={(e) => { setCityFilter(e.target.value); setNeighborhoodFilter(''); }}
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-pointer"
+                >
+                  <option value="">Todas as cidades</option>
+                  {cities.map(city => <option key={city} value={city}>{city}</option>)}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-slate-500 mb-1 block font-medium">Bairro</label>
+                <select
+                  value={neighborhoodFilter}
+                  onChange={(e) => setNeighborhoodFilter(e.target.value)}
+                  disabled={neighborhoods.length === 0}
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-pointer disabled:opacity-50"
+                >
+                  <option value="">Todos os bairros</option>
+                  {neighborhoods.map(nb => <option key={nb} value={nb}>{nb}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filtro de ordenação */}
         <div className="flex justify-end mb-6">
           <Select value={sortBy} onValueChange={setSortBy}>

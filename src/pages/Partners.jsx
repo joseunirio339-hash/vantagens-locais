@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -41,6 +41,7 @@ export default function Partners() {
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [cityFilter, setCityFilter] = useState('all');
+  const [neighborhoodFilter, setNeighborhoodFilter] = useState('all');
   const [minRating, setMinRating] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
   const [userLocation, setUserLocation] = useState(null);
@@ -91,25 +92,32 @@ export default function Partners() {
 
   const cities = ['all', ...Array.from(new Set(partners.filter(p => p.city).map(p => p.city))).sort()];
 
+  const neighborhoods = React.useMemo(() => {
+    const filtered = cityFilter !== 'all' ? partners.filter(p => p.city === cityFilter) : partners;
+    return ['all', ...Array.from(new Set(filtered.filter(p => p.neighborhood).map(p => p.neighborhood))).sort()];
+  }, [partners, cityFilter]);
+
   const filteredPartners = partners.filter(partner => {
     const matchesSearch = partner.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partner.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category === 'all' || partner.category === category;
     const matchesCity = cityFilter === 'all' || partner.city === cityFilter;
+    const matchesNeighborhood = neighborhoodFilter === 'all' || partner.neighborhood === neighborhoodFilter;
     const avg = getAvgRating(partner.id);
     const matchesRating = minRating === 'all' || (avg !== null && avg >= parseFloat(minRating));
-    return matchesSearch && matchesCategory && matchesCity && matchesRating;
+    return matchesSearch && matchesCategory && matchesCity && matchesNeighborhood && matchesRating;
   });
 
   const getProductCount = (partnerId) => products.filter(p => p.partner_id === partnerId).length;
 
-  const hasActiveFilters = category !== 'all' || cityFilter !== 'all' || minRating !== 'all' || searchTerm;
+  const hasActiveFilters = category !== 'all' || cityFilter !== 'all' || neighborhoodFilter !== 'all' || minRating !== 'all' || searchTerm;
 
   const clearFilters = () => {
     setSearchTerm('');
     setCategory('all');
     setCityFilter('all');
+    setNeighborhoodFilter('all');
     setMinRating('all');
   };
 
@@ -189,6 +197,24 @@ export default function Partners() {
             </SelectContent>
           </Select>
 
+          <Select
+            value={neighborhoodFilter}
+            onValueChange={(v) => setNeighborhoodFilter(v)}
+            disabled={neighborhoods.length <= 1}
+          >
+            <SelectTrigger className="w-full sm:w-48">
+              <MapPin className="w-4 h-4 mr-2 shrink-0" />
+              <SelectValue placeholder="Bairro" />
+            </SelectTrigger>
+            <SelectContent>
+              {neighborhoods.map(nb => (
+                <SelectItem key={nb} value={nb}>
+                  {nb === 'all' ? 'Todos os bairros' : nb}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Select value={minRating} onValueChange={setMinRating}>
             <SelectTrigger className="w-full sm:w-44">
               <Star className="w-4 h-4 mr-2 shrink-0" />
@@ -227,7 +253,13 @@ export default function Partners() {
             {cityFilter !== 'all' && (
               <Badge variant="outline" className="gap-1 text-xs">
                 📍 {cityFilter}
-                <button onClick={() => setCityFilter('all')}><X className="w-3 h-3" /></button>
+                <button onClick={() => { setCityFilter('all'); setNeighborhoodFilter('all'); }}><X className="w-3 h-3" /></button>
+              </Badge>
+            )}
+            {neighborhoodFilter !== 'all' && (
+              <Badge variant="outline" className="gap-1 text-xs">
+                🏘️ {neighborhoodFilter}
+                <button onClick={() => setNeighborhoodFilter('all')}><X className="w-3 h-3" /></button>
               </Badge>
             )}
             {minRating !== 'all' && (
