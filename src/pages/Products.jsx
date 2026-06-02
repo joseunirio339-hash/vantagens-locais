@@ -103,26 +103,42 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Produtos</h1>
-          <p className="text-slate-500">Todos os produtos com desconto</p>
+      {/* Hero com busca no topo */}
+      <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <h1 className="text-3xl font-bold text-white mb-1">Produtos</h1>
+          <p className="text-violet-200 mb-6">Encontre o produto com desconto que você procura</p>
+          <div className="relative max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Input
+              placeholder="Buscar produtos pelo nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 h-12 text-base rounded-xl bg-white border-0 shadow-lg focus-visible:ring-2 focus-visible:ring-white/50"
+              autoFocus={false}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-lg leading-none"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          {searchTerm && (
+            <p className="text-violet-200 text-sm mt-3">
+              {filteredProducts.length} resultado{filteredProducts.length !== 1 ? 's' : ''} para "<strong className="text-white">{searchTerm}</strong>"
+            </p>
+          )}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <Input
-              placeholder="Buscar produtos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+        {/* Filtro de ordenação */}
+        <div className="flex justify-end mb-6">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-48">
               <SlidersHorizontal className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Ordenar" />
             </SelectTrigger>
