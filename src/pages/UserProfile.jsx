@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
@@ -7,7 +7,8 @@ import { ptBR } from 'date-fns/locale';
 import {
   User, CreditCard, CheckCircle, XCircle, Clock, RefreshCw,
   ExternalLink, Receipt, ChevronDown, ChevronUp, AlertCircle,
-  Sparkles, Settings, ArrowRight, Loader2, Crown, Star
+  Sparkles, Settings, ArrowRight, Loader2, Crown, Star, Ticket,
+  TrendingDown, ShoppingBag, BadgePercent, Store
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -166,6 +167,37 @@ export default function UserProfile() {
     });
   }, []);
 
+  const { data: vouchers, isLoading: vouchersLoading } = useQuery({
+    queryKey: ['userVouchers', user?.email],
+    queryFn: () => base44.entities.Voucher.filter({ user_email: user.email }),
+    enabled: !!user?.email,
+  });
+
+  const { data: partners } = useQuery({
+    queryKey: ['allPartners'],
+    queryFn: () => base44.entities.Partner.list(),
+    enabled: !!user?.email,
+  });
+
+  const voucherStats = useMemo(() => {
+    if (!vouchers) return { total: 0, used: 0, totalSpentVouchers: 0, totalSaved: 0, byPartner: [] };
+    const used = vouchers.filter(v => v.status === 'used');
+    const totalSpentVouchers = used.reduce((s, v) => s + (v.discount_price || 0), 0);
+    const totalSaved = used.reduce((s, v) => s + ((v.original_price || 0) - (v.discount_price || 0)), 0);
+    const partnerMap = {};
+    used.forEach(v => {
+      if (!partnerMap[v.partner_id]) partnerMap[v.partner_id] = { partner_id: v.partner_id, count: 0, spent: 0, saved: 0 };
+      partnerMap[v.partner_id].count += 1;
+      partnerMap[v.partner_id].spent += v.discount_price || 0;
+      partnerMap[v.partner_id].saved += (v.original_price || 0) - (v.discount_price || 0);
+    });
+    const partnerName = (id) => partners?.find(p => p.id === id)?.business_name || 'Parceiro';
+    const byPartner = Object.values(partnerMap)
+      .sort((a, b) => b.spent - a.spent)
+      .map(p => ({ ...p, name: partnerName(p.partner_id) }));
+    return { total: vouchers.length, used: used.length, totalSpentVouchers, totalSaved, byPartner };
+  }, [vouchers, partners]);
+
   const { data: stripeData, isLoading: stripeLoading, refetch } = useQuery({
     queryKey: ['stripeHistory', user?.email],
     queryFn: () => base44.functions.invoke('stripeHistory', {}),
@@ -231,17 +263,24 @@ export default function UserProfile() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white border w-full">
-            <TabsTrigger value="overview" className="flex-1 gap-2">
+            <TabsTrigger value="overview" className="flex-1 gap-1 text-xs sm:text-sm">
               <User className="w-4 h-4" />
-              Visão Geral
+              <span className="hidden sm:inline">Visão Geral</span>
+              <span className="sm:hidden">Geral</span>
             </TabsTrigger>
-            <TabsTrigger value="payments" className="flex-1 gap-2">
+            <TabsTrigger value="vouchers" className="flex-1 gap-1 text-xs sm:text-sm">
+              <Ticket className="w-4 h-4" />
+              Vouchers
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex-1 gap-1 text-xs sm:text-sm">
               <Receipt className="w-4 h-4" />
-              Pagamentos
+              <span className="hidden sm:inline">Pagamentos</span>
+              <span className="sm:hidden">Pgtos</span>
             </TabsTrigger>
-            <TabsTrigger value="subscriptions" className="flex-1 gap-2">
+            <TabsTrigger value="subscriptions" className="flex-1 gap-1 text-xs sm:text-sm">
               <Crown className="w-4 h-4" />
-              Assinaturas
+              <span className="hidden sm:inline">Assinaturas</span>
+              <span className="sm:hidden">Planos</span>
             </TabsTrigger>
           </TabsList>
 
@@ -382,6 +421,150 @@ export default function UserProfile() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* === VOUCHERS === */}
+          <TabsContent value="vouchers" className="mt-5 space-y-5">
+            {vouchersLoading ? (
+              <div className="space-y-3">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>
+            ) : (
+              <>
+                {/* Stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <Card className="border-0 bg-gradient-to-br from-violet-50 to-violet-100">
+                    <CardContent className="p-4 text-center">
+                      <ShoppingBag className="w-5 h-5 text-violet-500 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-violet-700">{voucherStats.used}</p>
+                      <p className="text-xs text-violet-500 mt-0.5">Vouchers usados</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-0 bg-gradient-to-br from-fuchsia-50 to-fuchsia-100">
+                    <CardContent className="p-4 text-center">
+                      <Ticket className="w-5 h-5 text-fuchsia-500 mx-auto mb-1" />
+                      <p className="text-2xl font-bold text-fuchsia-700">{voucherStats.total}</p>
+                      <p className="text-xs text-fuchsia-500 mt-0.5">Total gerados</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-0 bg-gradient-to-br from-blue-50 to-blue-100">
+                    <CardContent className="p-4 text-center">
+                      <CreditCard className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                      <p className="text-xl font-bold text-blue-700">
+                        R$ {voucherStats.totalSpentVouchers.toFixed(2).replace('.', ',')}
+                      </p>
+                      <p className="text-xs text-blue-500 mt-0.5">Total gasto</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-0 bg-gradient-to-br from-emerald-50 to-emerald-100">
+                    <CardContent className="p-4 text-center">
+                      <TrendingDown className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                      <p className="text-xl font-bold text-emerald-700">
+                        R$ {voucherStats.totalSaved.toFixed(2).replace('.', ',')}
+                      </p>
+                      <p className="text-xs text-emerald-500 mt-0.5">Economia total</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Savings highlight */}
+                {voucherStats.totalSaved > 0 && (
+                  <div className="rounded-2xl p-5 text-center" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}>
+                    <BadgePercent className="w-8 h-8 text-white/80 mx-auto mb-2" />
+                    <p className="text-white/80 text-sm mb-1">Você economizou no total</p>
+                    <p className="text-4xl font-black text-white">
+                      R$ {voucherStats.totalSaved.toFixed(2).replace('.', ',')}
+                    </p>
+                    <p className="text-white/70 text-xs mt-1">usando vouchers do Clube Max Descontos 🎉</p>
+                  </div>
+                )}
+
+                {/* By partner */}
+                {voucherStats.byPartner.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Store className="w-4 h-4 text-slate-400" />
+                        Gastos por Parceiro
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {voucherStats.byPartner.map((p, i) => (
+                        <div key={p.partner_id} className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                            {i + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-sm font-medium text-slate-800 truncate">{p.name}</p>
+                              <p className="text-xs text-slate-500 shrink-0 ml-2">{p.count} voucher{p.count > 1 ? 's' : ''}</p>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-1.5">
+                              <div
+                                className="h-1.5 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
+                                style={{ width: `${Math.min(100, (p.spent / voucherStats.totalSpentVouchers) * 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-sm font-semibold text-slate-800">R$ {p.spent.toFixed(2).replace('.', ',')}</p>
+                            <p className="text-xs text-emerald-600">-R$ {p.saved.toFixed(2).replace('.', ',')}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Voucher list */}
+                {vouchers && vouchers.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Ticket className="w-4 h-4 text-slate-400" />
+                        Histórico de Vouchers
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {[...vouchers].sort((a, b) => new Date(b.created_date) - new Date(a.created_date)).map(v => {
+                        const saved = (v.original_price || 0) - (v.discount_price || 0);
+                        const statusMap = {
+                          pending: { label: 'Pendente', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+                          used: { label: 'Usado', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+                          expired: { label: 'Expirado', color: 'bg-slate-100 text-slate-500 border-slate-200' },
+                        };
+                        const sc = statusMap[v.status] || statusMap.pending;
+                        return (
+                          <div key={v.id} className="flex items-center justify-between p-3 rounded-xl border bg-slate-50/50 gap-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+                                <Ticket className="w-4 h-4 text-violet-500" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-slate-800 truncate">{v.product_name || 'Voucher'}</p>
+                                <p className="text-xs text-slate-400">
+                                  {v.created_date ? format(new Date(v.created_date), "dd/MM/yyyy", { locale: ptBR }) : '—'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="text-sm font-semibold text-slate-800">R$ {(v.discount_price || 0).toFixed(2).replace('.', ',')}</p>
+                              {saved > 0 && <p className="text-xs text-emerald-600">-R$ {saved.toFixed(2).replace('.', ',')}</p>}
+                            </div>
+                            <Badge className={`${sc.color} border text-xs shrink-0`}>{sc.label}</Badge>
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {(!vouchers || vouchers.length === 0) && (
+                  <div className="text-center py-16">
+                    <Ticket className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                    <p className="text-slate-500">Nenhum voucher encontrado</p>
+                  </div>
+                )}
+              </>
+            )}
           </TabsContent>
 
           {/* === PAYMENTS === */}
