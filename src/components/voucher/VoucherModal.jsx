@@ -142,6 +142,58 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
       }
     }
 
+    // Selos de fidelidade: 1 selo por voucher (não por quantidade em lote)
+    if (user?.email && partner?.id) {
+      const stampConfigs = await base44.entities.StampCardConfig.filter({ partner_id: partner.id, is_active: true });
+      if (stampConfigs.length > 0) {
+        const cfg = stampConfigs[0];
+        const stampsToAdd = createdVouchers.length; // 1 selo por voucher individual
+        const existingCards = await base44.entities.StampCard.filter({ user_email: user.email, partner_id: partner.id });
+        
+        let card = existingCards.length > 0 ? existingCards[0] : null;
+        if (!card) {
+          card = await base44.entities.StampCard.create({
+            user_email: user.email,
+            partner_id: partner.id,
+            partner_name: partner.business_name,
+            stamps_count: 0,
+            stamps_goal: cfg.stamps_goal,
+            total_completed: 0,
+            reward_status: 'none'
+          });
+        }
+
+        // Only add stamps if no pending prize
+        if (card.reward_status !== 'unlocked') {
+          const newCount = (card.stamps_count || 0) + stampsToAdd;
+          const goal = cfg.stamps_goal || 5;
+
+          if (newCount >= goal) {
+            // Unlock prize!
+            const options = cfg.discount_options || ['10% OFF'];
+            const prize = options[Math.floor(Math.random() * options.length)];
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            const code = 'SELO-' + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+
+            await base44.entities.StampCard.update(card.id, {
+              stamps_count: newCount - goal, // carry over extra stamps
+              stamps_goal: goal,
+              total_completed: (card.total_completed || 0) + 1,
+              discount_revealed: prize,
+              reward_code: code,
+              reward_status: 'unlocked'
+            });
+            toast.success(`🎉 Cartão completo! Você desbloqueou: ${prize}! Veja em Loja de Fidelidade.`, { duration: 6000 });
+          } else {
+            await base44.entities.StampCard.update(card.id, {
+              stamps_count: newCount,
+              stamps_goal: goal
+            });
+          }
+        }
+      }
+    }
+
     setVouchers(createdVouchers);
     setLoading(false);
     toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''}! +${createdVouchers.length * 10} pontos de fidelidade 🪙`);

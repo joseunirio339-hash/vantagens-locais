@@ -24,6 +24,7 @@ import PartnerPerformance from '@/components/partner/PartnerPerformance';
 import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
 import FinancialPanel from '@/components/partner/FinancialPanel';
 import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
+import StampCardsManager from '@/components/loyalty/StampCardsManager';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -375,7 +376,12 @@ export default function PartnerDashboard() {
           </TabsContent>
 
           <TabsContent value="loyalty">
-            <LoyaltyRewardsManager partnerId={partner?.id} />
+            <div className="space-y-8">
+              <StampCardsManager partnerId={partner?.id} />
+              <div className="border-t pt-6">
+                <LoyaltyRewardsManager partnerId={partner?.id} />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="settings">

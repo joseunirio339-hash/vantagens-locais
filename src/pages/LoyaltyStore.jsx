@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { Gift, Star, Coins, Trophy, Store, Check, X, Loader2, Lock, ChevronRight, Info } from 'lucide-react';
+import { Gift, Star, Trophy, Store, Check, Loader2, Lock, ChevronRight, Info, Stamp } from 'lucide-react';
+import StampCardDisplay from '@/components/loyalty/StampCardDisplay';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -261,6 +262,17 @@ export default function LoyaltyStore() {
     enabled: !!user?.email
   });
 
+  const { data: myStampCards = [] } = useQuery({
+    queryKey: ['myStampCards', user?.email],
+    queryFn: () => base44.entities.StampCard.filter({ user_email: user.email }),
+    enabled: !!user?.email
+  });
+
+  const { data: allStampConfigs = [] } = useQuery({
+    queryKey: ['allStampConfigs'],
+    queryFn: () => base44.entities.StampCardConfig.filter({ is_active: true })
+  });
+
   const userPoints = userPointsList[0]?.total_points || 0;
 
   const partnerMap = useMemo(() => {
@@ -317,11 +329,12 @@ export default function LoyaltyStore() {
           </div>
 
           {/* How to earn */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6 grid grid-cols-4 gap-3">
             {[
-              { emoji: '🎫', label: 'Resgate vouchers', pts: '+10 pts cada' },
+              { emoji: '🎫', label: 'Resgate vouchers', pts: '+10 pts + 1 selo' },
               { emoji: '⭐', label: 'Avalie parceiros', pts: '+5 pts cada' },
               { emoji: '👥', label: 'Indique amigos', pts: '+50 pts cada' },
+              { emoji: '🏅', label: 'Complete selos', pts: 'Desconto surpresa' },
             ].map((item, i) => (
               <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
                 <span className="text-2xl">{item.emoji}</span>
@@ -352,6 +365,29 @@ export default function LoyaltyStore() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Stamp Cards Section */}
+        {myStampCards.length > 0 && (
+          <div>
+            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Stamp className="w-5 h-5 text-violet-600" />
+              Meus Cartões de Selos
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {myStampCards.map(card => {
+                const config = allStampConfigs.find(c => c.partner_id === card.partner_id);
+                return (
+                  <StampCardDisplay
+                    key={card.id}
+                    stampCard={card}
+                    partnerName={card.partner_name}
+                    config={config || { stamps_goal: card.stamps_goal || 5 }}
+                  />
+                );
+              })}
             </div>
           </div>
         )}

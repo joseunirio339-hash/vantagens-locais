@@ -1,0 +1,56 @@
+{
+  "name": "StampCard",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio dono do cart\u00e3o"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Nome do parceiro (snapshot)"
+    },
+    "stamps_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de selos acumulados"
+    },
+    "stamps_goal": {
+      "type": "number",
+      "default": 5,
+      "description": "N\u00famero de selos para completar o cart\u00e3o"
+    },
+    "total_completed": {
+      "type": "number",
+      "default": 0,
+      "description": "Quantas vezes este cart\u00e3o foi completado"
+    },
+    "discount_revealed": {
+      "type": "string",
+      "description": "Desconto surpresa revelado ao completar (ex: 15% OFF)"
+    },
+    "reward_code": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico para resgatar o desconto surpresa"
+    },
+    "reward_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "unlocked",
+        "used"
+      ],
+      "default": "none",
+      "description": "Status do pr\u00eamio atual"
+    }
+  },
+  "required": [
+    "user_email",
+    "partner_id",
+    "partner_name"
+  ]
+}
