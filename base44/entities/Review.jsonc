@@ -1,0 +1,35 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro avaliado"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que avaliou"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nome do usu\u00e1rio"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Nota de 1 a 5"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Coment\u00e1rio da avalia\u00e7\u00e3o"
+    },
+    "voucher_id": {
+      "type": "string",
+      "description": "ID do voucher relacionado (opcional)"
+    }
+  },
+  "required": [
+    "partner_id",
+    "user_email",
+    "rating"
+  ]
+}

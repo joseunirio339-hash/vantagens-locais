@@ -1,0 +1,68 @@
+{
+  "name": "Voucher",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico do voucher"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "ID do produto"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "user_cpf": {
+      "type": "string",
+      "description": "CPF do comprador"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nome do comprador"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do comprador"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Nome do produto"
+    },
+    "original_price": {
+      "type": "number",
+      "description": "Pre\u00e7o original"
+    },
+    "discount_price": {
+      "type": "number",
+      "description": "Pre\u00e7o com desconto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "used",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Status do voucher"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de expira\u00e7\u00e3o"
+    },
+    "used_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data de uso"
+    }
+  },
+  "required": [
+    "product_id",
+    "partner_id",
+    "user_cpf",
+    "code"
+  ]
+}

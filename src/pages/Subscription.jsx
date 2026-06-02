@@ -294,12 +294,15 @@ export default function Subscription() {
           })}
         </div>
 
-        <div className="mt-8 text-center space-y-1">
-           <p className="text-sm text-slate-500">Pagamento mensal recorrente. Cancele a qualquer momento no portal Stripe.</p>
-           <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
-             <Gift className="w-3 h-3" /> Plano Usuário: 1 mês GRÁTIS para novos usuários (depois R$ 19,99/mês).
-           </p>
-         </div>
+        <div className="mt-10 bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
+          <p className="text-sm text-slate-600 font-medium mb-1">
+            💳 Pagamentos processados com segurança via <strong>Stripe</strong>
+          </p>
+          <p className="text-xs text-slate-400 mb-3">Assinatura mensal recorrente · Cancele a qualquer momento · Suporte por e-mail incluído</p>
+          <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
+            <Gift className="w-3 h-3" /> Plano Usuário: 1º mês GRÁTIS para novos usuários (depois R$ 19,99/mês).
+          </p>
+        </div>
       </div>
     </div>
   );

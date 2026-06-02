@@ -1,0 +1,43 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro destinat\u00e1rio"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "new_voucher",
+        "voucher_used",
+        "new_review",
+        "subscription_expiring"
+      ],
+      "description": "Tipo de notifica\u00e7\u00e3o"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo da notifica\u00e7\u00e3o"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensagem da notifica\u00e7\u00e3o"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Lida ou n\u00e3o"
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "ID do objeto relacionado (voucher, review, etc)"
+    }
+  },
+  "required": [
+    "partner_id",
+    "type",
+    "title",
+    "message"
+  ]
+}

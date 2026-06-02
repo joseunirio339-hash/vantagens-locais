@@ -1,0 +1,22 @@
+{
+  "name": "ProductView",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "description": "ID do produto visualizado"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que visualizou"
+    }
+  },
+  "required": [
+    "product_id",
+    "partner_id"
+  ]
+}

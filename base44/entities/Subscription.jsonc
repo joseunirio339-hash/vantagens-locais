@@ -1,0 +1,58 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "user",
+        "partner",
+        "empreendedor"
+      ],
+      "description": "Tipo de assinatura"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "pending",
+        "trial"
+      ],
+      "default": "pending",
+      "description": "Status da assinatura"
+    },
+    "price": {
+      "type": "number",
+      "description": "Valor pago"
+    },
+    "starts_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de in\u00edcio"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de expira\u00e7\u00e3o"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro (se for assinatura de parceiro ou empreendedor)"
+    },
+    "is_trial": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se \u00e9 o per\u00edodo de teste gratuito"
+    }
+  },
+  "required": [
+    "user_email",
+    "type",
+    "status"
+  ]
+}

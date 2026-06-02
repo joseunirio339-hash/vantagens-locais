@@ -48,7 +48,7 @@ export default function Layout({ children }) {
     { label: 'Início', href: 'Home', icon: Home },
     { label: 'Parceiros', href: 'Partners', icon: Store },
     { label: 'Produtos', href: 'Products', icon: Tag },
-    ...(!isPartner ? [{ label: 'Seja Parceiro', href: 'PartnerSignup', icon: Store }] : []),
+    ...(!isPartner ? [{ label: 'Seja Parceiro', href: 'ParceiroContato', icon: Store }] : []),
   ];
 
   const isActive = (href) => {
@@ -247,25 +247,59 @@ export default function Layout({ children }) {
       <main>{children}</main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-8 h-8 rounded-lg" />
-              <span className="font-semibold text-slate-700">Descontos Locais</span>
-            </div>
-            <div className="flex flex-col items-center md:items-end gap-1">
-              <p className="text-sm text-slate-500">
-                © {new Date().getFullYear()} Todos os direitos reservados.
-              </p>
-              <div className="flex gap-4">
-                <Link to="/PrivacyPolicy" className="text-xs text-slate-400 hover:text-violet-600 transition-colors">
-                  Política de Privacidade
-                </Link>
-                <Link to="/TermsOfUse" className="text-xs text-slate-400 hover:text-violet-600 transition-colors">
-                  Termos de Uso
-                </Link>
+      <footer className="bg-slate-900 mt-auto text-white">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-10 h-10 rounded-xl" />
+                <span className="font-bold text-lg">Clube Max Descontos</span>
               </div>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Conectando consumidores aos melhores descontos do comércio local.
+              </p>
+            </div>
+            {/* Links */}
+            <div>
+              <p className="font-semibold text-slate-300 mb-3 text-sm uppercase tracking-wide">Links</p>
+              <div className="space-y-2">
+                <Link to="/Home" className="block text-sm text-slate-400 hover:text-white transition-colors">Início</Link>
+                <Link to="/Partners" className="block text-sm text-slate-400 hover:text-white transition-colors">Parceiros</Link>
+                <Link to="/ParceiroContato" className="block text-sm text-slate-400 hover:text-white transition-colors">Seja Parceiro</Link>
+                <Link to="/Subscription" className="block text-sm text-slate-400 hover:text-white transition-colors">Planos e Preços</Link>
+              </div>
+            </div>
+            {/* Contato */}
+            <div>
+              <p className="font-semibold text-slate-300 mb-3 text-sm uppercase tracking-wide">Contato</p>
+              <div className="space-y-2">
+                <a href="https://wa.me/5535988397979" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+                  <span>💬</span> (35) 98839-7979 (WhatsApp)
+                </a>
+                <a href="mailto:clubemaxdescontos@gmail.com"
+                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+                  <span>✉️</span> clubemax@gmail.com
+                </a>
+                <a href="https://instagram.com/clubemaxdescontos" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+                  <span>📸</span> @clubemaxdescontos
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-sm text-slate-500">
+              © {new Date().getFullYear()} Clube Max Descontos. Todos os direitos reservados.
+            </p>
+            <div className="flex gap-4">
+              <Link to="/PrivacyPolicy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                Política de Privacidade
+              </Link>
+              <Link to="/TermsOfUse" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                Termos de Uso
+              </Link>
             </div>
           </div>
         </div>

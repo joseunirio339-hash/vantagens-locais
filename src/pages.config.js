@@ -63,6 +63,7 @@ import PurchaseHistory from './pages/PurchaseHistory';
 import ReferralPage from './pages/ReferralPage';
 import ReferralLanding from './pages/ReferralLanding';
 import Leaderboard from './pages/Leaderboard';
+import ParceiroContato from './pages/ParceiroContato';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +84,7 @@ export const PAGES = {
     "ReferralPage": ReferralPage,
     "ReferralLanding": ReferralLanding,
     "Leaderboard": Leaderboard,
+    "ParceiroContato": ParceiroContato,
 }
 
 export const pagesConfig = {
