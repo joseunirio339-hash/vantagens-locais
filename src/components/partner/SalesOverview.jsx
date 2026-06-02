@@ -1,8 +1,8 @@
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, DollarSign, ShoppingBag, Users } from 'lucide-react';
-import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { TrendingUp, DollarSign, ShoppingBag, Users, CalendarDays } from 'lucide-react';
+import { format, subDays, eachDayOfInterval, getDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function SalesOverview({ vouchers, products }) {
@@ -26,6 +26,21 @@ export default function SalesOverview({ vouchers, products }) {
       receita: revenue
     };
   });
+
+  // Sales by day of week (all-time used vouchers)
+  const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const DAY_COLORS = ['#a78bfa', '#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6', '#10b981', '#a78bfa'];
+
+  const salesByDow = DAY_NAMES.map((name, idx) => ({
+    name,
+    vendas: usedVouchers.filter(v => {
+      const dateStr = v.used_at ? v.used_at.substring(0, 10) : v.updated_date?.substring(0, 10);
+      if (!dateStr) return false;
+      return getDay(new Date(dateStr + 'T12:00:00')) === idx;
+    }).length
+  }));
+
+  const maxDow = Math.max(...salesByDow.map(d => d.vendas), 1);
 
   // Top products by sales
   const topProducts = products
@@ -105,6 +120,52 @@ export default function SalesOverview({ vouchers, products }) {
                 <p>Nenhuma venda registrada ainda</p>
               </div>
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Sales by day of week */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="w-5 h-5 text-violet-600" />
+            Volume de Vendas por Dia da Semana
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {usedVouchers.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={salesByDow} barCategoryGap="28%">
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 13, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+                <Tooltip
+                  cursor={{ fill: '#f1f5f9' }}
+                  formatter={(value) => [`${value} venda${value !== 1 ? 's' : ''}`, 'Volume']}
+                />
+                <Bar dataKey="vendas" radius={[6, 6, 0, 0]}>
+                  {salesByDow.map((entry, index) => (
+                    <Cell
+                      key={index}
+                      fill={entry.vendas === maxDow && entry.vendas > 0 ? '#7c3aed' : DAY_COLORS[index]}
+                      opacity={entry.vendas === 0 ? 0.3 : 1}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[220px] flex items-center justify-center text-slate-400">
+              <div className="text-center">
+                <CalendarDays className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p>Nenhuma venda registrada ainda</p>
+              </div>
+            </div>
+          )}
+          {usedVouchers.length > 0 && (
+            <p className="text-xs text-slate-400 mt-2 text-center">
+              O dia mais movimentado aparece em destaque roxo
+            </p>
           )}
         </CardContent>
       </Card>
