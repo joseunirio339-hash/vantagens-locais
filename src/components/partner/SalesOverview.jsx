@@ -2,7 +2,7 @@ import React from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, DollarSign, ShoppingBag, Users, CalendarDays } from 'lucide-react';
-import { format, subDays, eachDayOfInterval, getDay } from 'date-fns';
+import { format, subDays, eachDayOfInterval, getDay, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function SalesOverview({ vouchers, products }) {
@@ -24,6 +24,25 @@ export default function SalesOverview({ vouchers, products }) {
       day: format(day, 'dd/MM'),
       vendas: dayVouchers.length,
       receita: revenue
+    };
+  });
+
+  // Sales comparison last 3 months
+  const last3Months = [2, 1, 0].map(offset => {
+    const ref = subMonths(today, offset);
+    const start = startOfMonth(ref);
+    const end = endOfMonth(ref);
+    const label = format(ref, 'MMM/yy', { locale: ptBR });
+    const monthVouchers = usedVouchers.filter(v => {
+      const dateStr = v.used_at ? v.used_at.substring(0, 10) : v.updated_date?.substring(0, 10);
+      if (!dateStr) return false;
+      const d = new Date(dateStr + 'T12:00:00');
+      return d >= start && d <= end;
+    });
+    return {
+      name: label.charAt(0).toUpperCase() + label.slice(1),
+      vendas: monthVouchers.length,
+      receita: monthVouchers.reduce((s, v) => s + (v.discount_price || 0), 0)
     };
   });
 
@@ -117,6 +136,69 @@ export default function SalesOverview({ vouchers, products }) {
             <div className="h-[250px] flex items-center justify-center text-slate-400">
               <div className="text-center">
                 <ShoppingBag className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                <p>Nenhuma venda registrada ainda</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Last 3 months comparison */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            Comparativo — Últimos 3 Meses
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {usedVouchers.length > 0 ? (
+            <>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={last3Months} barCategoryGap="35%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 13, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={28} />
+                  <Tooltip
+                    cursor={{ fill: '#f1f5f9' }}
+                    formatter={(value, name) => [
+                      name === 'vendas' ? `${value} venda${value !== 1 ? 's' : ''}` : `R$ ${value.toFixed(2).replace('.', ',')}`,
+                      name === 'vendas' ? 'Vendas' : 'Receita'
+                    ]}
+                  />
+                  <Bar dataKey="vendas" radius={[6, 6, 0, 0]}>
+                    {last3Months.map((entry, index) => (
+                      <Cell
+                        key={index}
+                        fill={index === 2 ? '#10b981' : index === 1 ? '#3b82f6' : '#94a3b8'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-6 mt-3">
+                {last3Months.map((m, i) => {
+                  const growth = i > 0 ? last3Months[i - 1].vendas > 0
+                    ? (((m.vendas - last3Months[i - 1].vendas) / last3Months[i - 1].vendas) * 100).toFixed(0)
+                    : null : null;
+                  return (
+                    <div key={i} className="text-center">
+                      <p className="text-xs text-slate-500">{m.name}</p>
+                      <p className="text-sm font-bold text-slate-800">{m.vendas} vendas</p>
+                      {growth !== null && (
+                        <p className={`text-xs font-medium ${Number(growth) >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {Number(growth) >= 0 ? '▲' : '▼'} {Math.abs(Number(growth))}%
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <div className="h-[220px] flex items-center justify-center text-slate-400">
+              <div className="text-center">
+                <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-30" />
                 <p>Nenhuma venda registrada ainda</p>
               </div>
             </div>
