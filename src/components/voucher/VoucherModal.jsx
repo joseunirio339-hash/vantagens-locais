@@ -128,9 +128,23 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
       });
     }
 
+    // Creditar pontos de fidelidade: 10 pts por voucher
+    if (user?.email) {
+      const pointsToAdd = createdVouchers.length * 10;
+      const pointsList = await base44.entities.UserPoints.filter({ user_email: user.email });
+      if (pointsList.length > 0) {
+        const up = pointsList[0];
+        await base44.entities.UserPoints.update(up.id, {
+          total_points: (up.total_points || 0) + pointsToAdd,
+          lifetime_points: (up.lifetime_points || 0) + pointsToAdd,
+          voucher_points: (up.voucher_points || 0) + pointsToAdd
+        });
+      }
+    }
+
     setVouchers(createdVouchers);
     setLoading(false);
-    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''} com sucesso!`);
+    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''}! +${createdVouchers.length * 10} pontos de fidelidade 🪙`);
     onSuccess?.(createdVouchers[0]);
   };
 

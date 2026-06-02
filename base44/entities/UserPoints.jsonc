@@ -9,7 +9,17 @@
     "total_points": {
       "type": "number",
       "default": 0,
-      "description": "Total de pontos acumulados"
+      "description": "Total de pontos acumulados (saldo atual)"
+    },
+    "lifetime_points": {
+      "type": "number",
+      "default": 0,
+      "description": "Total hist\u00f3rico de pontos ganhos (nunca diminui)"
+    },
+    "voucher_points": {
+      "type": "number",
+      "default": 0,
+      "description": "Pontos acumulados por vouchers resgatados"
     },
     "referral_code": {
       "type": "string",

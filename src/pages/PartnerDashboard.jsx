@@ -23,6 +23,7 @@ import RaffleManager from '@/components/raffle/RaffleManager';
 import PartnerPerformance from '@/components/partner/PartnerPerformance';
 import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
 import FinancialPanel from '@/components/partner/FinancialPanel';
+import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -306,6 +307,10 @@ export default function PartnerDashboard() {
               <CalendarDays className="w-4 h-4" />
               Agendamentos
             </TabsTrigger>
+            <TabsTrigger value="loyalty" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Fidelidade
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -367,6 +372,10 @@ export default function PartnerDashboard() {
 
           <TabsContent value="appointments">
             <AppointmentsCalendar partnerId={partner?.id} />
+          </TabsContent>
+
+          <TabsContent value="loyalty">
+            <LoyaltyRewardsManager partnerId={partner?.id} />
           </TabsContent>
 
           <TabsContent value="settings">

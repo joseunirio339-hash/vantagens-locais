@@ -1,0 +1,66 @@
+{
+  "name": "LoyaltyReward",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro que oferece a recompensa"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo da recompensa (ex: Caf\u00e9 Gr\u00e1tis)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o detalhada da recompensa"
+    },
+    "points_required": {
+      "type": "number",
+      "description": "Quantidade de pontos necess\u00e1rios para resgatar"
+    },
+    "reward_type": {
+      "type": "string",
+      "enum": [
+        "desconto_percentual",
+        "item_gratis",
+        "desconto_fixo",
+        "servico_gratis",
+        "brinde"
+      ],
+      "description": "Tipo da recompensa"
+    },
+    "reward_value": {
+      "type": "number",
+      "description": "Valor do desconto (% ou R$) ou 0 para item/servi\u00e7o gr\u00e1tis"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagem da recompensa"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Recompensa dispon\u00edvel"
+    },
+    "max_redemptions": {
+      "type": "number",
+      "description": "Limite total de resgates (0 = ilimitado)"
+    },
+    "total_redeemed": {
+      "type": "number",
+      "default": 0,
+      "description": "Total de resgates realizados"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de validade da oferta"
+    }
+  },
+  "required": [
+    "partner_id",
+    "title",
+    "points_required",
+    "reward_type"
+  ]
+}

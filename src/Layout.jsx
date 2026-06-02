@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import { useCart } from '@/context/CartContext';
@@ -142,6 +142,12 @@ export default function Layout({ children }) {
                         Indique e Ganhe
                       </DropdownMenuItem>
                     </Link>
+                    <Link to="/LoyaltyStore">
+                      <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
+                        <Gift className="w-4 h-4 mr-2" />
+                        Loja de Fidelidade 🪙
+                      </DropdownMenuItem>
+                    </Link>
 
                     <Link to={createPageUrl('PurchaseHistory')}>
                       <DropdownMenuItem className="cursor-pointer">
@@ -268,6 +274,7 @@ export default function Layout({ children }) {
                 <Link to="/Partners" className="block text-sm text-slate-400 hover:text-white transition-colors">Parceiros</Link>
                 <Link to="/ParceiroContato" className="block text-sm text-slate-400 hover:text-white transition-colors">Seja Parceiro</Link>
                 <Link to="/Subscription" className="block text-sm text-slate-400 hover:text-white transition-colors">Planos e Preços</Link>
+                <Link to="/LoyaltyStore" className="block text-sm text-slate-400 hover:text-white transition-colors">Loja de Fidelidade 🪙</Link>
               </div>
             </div>
             {/* Contato */}

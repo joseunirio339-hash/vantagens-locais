@@ -1,0 +1,64 @@
+{
+  "name": "LoyaltyRedemption",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email do usu\u00e1rio que resgatou"
+    },
+    "reward_id": {
+      "type": "string",
+      "description": "ID da recompensa resgatada"
+    },
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro"
+    },
+    "points_spent": {
+      "type": "number",
+      "description": "Pontos gastos no resgate"
+    },
+    "redemption_code": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico para apresentar ao parceiro"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "used",
+        "expired",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Status do resgate"
+    },
+    "reward_title": {
+      "type": "string",
+      "description": "T\u00edtulo da recompensa (snapshot)"
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Nome do parceiro (snapshot)"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Validade do c\u00f3digo de resgate"
+    },
+    "used_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data de uso"
+    }
+  },
+  "required": [
+    "user_email",
+    "reward_id",
+    "partner_id",
+    "points_spent",
+    "redemption_code",
+    "reward_title",
+    "partner_name"
+  ]
+}
