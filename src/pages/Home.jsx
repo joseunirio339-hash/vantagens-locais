@@ -222,9 +222,9 @@ export default function Home() {
                 <span className="text-sm font-semibold text-white">🛍️ Descontos reais no comércio local</span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight leading-none">
-                <span className="text-white drop-shadow-lg">CLUBE MAX</span>
+                <span className="text-white drop-shadow-lg">LINKA</span>
                 <br />
-                <span className="text-yellow-300 drop-shadow-lg">DESCONTOS</span>
+                <span className="text-yellow-300 drop-shadow-lg">conectando descontos a você</span>
               </h1>
               <p className="text-base md:text-lg text-white/90 max-w-xl mb-8 font-medium leading-relaxed">
                 Economize em restaurantes, beleza, moda e muito mais — tudo perto de você 🔥
