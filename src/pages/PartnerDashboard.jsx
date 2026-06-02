@@ -26,6 +26,8 @@ import FinancialPanel from '@/components/partner/FinancialPanel';
 import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
 import StampCardsManager from '@/components/loyalty/StampCardsManager';
 import ExportSalesButton from '@/components/partner/ExportSalesButton';
+import NewsPostManager from '@/components/news/NewsPostManager';
+import { Megaphone } from 'lucide-react';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -313,6 +315,10 @@ export default function PartnerDashboard() {
               <Star className="w-4 h-4" />
               Fidelidade
             </TabsTrigger>
+            <TabsTrigger value="news" className="flex items-center gap-2">
+              <Megaphone className="w-4 h-4" />
+              Novidades
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -386,6 +392,10 @@ export default function PartnerDashboard() {
                 <LoyaltyRewardsManager partnerId={partner?.id} />
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="news">
+            <NewsPostManager partner={partner} />
           </TabsContent>
 
           <TabsContent value="settings">

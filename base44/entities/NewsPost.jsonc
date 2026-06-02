@@ -1,0 +1,48 @@
+{
+  "name": "NewsPost",
+  "type": "object",
+  "properties": {
+    "partner_id": {
+      "type": "string",
+      "description": "ID do parceiro que publicou"
+    },
+    "partner_name": {
+      "type": "string",
+      "description": "Nome do parceiro (snapshot)"
+    },
+    "partner_logo_url": {
+      "type": "string",
+      "description": "Logo do parceiro (snapshot)"
+    },
+    "content": {
+      "type": "string",
+      "description": "Texto da novidade (m\u00e1x 280 caracteres)"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagem opcional da promo\u00e7\u00e3o"
+    },
+    "tag": {
+      "type": "string",
+      "enum": [
+        "promo\u00e7\u00e3o",
+        "novidade",
+        "destaque",
+        "evento",
+        "dica"
+      ],
+      "default": "novidade",
+      "description": "Tipo de post"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Post vis\u00edvel"
+    }
+  },
+  "required": [
+    "partner_id",
+    "partner_name",
+    "content"
+  ]
+}

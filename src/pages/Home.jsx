@@ -21,6 +21,7 @@ import TopRatedPartners from '@/components/home/TopRatedPartners';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
 import SmartSearchBar from '@/components/home/SmartSearchBar';
+import NewsFeed from '@/components/news/NewsFeed';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -303,6 +304,9 @@ export default function Home() {
           onCityChange={setSelectedCity}
           onNeighborhoodChange={setSelectedNeighborhood}
         />
+
+        {/* Novidades dos Parceiros */}
+        {!searchTerm && <NewsFeed />}
 
         {/* Top Rated Partners */}
         {!searchTerm && <TopRatedPartners />}
