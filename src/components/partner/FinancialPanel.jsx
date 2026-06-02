@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, ShoppingBag, Users, TrendingUp, ArrowUpRight, Wallet } from 'lucide-react';
+import { DollarSign, ShoppingBag, Users, TrendingUp, ArrowUpRight, Wallet, Ticket, PiggyBank } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -31,6 +31,10 @@ export default function FinancialPanel({ vouchers = [] }) {
 
   const currentMonthRevenue = currentMonthVouchers.reduce((s, v) => s + (v.discount_price || 0), 0);
   const lastMonthRevenue = lastMonthVouchers.reduce((s, v) => s + (v.discount_price || 0), 0);
+
+  // Economia gerada para clientes no mês atual (diferença entre preço original e preço com desconto)
+  const currentMonthSavings = currentMonthVouchers.reduce((s, v) => s + ((v.original_price || 0) - (v.discount_price || 0)), 0);
+  const totalSavingsAllTime = usedVouchers.reduce((s, v) => s + ((v.original_price || 0) - (v.discount_price || 0)), 0);
   const growthPct = lastMonthRevenue > 0
     ? Math.round(((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
     : currentMonthRevenue > 0 ? 100 : 0;
@@ -115,6 +119,38 @@ export default function FinancialPanel({ vouchers = [] }) {
               </div>
             );
           })}
+        </div>
+
+        {/* Resumo do Mês Atual */}
+        <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-100 rounded-xl p-4">
+          <p className="text-xs font-semibold text-violet-500 uppercase tracking-wide mb-3">
+            📅 Resumo — {format(now, 'MMMM yyyy', { locale: ptBR })}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-3 bg-white rounded-xl p-3 border border-violet-100 shadow-sm">
+              <div className="w-9 h-9 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
+                <Ticket className="w-4 h-4 text-violet-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-slate-800">{currentMonthVouchers.length}</p>
+                <p className="text-xs text-slate-500">Vouchers resgatados</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white rounded-xl p-3 border border-emerald-100 shadow-sm">
+              <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <PiggyBank className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-emerald-700">R$ {currentMonthSavings.toFixed(2).replace('.', ',')}</p>
+                <p className="text-xs text-slate-500">Economia para clientes</p>
+              </div>
+            </div>
+          </div>
+          {totalSavingsAllTime > 0 && (
+            <p className="text-xs text-slate-400 mt-2 text-center">
+              Total acumulado: clientes economizaram <strong className="text-slate-600">R$ {totalSavingsAllTime.toFixed(2).replace('.', ',')}</strong> com suas promoções
+            </p>
+          )}
         </div>
 
         {/* Receita mensal */}
