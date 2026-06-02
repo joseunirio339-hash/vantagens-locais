@@ -20,6 +20,7 @@ import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
+import SmartSearchBar from '@/components/home/SmartSearchBar';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -243,15 +244,14 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="max-w-md relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <Input
-                  placeholder="Buscar produtos ou lojas..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-13 rounded-2xl border-0 shadow-2xl text-slate-800 bg-white text-base"
-                />
-              </div>
+              <SmartSearchBar
+                products={products}
+                partners={partners}
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                onSearch={setSearchTerm}
+                onCategoryChange={setSelectedCategory}
+              />
             </div>
             {/* Image side */}
             <div className="flex-shrink-0 w-full md:w-72 lg:w-80">
