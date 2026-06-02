@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Ticket, Star, Eye, TrendingUp, Award, Target, Zap, DollarSign } from 'lucide-react';
+import ExportPerformanceButton from './ExportPerformanceButton';
 import { subDays, subMonths, format, parseISO, isAfter, startOfMonth, endOfMonth, eachMonthOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -168,7 +169,16 @@ export default function PartnerPerformance({ partner, products, vouchers, views 
           <TrendingUp className="w-5 h-5 text-violet-600" />
           Dashboard de Performance
         </h2>
-        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center gap-3">
+          <ExportPerformanceButton
+            partner={partner}
+            products={products}
+            vouchers={vouchers}
+            views={views}
+            reviews={reviews}
+            periodDays={periodDays}
+          />
+          <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
           {PERIODS.map(p => (
             <button
               key={p.days}
@@ -182,6 +192,7 @@ export default function PartnerPerformance({ partner, products, vouchers, views 
               {p.label}
             </button>
           ))}
+          </div>
         </div>
       </div>
 
