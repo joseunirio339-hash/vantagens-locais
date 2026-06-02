@@ -25,6 +25,7 @@ import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
 import FinancialPanel from '@/components/partner/FinancialPanel';
 import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
 import StampCardsManager from '@/components/loyalty/StampCardsManager';
+import ExportSalesButton from '@/components/partner/ExportSalesButton';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -336,6 +337,9 @@ export default function PartnerDashboard() {
           </TabsContent>
 
           <TabsContent value="sales">
+            <div className="flex justify-end mb-4">
+              <ExportSalesButton vouchers={vouchers} products={products} partnerName={partner?.business_name} />
+            </div>
             <SalesOverview vouchers={vouchers} products={products} />
           </TabsContent>
 
