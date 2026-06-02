@@ -22,6 +22,7 @@ import QRScanner from '@/components/partner/QRScanner';
 import RaffleManager from '@/components/raffle/RaffleManager';
 import PartnerPerformance from '@/components/partner/PartnerPerformance';
 import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
+import FinancialPanel from '@/components/partner/FinancialPanel';
 
 export default function PartnerDashboard() {
   const [user, setUser] = useState(null);
@@ -264,6 +265,8 @@ export default function PartnerDashboard() {
             );
           })}
         </div>
+
+        <FinancialPanel vouchers={vouchers} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border flex-wrap h-auto gap-1 p-1">
