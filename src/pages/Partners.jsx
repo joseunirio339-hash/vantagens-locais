@@ -10,8 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PartnerCard from '@/components/partners/PartnerCard';
-import FavoriteButton from '@/components/partners/FavoriteButton';
 import PartnersMap from '@/components/partners/PartnersMap';
+import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
 
 const categories = [
   { value: 'all', label: 'Todas Categorias' },
@@ -52,6 +52,8 @@ export default function Partners() {
       if (auth) setUser(await base44.auth.me());
     });
   }, []);
+
+  const { favoriteIds: favPartnerIds, toggleFavorite: togglePartnerFav } = usePartnerFavorites(user);
 
   const { data: partners = [], isLoading } = useQuery({
     queryKey: ['partners'],
@@ -331,19 +333,16 @@ export default function Partners() {
             {filteredPartners.map(partner => {
               const avg = getAvgRating(partner.id);
               return (
-                <div key={partner.id} className="relative group">
-                  <Link to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
-                    <PartnerCard
-                      partner={partner}
-                      productCount={getProductCount(partner.id)}
-                      avgRating={avg || 0}
-                      reviewCount={avgRatings[partner.id]?.count || 0}
-                    />
-                  </Link>
-                  <div className="absolute top-2 right-2">
-                    <FavoriteButton partnerId={partner.id} user={user} />
-                  </div>
-                </div>
+                <Link key={partner.id} to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
+                  <PartnerCard
+                    partner={partner}
+                    productCount={getProductCount(partner.id)}
+                    avgRating={avg || 0}
+                    reviewCount={avgRatings[partner.id]?.count || 0}
+                    isFavorite={favPartnerIds.has(partner.id)}
+                    onToggleFavorite={user ? () => togglePartnerFav(partner.id) : undefined}
+                  />
+                </Link>
               );
             })}
           </div>

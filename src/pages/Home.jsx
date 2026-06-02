@@ -19,6 +19,7 @@ import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
 import { useFavorites } from '@/hooks/useFavorites';
+import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -135,6 +136,7 @@ export default function Home() {
   }, [locationFilteredProducts, searchTerm, selectedCategory, sortBy]);
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
+  const { favoriteIds: favPartnerIds, toggleFavorite: togglePartnerFav } = usePartnerFavorites(user);
 
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
@@ -445,6 +447,8 @@ export default function Home() {
                       productCount={getProductCount(partner.id)}
                       avgRating={avgRatings[partner.id] ? avgRatings[partner.id].sum / avgRatings[partner.id].count : 0}
                       reviewCount={avgRatings[partner.id]?.count || 0}
+                      isFavorite={favPartnerIds.has(partner.id)}
+                      onToggleFavorite={user ? () => togglePartnerFav(partner.id) : undefined}
                     />
                   </Link>
                 ))}

@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, Tag, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import PartnerFavoriteButton from './PartnerFavoriteButton';
 
 const categoryLabels = {
   restaurante: 'Restaurante', moda: 'Moda', eletronicos: 'Eletrônicos',
@@ -22,7 +23,7 @@ const categoryColors = {
   outros: 'bg-slate-100 text-slate-700'
 };
 
-export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick }) {
+export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick, isFavorite, onToggleFavorite }) {
   const isEmpreendedor = partner?.partner_type === 'empreendedor';
   return (
     <motion.div
@@ -54,11 +55,16 @@ export default function PartnerCard({ partner, productCount = 0, avgRating = 0, 
                 <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-1.5 py-0.5 whitespace-nowrap flex-shrink-0">🤝 Autônomo</span>
               )}
             </div>
-            {partner.category && (
-              <Badge className={`${categoryColors[partner.category]} text-xs flex-shrink-0`}>
-                {categoryLabels[partner.category]}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {partner.category && (
+                <Badge className={`${categoryColors[partner.category]} text-xs`}>
+                  {categoryLabels[partner.category]}
+                </Badge>
+              )}
+              {onToggleFavorite && (
+                <PartnerFavoriteButton isFavorite={!!isFavorite} onToggle={onToggleFavorite} />
+              )}
+            </div>
           </div>
 
           {partner.description && (

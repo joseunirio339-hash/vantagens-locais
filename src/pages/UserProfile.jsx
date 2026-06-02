@@ -8,8 +8,9 @@ import {
   User, CreditCard, CheckCircle, XCircle, Clock, RefreshCw,
   ExternalLink, Receipt, ChevronDown, ChevronUp, AlertCircle,
   Sparkles, Settings, ArrowRight, Loader2, Crown, Star, Ticket,
-  TrendingDown, ShoppingBag, BadgePercent, Store
+  TrendingDown, ShoppingBag, BadgePercent, Store, Heart
 } from 'lucide-react';
+import FavoritesTab from '@/components/profile/FavoritesTab';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -271,6 +272,11 @@ export default function UserProfile() {
             <TabsTrigger value="vouchers" className="flex-1 gap-1 text-xs sm:text-sm">
               <Ticket className="w-4 h-4" />
               Vouchers
+            </TabsTrigger>
+            <TabsTrigger value="favorites" className="flex-1 gap-1 text-xs sm:text-sm">
+              <Heart className="w-4 h-4" />
+              <span className="hidden sm:inline">Favoritos</span>
+              <span className="sm:hidden">Favs</span>
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex-1 gap-1 text-xs sm:text-sm">
               <Receipt className="w-4 h-4" />
@@ -565,6 +571,11 @@ export default function UserProfile() {
                 )}
               </>
             )}
+          </TabsContent>
+
+          {/* === FAVORITES === */}
+          <TabsContent value="favorites" className="mt-5">
+            <FavoritesTab user={user} />
           </TabsContent>
 
           {/* === PAYMENTS === */}
