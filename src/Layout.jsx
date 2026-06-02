@@ -64,10 +64,13 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-              <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-12 h-12 rounded-lg" />
-              <span className="font-bold text-xl text-slate-800 hidden sm:block">
-                Clube Max Descontos
-              </span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-md">
+                <span className="text-white font-black text-lg tracking-tight">L</span>
+              </div>
+              <div className="hidden sm:flex flex-col leading-none">
+                <span className="font-black text-xl text-slate-800 tracking-tight">LINKA</span>
+                <span className="text-xs text-slate-400 font-medium">Conectando descontos a você</span>
+              </div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -259,8 +262,13 @@ export default function Layout({ children }) {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <img src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/a4925e758_image.png" alt="Clube Max Descontos" className="w-10 h-10 rounded-xl" />
-                <span className="font-bold text-lg">Clube Max Descontos</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow">
+                  <span className="text-white font-black text-lg tracking-tight">L</span>
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="font-black text-lg tracking-tight">LINKA</span>
+                  <span className="text-xs text-slate-400">Conectando descontos a você</span>
+                </div>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
                 Conectando consumidores aos melhores descontos do comércio local.
@@ -285,20 +293,20 @@ export default function Layout({ children }) {
                   className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
                   <span>💬</span> (35) 98839-7979 (WhatsApp)
                 </a>
-                <a href="mailto:clubemaxdescontos@gmail.com"
+                <a href="mailto:contato@linka.com.br"
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>✉️</span> clubemax@gmail.com
+                  <span>✉️</span> contato@linka.com.br
                 </a>
-                <a href="https://instagram.com/clubemaxdescontos" target="_blank" rel="noopener noreferrer"
+                <a href="https://instagram.com/linka" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>📸</span> @clubemaxdescontos
+                  <span>📸</span> @linka
                 </a>
               </div>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Clube Max Descontos. Todos os direitos reservados.
+              © {new Date().getFullYear()} LINKA. Todos os direitos reservados.
             </p>
             <div className="flex gap-4">
               <Link to="/PrivacyPolicy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
