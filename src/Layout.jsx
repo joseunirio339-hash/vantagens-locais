@@ -65,10 +65,10 @@ export default function Layout({ children }) {
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-black text-lg tracking-tight">L</span>
+                <span className="text-white font-black text-lg tracking-tight">C</span>
               </div>
               <div className="hidden sm:flex flex-col leading-none">
-                <span className="font-black text-xl text-slate-800 tracking-tight">Linka</span>
+                <span className="font-black text-sm text-slate-800 tracking-tight">Clube Max</span>
                 <span className="text-xs text-slate-400 font-medium">Conectando descontos a você</span>
               </div>
             </Link>
@@ -263,10 +263,10 @@ export default function Layout({ children }) {
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow">
-                  <span className="text-white font-black text-lg tracking-tight">L</span>
+                  <span className="text-white font-black text-lg tracking-tight">C</span>
                 </div>
                 <div className="flex flex-col leading-none">
-                  <span className="font-black text-lg tracking-tight">Linka</span>
+                  <span className="font-black text-lg tracking-tight">Clube Max</span>
                   <span className="text-xs text-slate-400">Conectando descontos a você</span>
                 </div>
               </div>
@@ -306,7 +306,7 @@ export default function Layout({ children }) {
           </div>
           <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} LINKA. Todos os direitos reservados.
+              © {new Date().getFullYear()} Clube Max de Desconto. Todos os direitos reservados.
             </p>
             <div className="flex gap-4">
               <Link to="/PrivacyPolicy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
