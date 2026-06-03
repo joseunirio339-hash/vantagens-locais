@@ -8,9 +8,10 @@ import {
   User, CreditCard, CheckCircle, XCircle, Clock, RefreshCw,
   ExternalLink, Receipt, ChevronDown, ChevronUp, AlertCircle,
   Sparkles, Settings, ArrowRight, Loader2, Crown, Star, Ticket,
-  TrendingDown, ShoppingBag, BadgePercent, Store, Heart, BookOpen, MapPin
+  TrendingDown, ShoppingBag, BadgePercent, Store, Heart, BookOpen, MapPin, Award
 } from 'lucide-react';
 import FavoritesTab from '@/components/profile/FavoritesTab';
+import AchievementsTab from '@/components/gamification/AchievementsTab';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -287,6 +288,11 @@ export default function UserProfile() {
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Meus Resgates</span>
               <span className="sm:hidden">Resgates</span>
+            </TabsTrigger>
+            <TabsTrigger value="conquistas" className="flex-1 gap-1 text-xs sm:text-sm">
+              <Award className="w-4 h-4" />
+              <span className="hidden sm:inline">Conquistas</span>
+              <span className="sm:hidden">Medal.</span>
             </TabsTrigger>
             <TabsTrigger value="subscriptions" className="flex-1 gap-1 text-xs sm:text-sm">
               <Crown className="w-4 h-4" />
@@ -681,6 +687,11 @@ export default function UserProfile() {
                 </div>
               );
             })()}
+          </TabsContent>
+
+          {/* === CONQUISTAS === */}
+          <TabsContent value="conquistas" className="mt-5">
+            <AchievementsTab vouchers={vouchers || []} userEmail={user?.email} />
           </TabsContent>
 
           {/* === FAVORITES === */}

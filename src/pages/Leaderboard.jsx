@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,15 @@ import { Trophy, Star, Users, Crown, Ticket, Gift, Flame, Target } from 'lucide-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// Apenas as badges mais importantes para exibir no ranking (máx 3)
+const HIGHLIGHT_BADGES = ['fifty_vouchers', 'twenty_five', 'ten_vouchers', 'top_referrer', 'five_referrals', 'first_referral', 'five_vouchers', 'first_voucher'];
+const BADGE_ICONS = {
+  first_voucher: '🎫', five_vouchers: '⚡', ten_vouchers: '🔥',
+  twenty_five: '🏆', fifty_vouchers: '💎', three_partners: '🗺️',
+  five_partners: '🌟', ten_partners: '🏙️', first_referral: '🤝',
+  five_referrals: '🚀', top_referrer: '👑',
+};
 
 const TIER_CONFIG = [
   { min: 1000, label: 'Lenda', color: 'text-yellow-600', bg: 'bg-yellow-50', badge: 'bg-yellow-100 text-yellow-700', icon: '👑' },
@@ -20,7 +29,18 @@ function getTier(points) {
   return TIER_CONFIG.find(t => points >= t.min) || TIER_CONFIG[TIER_CONFIG.length - 1];
 }
 
-function PodiumCard({ userPoint, rank }) {
+function UserBadgePips({ badgeIds = [] }) {
+  if (!badgeIds.length) return null;
+  return (
+    <div className="flex gap-0.5 items-center">
+      {badgeIds.map(id => (
+        <span key={id} className="text-sm" title={id.replace(/_/g, ' ')}>{BADGE_ICONS[id] || '🏅'}</span>
+      ))}
+    </div>
+  );
+}
+
+function PodiumCard({ userPoint, rank, badges = [] }) {
   const heights = { 1: 'h-28', 2: 'h-20', 3: 'h-14' };
   const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
   const podiumColors = {
@@ -54,6 +74,11 @@ function PodiumCard({ userPoint, rank }) {
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tier.badge}`}>
           {tier.icon} {tier.label}
         </span>
+        {badges.length > 0 && (
+          <div className="flex justify-center mt-1">
+            <UserBadgePips badgeIds={badges} />
+          </div>
+        )}
       </div>
 
       {/* Points */}
@@ -67,7 +92,7 @@ function PodiumCard({ userPoint, rank }) {
   );
 }
 
-function RankRow({ userPoint, rank, isCurrentUser }) {
+function RankRow({ userPoint, rank, isCurrentUser, badges = [] }) {
   const maskedEmail = userPoint.user_email?.replace(/(.{2})(.*)(@.*)/, '$1***$3') || '---';
   const initial = userPoint.user_email?.charAt(0).toUpperCase() || '?';
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
@@ -99,8 +124,9 @@ function RankRow({ userPoint, rank, isCurrentUser }) {
           <p className="font-semibold text-slate-700 text-sm truncate">{maskedEmail}</p>
           {isCurrentUser && <Badge className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0 h-4">Você</Badge>}
         </div>
-        <div className="flex items-center gap-2 mt-0.5">
+        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
           <span className={`text-xs px-1.5 py-0 rounded-full ${tier.badge}`}>{tier.icon} {tier.label}</span>
+          {badges.length > 0 && <UserBadgePips badgeIds={badges} />}
           {userPoint.voucher_points > 0 && (
             <span className="text-xs text-slate-400 flex items-center gap-0.5">
               <Ticket className="w-3 h-3" /> {userPoint.voucher_points} por vouchers
@@ -134,6 +160,29 @@ export default function Leaderboard() {
       return all.filter(u => u.total_points > 0).slice(0, 30);
     }
   });
+
+  // Busca todas as badges dos usuários do ranking
+  const { data: allBadges = [] } = useQuery({
+    queryKey: ['leaderboard-badges', topUsers.map(u => u.user_email).join(',')],
+    queryFn: () => base44.entities.Badge.list('-created_date', 200),
+    enabled: topUsers.length > 0,
+  });
+
+  // Mapeia email -> badges ganhas (top 3 mais raras)
+  const badgesByUser = useMemo(() => {
+    const map = {};
+    allBadges.forEach(b => {
+      if (!map[b.user_email]) map[b.user_email] = [];
+      map[b.user_email].push(b.badge_id);
+    });
+    // Ordena pela raridade (HIGHLIGHT_BADGES está do mais raro ao mais comum)
+    Object.keys(map).forEach(email => {
+      map[email] = map[email]
+        .sort((a, b) => HIGHLIGHT_BADGES.indexOf(a) - HIGHLIGHT_BADGES.indexOf(b))
+        .slice(0, 3);
+    });
+    return map;
+  }, [allBadges]);
 
   // Find current user's position
   const { data: myPoints } = useQuery({
@@ -251,9 +300,9 @@ export default function Leaderboard() {
                 </CardHeader>
                 <CardContent className="pt-4 pb-6">
                   <div className="flex items-end justify-center gap-3 md:gap-8">
-                    {podium[1] && <PodiumCard userPoint={podium[1]} rank={2} />}
-                    {podium[0] && <PodiumCard userPoint={podium[0]} rank={1} />}
-                    {podium[2] && <PodiumCard userPoint={podium[2]} rank={3} />}
+                    {podium[1] && <PodiumCard userPoint={podium[1]} rank={2} badges={badgesByUser[podium[1].user_email] || []} />}
+                    {podium[0] && <PodiumCard userPoint={podium[0]} rank={1} badges={badgesByUser[podium[0].user_email] || []} />}
+                    {podium[2] && <PodiumCard userPoint={podium[2]} rank={3} badges={badgesByUser[podium[2].user_email] || []} />}
                   </div>
                 </CardContent>
               </Card>
@@ -274,6 +323,7 @@ export default function Leaderboard() {
                     userPoint={u}
                     rank={i + 1}
                     isCurrentUser={currentUser && u.user_email === currentUser.email}
+                    badges={badgesByUser[u.user_email] || []}
                   />
                 ))}
               </CardContent>
