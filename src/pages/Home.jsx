@@ -223,7 +223,7 @@ export default function Home() {
                 <span className="text-sm font-semibold text-white">🛍️ Descontos reais no comércio local</span>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight leading-none">
-                <span className="text-white drop-shadow-lg">LINKA</span>
+                <span className="text-white drop-shadow-lg">Clube Max</span>
                 <br />
                 <span className="text-yellow-300 drop-shadow-lg">conectando descontos a você</span>
               </h1>
