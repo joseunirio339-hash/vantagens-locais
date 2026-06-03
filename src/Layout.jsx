@@ -293,13 +293,13 @@ export default function Layout({ children }) {
                   className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
                   <span>💬</span> (35) 98839-7979 (WhatsApp)
                 </a>
-                <a href="mailto:contato@linka.com.br"
+                <a href="mailto:clubemaxdescontos@gmail.com"
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>✉️</span> contato@linka.com.br
+                  <span>✉️</span> clubemaxdescontos@gmail.com
                 </a>
-                <a href="https://instagram.com/linka" target="_blank" rel="noopener noreferrer"
+                <a href="https://instagram.com/clubemaxdescontos" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>📸</span> @linka
+                  <span>📸</span> @clubemaxdescontos
                 </a>
               </div>
             </div>

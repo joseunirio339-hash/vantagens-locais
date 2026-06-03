@@ -48,10 +48,10 @@ Seu voucher está prestes a vencer. Não perca essa oportunidade!
 
 Apresente este código na loja para aproveitar seu desconto antes que expire.
 
-Acesse seus vouchers em: https://app.linka.com.br/MyVouchers
+Acesse seus vouchers em: https://clubemaxdescontos.com.br/MyVouchers
 
 ---
-LINKA — Conectando descontos a você
+Clube Max Descontos — Conectando descontos a você
           `.trim()
         });
 
