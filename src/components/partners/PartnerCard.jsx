@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Tag, Star } from 'lucide-react';
+import { MapPin, Tag, Star, Navigation } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import PartnerFavoriteButton from './PartnerFavoriteButton';
@@ -23,8 +23,12 @@ const categoryColors = {
   outros: 'bg-slate-100 text-slate-700'
 };
 
-export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick, isFavorite, onToggleFavorite }) {
+export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick, isFavorite, onToggleFavorite, distanceKm }) {
   const isEmpreendedor = partner?.partner_type === 'empreendedor';
+  const distanceLabel = distanceKm != null
+    ? (distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m` : `${distanceKm.toFixed(1)}km`)
+    : null;
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -32,6 +36,14 @@ export default function PartnerCard({ partner, productCount = 0, avgRating = 0, 
       onClick={onClick}
       className={`bg-white rounded-3xl shadow-md hover:shadow-xl border overflow-hidden cursor-pointer transition-all p-4 ${isEmpreendedor ? 'border-amber-200' : 'border-slate-100'}`}
     >
+      {distanceLabel && (
+        <div className="flex justify-end mb-2">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-200 rounded-full px-2.5 py-0.5">
+            <Navigation className="w-3 h-3" />
+            {distanceLabel} de você
+          </span>
+        </div>
+      )}
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
           {partner.logo_url ? (
@@ -74,7 +86,13 @@ export default function PartnerCard({ partner, productCount = 0, avgRating = 0, 
           )}
 
           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-            {partner.address && (
+            {distanceKm != null && (
+              <span className="flex items-center gap-1 text-violet-600 font-semibold">
+                <MapPin className="w-3 h-3" />
+                {distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m` : `${distanceKm.toFixed(1)}km`}
+              </span>
+            )}
+            {!distanceKm && partner.address && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 <span className="truncate">{partner.address}</span>

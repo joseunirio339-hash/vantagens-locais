@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Search, Store, Filter, Star, MapPin, X, Map, List, Navigation } from 'lucide-react';
+import { Search, Store, Filter, Star, MapPin, X, Map, List } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import PartnerCard from '@/components/partners/PartnerCard';
 import PartnersMap from '@/components/partners/PartnersMap';
+import ProximitySearch from '@/components/partners/ProximitySearch';
 import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
 
 const categories = [
@@ -45,7 +46,8 @@ export default function Partners() {
   const [minRating, setMinRating] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
   const [userLocation, setUserLocation] = useState(null);
-  const [locating, setLocating] = useState(false);
+  const [proximityActive, setProximityActive] = useState(false);
+  const [partnerDistances, setPartnerDistances] = useState({}); // { partnerId: distanceKm }
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (auth) => {
@@ -99,17 +101,29 @@ export default function Partners() {
     return ['all', ...Array.from(new Set(filtered.filter(p => p.neighborhood).map(p => p.neighborhood))).sort()];
   }, [partners, cityFilter]);
 
-  const filteredPartners = partners.filter(partner => {
-    const matchesSearch = partner.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partner.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partner.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'all' || partner.category === category;
-    const matchesCity = cityFilter === 'all' || partner.city === cityFilter;
-    const matchesNeighborhood = neighborhoodFilter === 'all' || partner.neighborhood === neighborhoodFilter;
-    const avg = getAvgRating(partner.id);
-    const matchesRating = minRating === 'all' || (avg !== null && avg >= parseFloat(minRating));
-    return matchesSearch && matchesCategory && matchesCity && matchesNeighborhood && matchesRating;
-  });
+  const filteredPartners = useMemo(() => {
+    const result = partners.filter(partner => {
+      const matchesSearch = partner.business_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partner.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partner.neighborhood?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || partner.category === category;
+      const matchesCity = cityFilter === 'all' || partner.city === cityFilter;
+      const matchesNeighborhood = neighborhoodFilter === 'all' || partner.neighborhood === neighborhoodFilter;
+      const avg = getAvgRating(partner.id);
+      const matchesRating = minRating === 'all' || (avg !== null && avg >= parseFloat(minRating));
+      return matchesSearch && matchesCategory && matchesCity && matchesNeighborhood && matchesRating;
+    });
+
+    if (proximityActive && Object.keys(partnerDistances).length > 0) {
+      result.sort((a, b) => {
+        const da = partnerDistances[a.id] ?? Infinity;
+        const db = partnerDistances[b.id] ?? Infinity;
+        return da - db;
+      });
+    }
+
+    return result;
+  }, [partners, searchTerm, category, cityFilter, neighborhoodFilter, minRating, proximityActive, partnerDistances]);
 
   const getProductCount = (partnerId) => products.filter(p => p.partner_id === partnerId).length;
 
@@ -123,17 +137,25 @@ export default function Partners() {
     setMinRating('all');
   };
 
-  const handleLocate = () => {
-    if (!navigator.geolocation) return;
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-        setViewMode('map');
-        setLocating(false);
-      },
-      () => setLocating(false)
+  const handleProximitySort = async (userLat, userLng, geocodeFn, distanceFn) => {
+    setUserLocation([userLat, userLng]);
+    const distances = {};
+    await Promise.all(
+      partners.map(async (p) => {
+        const coords = await geocodeFn(p).catch(() => null);
+        if (coords) {
+          distances[p.id] = distanceFn(userLat, userLng, coords.lat, coords.lng);
+        }
+      })
     );
+    setPartnerDistances(distances);
+    setProximityActive(true);
+  };
+
+  const handleClearProximity = () => {
+    setProximityActive(false);
+    setPartnerDistances({});
+    setUserLocation(null);
   };
 
   // Build avgRatings map for map component
@@ -279,16 +301,11 @@ export default function Partners() {
             {isLoading ? 'Carregando...' : `${filteredPartners.length} parceiro${filteredPartners.length !== 1 ? 's' : ''} encontrado${filteredPartners.length !== 1 ? 's' : ''}`}
           </p>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={handleLocate}
-              disabled={locating}
-            >
-              <Navigation className={`w-4 h-4 ${locating ? 'animate-pulse text-violet-500' : ''}`} />
-              {locating ? 'Localizando...' : 'Perto de mim'}
-            </Button>
+            <ProximitySearch
+              active={proximityActive}
+              onProximitySort={handleProximitySort}
+              onClear={handleClearProximity}
+            />
             <div className="flex border rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('list')}
@@ -332,6 +349,7 @@ export default function Partners() {
           <div className="grid md:grid-cols-2 gap-4">
             {filteredPartners.map(partner => {
               const avg = getAvgRating(partner.id);
+              const distKm = partnerDistances[partner.id];
               return (
                 <Link key={partner.id} to={createPageUrl(`PartnerStore?id=${partner.id}`)}>
                   <PartnerCard
@@ -341,6 +359,7 @@ export default function Partners() {
                     reviewCount={avgRatings[partner.id]?.count || 0}
                     isFavorite={favPartnerIds.has(partner.id)}
                     onToggleFavorite={user ? () => togglePartnerFav(partner.id) : undefined}
+                    distanceKm={distKm}
                   />
                 </Link>
               );
