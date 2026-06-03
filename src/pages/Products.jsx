@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductCard from '@/components/products/ProductCard';
 import VoucherModal from '@/components/voucher/VoucherModal';
+import { useFavorites } from '@/hooks/useFavorites';
 
 export default function Products() {
   const [user, setUser] = useState(null);
@@ -19,6 +20,8 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+
+  const { favoriteIds, toggleFavorite } = useFavorites(user);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -239,6 +242,8 @@ export default function Products() {
                 product={product}
                 partner={partners.find(p => p.id === product.partner_id)}
                 onClick={() => handleProductClick(product)}
+                isFavorite={favoriteIds.has(product.id)}
+                onToggleFavorite={user ? () => toggleFavorite(product, partners.find(p => p.id === product.partner_id)) : undefined}
               />
             ))}
           </div>

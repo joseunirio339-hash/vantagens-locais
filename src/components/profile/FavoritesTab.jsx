@@ -1,9 +1,10 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Heart, Store, Tag, MapPin, Star, Loader2 } from 'lucide-react';
+import { Heart, Store, Tag, MapPin, Star, Loader2, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const categoryLabels = {
   restaurante: 'Restaurante', moda: 'Moda', eletronicos: 'Eletrônicos',
@@ -20,38 +21,50 @@ function FavoriteProductCard({ product, partner, onUnfavorite }) {
 
   return (
     <div className="flex items-center gap-3 p-3 rounded-xl border bg-white hover:bg-slate-50 transition-colors">
-      <div className="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0">
-        {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Tag className="w-5 h-5 text-slate-300" />
-          </div>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        {partner && <p className="text-xs text-slate-400 truncate">{partner.business_name}</p>}
-        <p className="text-sm font-semibold text-slate-800 truncate">{product.name}</p>
-        <div className="flex items-baseline gap-1.5 mt-0.5">
-          <span className="text-sm font-bold text-emerald-600">
-            R$ {product.discount_price?.toFixed(2).replace('.', ',')}
-          </span>
-          <span className="text-xs text-slate-400 line-through">
-            R$ {product.original_price?.toFixed(2).replace('.', ',')}
-          </span>
-          {discountPct > 0 && (
-            <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold">
-              -{discountPct}%
-            </span>
+      <Link to={partner ? `/PartnerStore?id=${partner.id}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0">
+          {product.image_url ? (
+            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Tag className="w-5 h-5 text-slate-300" />
+            </div>
           )}
         </div>
+        <div className="flex-1 min-w-0">
+          {partner && <p className="text-xs text-slate-400 truncate">{partner.business_name}</p>}
+          <p className="text-sm font-semibold text-slate-800 truncate">{product.name}</p>
+          <div className="flex items-baseline gap-1.5 mt-0.5">
+            <span className="text-sm font-bold text-emerald-600">
+              R$ {product.discount_price?.toFixed(2).replace('.', ',')}
+            </span>
+            <span className="text-xs text-slate-400 line-through">
+              R$ {product.original_price?.toFixed(2).replace('.', ',')}
+            </span>
+            {discountPct > 0 && (
+              <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold">
+                -{discountPct}%
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {partner && (
+          <Link to={`/PartnerStore?id=${partner.id}`}>
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1 border-violet-200 text-violet-700 hover:bg-violet-50">
+              <ShoppingBag className="w-3 h-3" />
+              Comprar
+            </Button>
+          </Link>
+        )}
+        <button
+          onClick={onUnfavorite}
+          className="w-8 h-8 rounded-full flex items-center justify-center bg-rose-50 hover:bg-rose-100 transition-colors"
+        >
+          <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
+        </button>
       </div>
-      <button
-        onClick={onUnfavorite}
-        className="w-8 h-8 rounded-full flex items-center justify-center bg-rose-50 hover:bg-rose-100 transition-colors flex-shrink-0"
-      >
-        <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-      </button>
     </div>
   );
 }
