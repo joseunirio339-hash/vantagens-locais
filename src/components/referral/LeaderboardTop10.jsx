@@ -26,7 +26,7 @@ export default function LeaderboardTop10() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-slate-700 text-base">
             <Trophy className="w-5 h-5 text-yellow-500" />
-            Top Indicadores
+            🏆 Top Pontuadores
           </CardTitle>
           <Link to={createPageUrl('Leaderboard')} className="text-xs text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
             Ver ranking <ChevronRight className="w-3 h-3" />
