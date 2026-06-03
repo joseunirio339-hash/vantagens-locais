@@ -27,6 +27,7 @@ import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
 import StampCardsManager from '@/components/loyalty/StampCardsManager';
 import ExportSalesButton from '@/components/partner/ExportSalesButton';
 import NewsPostManager from '@/components/news/NewsPostManager';
+import PartnerStatsPanel from '@/components/partner/PartnerStatsPanel';
 import { Megaphone } from 'lucide-react';
 
 export default function PartnerDashboard() {
@@ -270,6 +271,8 @@ export default function PartnerDashboard() {
             );
           })}
         </div>
+
+        <PartnerStatsPanel vouchers={vouchers} products={products} views={views} />
 
         <FinancialPanel vouchers={vouchers} />
 
