@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { Search, Tag, SlidersHorizontal, MapPin, X } from 'lucide-react';
+import { Search, Tag, SlidersHorizontal, MapPin, X, Utensils, Shirt, Zap, Sparkles, Heart, ShoppingCart, Briefcase, Music, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,8 +20,21 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
+
+  const CATEGORIES = [
+    { value: 'alimentacao', label: 'Alimentação', icon: Utensils },
+    { value: 'moda', label: 'Moda', icon: Shirt },
+    { value: 'eletronicos', label: 'Eletrônicos', icon: Zap },
+    { value: 'beleza', label: 'Beleza', icon: Sparkles },
+    { value: 'saude', label: 'Saúde', icon: Heart },
+    { value: 'mercado', label: 'Mercado', icon: ShoppingCart },
+    { value: 'servicos', label: 'Serviços', icon: Briefcase },
+    { value: 'lazer', label: 'Lazer', icon: Music },
+    { value: 'outros', label: 'Outros', icon: Package },
+  ];
 
   useEffect(() => {
     const loadUser = async () => {
@@ -82,7 +95,14 @@ export default function Products() {
   }, [activeProducts, partners, cityFilter, neighborhoodFilter]);
 
   const filteredProducts = locationFilteredProducts
-    .filter(p => p.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(p => {
+      const matchesSearch = !searchTerm ||
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.category?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !categoryFilter || p.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
     .sort((a, b) => {
       switch (sortBy) {
         case 'price_low':
@@ -130,14 +150,14 @@ export default function Products() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero com busca no topo */}
-      <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600">
-        <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 pb-6">
+        <div className="max-w-6xl mx-auto px-4 pt-10 pb-4">
           <h1 className="text-3xl font-bold text-white mb-1">Produtos</h1>
-          <p className="text-violet-200 mb-6">Encontre o produto com desconto que você procura</p>
+          <p className="text-violet-200 mb-5">Encontre o produto com desconto que você procura</p>
           <div className="relative max-w-2xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <Input
-              placeholder="Buscar produtos pelo nome..."
+              placeholder="Buscar por nome, descrição ou categoria..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 h-12 text-base rounded-xl bg-white border-0 shadow-lg focus-visible:ring-2 focus-visible:ring-white/50"
@@ -152,11 +172,43 @@ export default function Products() {
               </button>
             )}
           </div>
-          {searchTerm && (
+          {(searchTerm || categoryFilter) && (
             <p className="text-violet-200 text-sm mt-3">
-              {filteredProducts.length} resultado{filteredProducts.length !== 1 ? 's' : ''} para "<strong className="text-white">{searchTerm}</strong>"
+              {filteredProducts.length} resultado{filteredProducts.length !== 1 ? 's' : ''}
+              {searchTerm && <> para "<strong className="text-white">{searchTerm}</strong>"</>}
+              {categoryFilter && <> em <strong className="text-white">{CATEGORIES.find(c => c.value === categoryFilter)?.label}</strong></>}
             </p>
           )}
+        </div>
+
+        {/* Category chips */}
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button
+              onClick={() => setCategoryFilter('')}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                !categoryFilter
+                  ? 'bg-white text-violet-700 shadow-md'
+                  : 'bg-white/20 text-white hover:bg-white/30'
+              }`}
+            >
+              Todos
+            </button>
+            {CATEGORIES.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                onClick={() => setCategoryFilter(categoryFilter === value ? '' : value)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  categoryFilter === value
+                    ? 'bg-white text-violet-700 shadow-md'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
