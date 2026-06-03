@@ -58,7 +58,7 @@ function RecenterMap({ center, zoom }) {
   return null;
 }
 
-const DISTANCE_OPTIONS = [1, 3, 5, 10, 20];
+const DISTANCE_OPTIONS = [1, 5, 10];
 
 export default function NearbyPartnersMap({ partners, avgRatings = {}, productCounts = {} }) {
   const [userLocation, setUserLocation] = useState(null);
