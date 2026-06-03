@@ -68,7 +68,7 @@ export default function Layout({ children }) {
                 <span className="text-white font-black text-lg tracking-tight">L</span>
               </div>
               <div className="hidden sm:flex flex-col leading-none">
-                <span className="font-black text-xl text-slate-800 tracking-tight">LIN<span style={{display: 'inline-block', transform: 'scaleX(-1)'}}>K</span>A</span>
+                <span className="font-black text-xl text-slate-800 tracking-tight">Linꓘka</span>
                 <span className="text-xs text-slate-400 font-medium">Conectando descontos a você</span>
               </div>
             </Link>
@@ -266,7 +266,7 @@ export default function Layout({ children }) {
                   <span className="text-white font-black text-lg tracking-tight">L</span>
                 </div>
                 <div className="flex flex-col leading-none">
-                  <span className="font-black text-lg tracking-tight">LIN<span style={{display: 'inline-block', transform: 'scaleX(-1)'}}>K</span>A</span>
+                  <span className="font-black text-lg tracking-tight">Linꓘka</span>
                   <span className="text-xs text-slate-400">Conectando descontos a você</span>
                 </div>
               </div>
