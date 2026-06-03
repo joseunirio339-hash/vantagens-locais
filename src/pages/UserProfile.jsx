@@ -8,7 +8,7 @@ import {
   User, CreditCard, CheckCircle, XCircle, Clock, RefreshCw,
   ExternalLink, Receipt, ChevronDown, ChevronUp, AlertCircle,
   Sparkles, Settings, ArrowRight, Loader2, Crown, Star, Ticket,
-  TrendingDown, ShoppingBag, BadgePercent, Store, Heart
+  TrendingDown, ShoppingBag, BadgePercent, Store, Heart, BookOpen, MapPin
 } from 'lucide-react';
 import FavoritesTab from '@/components/profile/FavoritesTab';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -282,6 +282,11 @@ export default function UserProfile() {
               <Receipt className="w-4 h-4" />
               <span className="hidden sm:inline">Pagamentos</span>
               <span className="sm:hidden">Pgtos</span>
+            </TabsTrigger>
+            <TabsTrigger value="resgates" className="flex-1 gap-1 text-xs sm:text-sm">
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">Meus Resgates</span>
+              <span className="sm:hidden">Resgates</span>
             </TabsTrigger>
             <TabsTrigger value="subscriptions" className="flex-1 gap-1 text-xs sm:text-sm">
               <Crown className="w-4 h-4" />
@@ -571,6 +576,111 @@ export default function UserProfile() {
                 )}
               </>
             )}
+          </TabsContent>
+
+          {/* === MEUS RESGATES === */}
+          <TabsContent value="resgates" className="mt-5">
+            {vouchersLoading ? (
+              <div className="space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>
+            ) : (() => {
+              const usedVouchers = (vouchers || [])
+                .filter(v => v.status === 'used')
+                .sort((a, b) => new Date(b.updated_date || b.created_date) - new Date(a.updated_date || a.created_date));
+
+              if (usedVouchers.length === 0) {
+                return (
+                  <div className="text-center py-16">
+                    <BookOpen className="w-14 h-14 text-slate-200 mx-auto mb-3" />
+                    <p className="text-slate-500 font-medium">Nenhum resgate ainda</p>
+                    <p className="text-slate-400 text-sm mt-1">Use seus vouchers em parceiros para ver o histórico aqui.</p>
+                  </div>
+                );
+              }
+
+              const totalEconomizado = usedVouchers.reduce((s, v) => s + ((v.original_price || 0) - (v.discount_price || 0)), 0);
+
+              return (
+                <div className="space-y-4">
+                  {/* Summary */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <Card className="border-0 bg-gradient-to-br from-violet-50 to-violet-100 text-center">
+                      <CardContent className="p-4">
+                        <p className="text-2xl font-black text-violet-700">{usedVouchers.length}</p>
+                        <p className="text-xs text-violet-500 mt-0.5">Resgates feitos</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-0 bg-gradient-to-br from-emerald-50 to-emerald-100 text-center">
+                      <CardContent className="p-4">
+                        <p className="text-lg font-black text-emerald-700">R$ {totalEconomizado.toFixed(2).replace('.', ',')}</p>
+                        <p className="text-xs text-emerald-500 mt-0.5">Economizado</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border-0 bg-gradient-to-br from-fuchsia-50 to-fuchsia-100 text-center">
+                      <CardContent className="p-4">
+                        <p className="text-2xl font-black text-fuchsia-700">
+                          {new Set(usedVouchers.map(v => v.partner_id)).size}
+                        </p>
+                        <p className="text-xs text-fuchsia-500 mt-0.5">Lojas visitadas</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* List */}
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <BookOpen className="w-4 h-4 text-slate-400" />
+                        Histórico Completo de Resgates
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      {usedVouchers.map((v, i) => {
+                        const partner = partners?.find(p => p.id === v.partner_id);
+                        const saved = (v.original_price || 0) - (v.discount_price || 0);
+                        const usedDate = v.updated_date || v.created_date;
+                        return (
+                          <div key={v.id} className={`flex items-center gap-4 px-4 py-4 border-b last:border-b-0 ${i % 2 === 0 ? '' : 'bg-slate-50/50'}`}>
+                            {/* Index */}
+                            <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-600 shrink-0">
+                              {i + 1}
+                            </div>
+
+                            {/* Logo or initial */}
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                              {partner?.logo_url
+                                ? <img src={partner.logo_url} alt={partner.business_name} className="w-full h-full object-cover" />
+                                : <Store className="w-5 h-5 text-slate-400" />
+                              }
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-slate-800 text-sm truncate">{v.product_name || 'Voucher'}</p>
+                              <div className="flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                                <p className="text-xs text-slate-500 truncate">{partner?.business_name || 'Parceiro'}</p>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5">
+                                {usedDate ? format(new Date(usedDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '—'}
+                              </p>
+                            </div>
+
+                            {/* Prices */}
+                            <div className="text-right shrink-0">
+                              <p className="font-bold text-slate-800 text-sm">R$ {(v.discount_price || 0).toFixed(2).replace('.', ',')}</p>
+                              {saved > 0 && (
+                                <p className="text-xs text-emerald-600 font-medium">-R$ {saved.toFixed(2).replace('.', ',')}</p>
+                              )}
+                              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 border text-xs mt-1">Usado</Badge>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
           </TabsContent>
 
           {/* === FAVORITES === */}
