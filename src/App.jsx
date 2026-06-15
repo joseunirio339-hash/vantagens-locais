@@ -10,6 +10,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import UserProfile from './pages/UserProfile';
 import Cart from './pages/Cart';
 import LoyaltyStore from './pages/LoyaltyStore';
+import SystemReport from './pages/SystemReport';
 import { CartProvider } from '@/context/CartContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
       <Route path="/UserProfile" element={<LayoutWrapper currentPageName="UserProfile"><UserProfile /></LayoutWrapper>} />
       <Route path="/Cart" element={<LayoutWrapper currentPageName="Cart"><Cart /></LayoutWrapper>} />
       <Route path="/LoyaltyStore" element={<LayoutWrapper currentPageName="LoyaltyStore"><LoyaltyStore /></LayoutWrapper>} />
+      <Route path="/SystemReport" element={<LayoutWrapper currentPageName="SystemReport"><SystemReport /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
