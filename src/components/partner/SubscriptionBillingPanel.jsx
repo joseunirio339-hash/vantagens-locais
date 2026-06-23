@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import AddToCalendarButton from '@/components/partner/AddToCalendarButton';
 import { 
   CreditCard, Receipt, Calendar, Clock, CheckCircle, XCircle, 
   AlertCircle, ExternalLink, TrendingUp, DollarSign, Download
@@ -44,7 +45,7 @@ const statusColors = {
   pending: 'bg-slate-100 text-slate-600 border-slate-200'
 };
 
-export default function SubscriptionBillingPanel({ subscription, userEmail }) {
+export default function SubscriptionBillingPanel({ subscription, userEmail, businessName }) {
   const [stripeData, setStripeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -195,6 +196,10 @@ export default function SubscriptionBillingPanel({ subscription, userEmail }) {
             <ExternalLink className="w-4 h-4" />
             Gerenciar Assinatura no Stripe
           </button>
+
+          <div className="mt-3 flex justify-center">
+            <AddToCalendarButton subscription={subscription} businessName={businessName} />
+          </div>
         </CardContent>
       </Card>
 

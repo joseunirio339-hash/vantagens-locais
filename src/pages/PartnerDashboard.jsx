@@ -430,6 +430,7 @@ export default function PartnerDashboard() {
             <SubscriptionBillingPanel 
               subscription={subscription} 
               userEmail={user?.email}
+              businessName={partner?.business_name}
             />
           </TabsContent>
 
