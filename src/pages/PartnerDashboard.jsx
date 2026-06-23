@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
+import { Link } from 'react-router-dom';
 import { 
-  Store, Package, Eye, Ticket, TrendingUp, 
+  Store, Package, Eye, Ticket, TrendingUp, ArrowRight,
   Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, Gift, CalendarDays, CreditCard
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,6 +123,7 @@ export default function PartnerDashboard() {
   });
 
   const isBlocked = subscription?.status !== 'active';
+  const isNewPartner = partner?.subscription_status === 'pending' && !subscription;
   const isPremium = subscription?.type === 'lojista' && subscription?.status === 'active';
 
   if (loading) {
@@ -220,13 +222,36 @@ export default function PartnerDashboard() {
           businessName={partner?.business_name}
         />
 
-        {isBlocked && (
+        {isBlocked && isNewPartner && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Store className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-800">Seu negócio está quase pronto!</h3>
+                <p className="text-amber-700 text-sm mt-1">
+                  Seu cadastro foi recebido, mas para ativar sua vitrine e começar a receber clientes, escolha um plano de assinatura.
+                </p>
+                <div className="mt-4">
+                  <Link to={createPageUrl('Subscription')}>
+                    <Button className="bg-amber-500 hover:bg-amber-600 text-white">
+                      Escolher Plano <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isBlocked && !isNewPartner && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6">
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="font-semibold text-red-800">Acesso Bloqueado</h3>
-                <p className="text-red-600 mt-1">
+                <p className="text-red-600 text-sm mt-1">
                   Sua assinatura expirou. Renove para continuar gerenciando seus produtos e receber novos clientes.
                 </p>
                 <div className="mt-3">

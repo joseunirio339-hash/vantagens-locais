@@ -135,16 +135,26 @@ export default function PartnerSignup() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <Card className="max-w-md w-full text-center p-8">
-          <CheckCircle className="w-14 h-14 text-emerald-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Cadastro realizado!</h2>
-          <p className="text-slate-500 mb-6">
-            Seu negócio foi cadastrado com sucesso. Acesse o painel para configurar seus produtos e sua assinatura.
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-9 h-9 text-emerald-500" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">Negócio cadastrado!</h2>
+          <p className="text-slate-500 mb-8 leading-relaxed">
+            Seu estabelecimento foi registrado com sucesso. <br />
+            <strong className="text-slate-700">Agora escolha seu plano</strong> para ativar sua vitrine e começar a atrair clientes.
           </p>
-          <Link to={createPageUrl('PartnerDashboard')}>
-            <Button className="w-full bg-violet-600 hover:bg-violet-700">
-              Acessar Painel do Parceiro <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+          <div className="space-y-3">
+            <Link to={createPageUrl('Subscription')}>
+              <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-base h-12">
+                Escolher Plano <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link to={createPageUrl('PartnerDashboard')}>
+              <Button variant="outline" className="w-full">
+                Ir para o Painel
+              </Button>
+            </Link>
+          </div>
         </Card>
       </div>
     );
