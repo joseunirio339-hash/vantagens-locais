@@ -10,6 +10,7 @@ import ProductCard from '@/components/products/ProductCard';
 import FeaturedVideoStrip from '@/components/products/FeaturedVideoStrip';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import { useFavorites } from '@/hooks/useFavorites';
+import { getAllCities, getNeighborhoods } from '@/lib/brazilianCities';
 
 // Haversine distance in km
 function haversine(lat1, lon1, lat2, lon2) {
@@ -124,14 +125,8 @@ export default function Products() {
     return new Set(partners.filter(p => premiumEmails.has(p.owner_email)).map(p => p.id));
   }, [premiumSubs, partners]);
 
-  const cities = React.useMemo(() => {
-    return Array.from(new Set(partners.filter(p => p.city).map(p => p.city))).sort();
-  }, [partners]);
-
-  const neighborhoods = React.useMemo(() => {
-    const filtered = cityFilter ? partners.filter(p => p.city === cityFilter) : partners;
-    return Array.from(new Set(filtered.filter(p => p.neighborhood).map(p => p.neighborhood))).sort();
-  }, [partners, cityFilter]);
+  const allCities = React.useMemo(() => getAllCities(), []);
+  const allNeighborhoods = React.useMemo(() => getNeighborhoods(cityFilter), [cityFilter]);
 
   const locationFilteredProducts = React.useMemo(() => {
     if (!cityFilter && !neighborhoodFilter) return activeProducts;
@@ -365,7 +360,7 @@ export default function Products() {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Filtro de Localização */}
-        {(cities.length > 0) && (
+        {(allCities.length > 0) && (
           <div className="bg-white border border-stone-200 rounded-2xl shadow-sm p-4 mb-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center">
@@ -432,26 +427,37 @@ export default function Products() {
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <label className="text-xs text-slate-500 mb-1 block font-medium">Cidade</label>
-                <select
+                <input
+                  type="text"
+                  placeholder="Buscar cidade..."
                   value={cityFilter}
-                  onChange={(e) => { setCityFilter(e.target.value); setNeighborhoodFilter(''); }}
-                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 appearance-none focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer"
-                >
+                  onChange={(e) => {
+                    setCityFilter(e.target.value);
+                    setNeighborhoodFilter('');
+                  }}
+                  list="products-city-list"
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                />
+                <datalist id="products-city-list">
                   <option value="">Todas as cidades</option>
-                  {cities.map(city => <option key={city} value={city}>{city}</option>)}
-                </select>
+                  {allCities.map(city => <option key={city} value={city} />)}
+                </datalist>
               </div>
               <div className="flex-1">
                 <label className="text-xs text-slate-500 mb-1 block font-medium">Bairro</label>
-                <select
+                <input
+                  type="text"
+                  placeholder="Buscar bairro..."
                   value={neighborhoodFilter}
                   onChange={(e) => setNeighborhoodFilter(e.target.value)}
-                  disabled={neighborhoods.length === 0}
-                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 appearance-none focus:outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer disabled:opacity-50"
-                >
+                  disabled={!cityFilter}
+                  list="products-nbh-list"
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-50"
+                />
+                <datalist id="products-nbh-list">
                   <option value="">Todos os bairros</option>
-                  {neighborhoods.map(nb => <option key={nb} value={nb}>{nb}</option>)}
-                </select>
+                  {allNeighborhoods.map(nb => <option key={nb} value={nb} />)}
+                </datalist>
               </div>
             </div>
           </div>

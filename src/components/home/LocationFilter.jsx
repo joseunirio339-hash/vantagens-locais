@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { MapPin, X, ChevronDown, Map } from 'lucide-react';
+import { MapPin, X, ChevronDown, Map, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { getAllCities, getNeighborhoods } from '@/lib/brazilianCities';
 
 // Fix default marker icon issue with webpack/vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,30 +20,38 @@ export default function LocationFilter({ partners, selectedCity, selectedNeighbo
   const [mapPartners, setMapPartners] = useState([]);
   const [geocoding, setGeocoding] = useState(false);
   const [geocodedPartners, setGeocodedPartners] = useState([]);
+  const [citySearch, setCitySearch] = useState('');
+  const [nbhSearch, setNbhSearch] = useState('');
 
-  const cities = useMemo(() => {
-    const set = new Set(partners.map(p => p.city).filter(Boolean));
-    return [...set].sort();
-  }, [partners]);
+  const allCities = useMemo(() => getAllCities(), []);
+  const allNeighborhoods = useMemo(() => getNeighborhoods(selectedCity), [selectedCity]);
 
-  const neighborhoods = useMemo(() => {
-    const filtered = selectedCity
-      ? partners.filter(p => p.city === selectedCity)
-      : partners;
-    const set = new Set(filtered.map(p => p.neighborhood).filter(Boolean));
-    return [...set].sort();
-  }, [partners, selectedCity]);
+  const filteredCities = useMemo(() => {
+    if (!citySearch) return allCities;
+    const q = citySearch.toLowerCase();
+    return allCities.filter(c => c.toLowerCase().includes(q));
+  }, [allCities, citySearch]);
+
+  const filteredNeighborhoods = useMemo(() => {
+    if (!nbhSearch) return allNeighborhoods;
+    const q = nbhSearch.toLowerCase();
+    return allNeighborhoods.filter(n => n.toLowerCase().includes(q));
+  }, [allNeighborhoods, nbhSearch]);
 
   const hasFilter = selectedCity || selectedNeighborhood;
 
   const handleCityChange = (val) => {
     onCityChange(val);
     onNeighborhoodChange('');
+    setCitySearch(val);
+    setNbhSearch('');
   };
 
   const handleClear = () => {
     onCityChange('');
     onNeighborhoodChange('');
+    setCitySearch('');
+    setNbhSearch('');
     setShowMap(false);
     setGeocodedPartners([]);
   };
@@ -108,41 +117,98 @@ export default function LocationFilter({ partners, selectedCity, selectedNeighbo
 
       {/* Selects */}
       <div className="px-4 pb-3 flex flex-col sm:flex-row gap-3">
-        {/* City dropdown */}
+        {/* City searchable input */}
         <div className="flex-1">
           <label className="text-xs text-slate-500 mb-1 block font-medium">Cidade</label>
           <div className="relative">
-            <select
-              value={selectedCity || ''}
-              onChange={(e) => handleCityChange(e.target.value)}
-              className="w-full h-10 pl-3 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 cursor-pointer"
-            >
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Buscar cidade..."
+              value={citySearch}
+              onChange={(e) => {
+                setCitySearch(e.target.value);
+                if (e.target.value === '') handleCityChange('');
+              }}
+              list="city-list"
+              className="w-full h-10 pl-9 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400"
+            />
+            <datalist id="city-list">
               <option value="">Todas as cidades</option>
-              {cities.map(city => (
-                <option key={city} value={city}>{city}</option>
+              {filteredCities.slice(0, 100).map(city => (
+                <option key={city} value={city} />
               ))}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </datalist>
+            {citySearch && (
+              <button
+                onClick={() => handleClear()}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
+          {selectedCity && (
+            <p className="text-xs text-violet-600 mt-1 ml-1">{allCities.length} cidades disponíveis</p>
+          )}
         </div>
 
-        {/* Neighborhood dropdown */}
+        {/* Neighborhood searchable input */}
         <div className="flex-1">
           <label className="text-xs text-slate-500 mb-1 block font-medium">Bairro</label>
           <div className="relative">
-            <select
-              value={selectedNeighborhood || ''}
-              onChange={(e) => onNeighborhoodChange(e.target.value)}
-              disabled={neighborhoods.length === 0}
-              className="w-full h-10 pl-3 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 appearance-none focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              placeholder={selectedCity ? 'Buscar bairro...' : 'Selecione uma cidade'}
+              value={nbhSearch}
+              onChange={(e) => {
+                setNbhSearch(e.target.value);
+              }}
+              onBlur={(e) => {
+                // On blur, if the value matches a neighborhood, set it
+                const match = allNeighborhoods.find(
+                  n => n.toLowerCase() === e.target.value.toLowerCase()
+                );
+                if (match) {
+                  onNeighborhoodChange(match);
+                } else if (e.target.value === '') {
+                  onNeighborhoodChange('');
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const match = allNeighborhoods.find(
+                    n => n.toLowerCase() === e.target.value.toLowerCase()
+                  );
+                  if (match) {
+                    onNeighborhoodChange(match);
+                    setNbhSearch(match);
+                  }
+                }
+              }}
+              list="nbh-list"
+              disabled={!selectedCity}
+              className="w-full h-10 pl-9 pr-8 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <datalist id="nbh-list">
               <option value="">Todos os bairros</option>
-              {neighborhoods.map(nb => (
-                <option key={nb} value={nb}>{nb}</option>
+              {filteredNeighborhoods.map(nb => (
+                <option key={nb} value={nb} />
               ))}
-            </select>
-            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </datalist>
+            {nbhSearch && selectedCity && (
+              <button
+                onClick={() => { onNeighborhoodChange(''); setNbhSearch(''); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
+          {selectedCity && allNeighborhoods.length > 0 && (
+            <p className="text-xs text-violet-600 mt-1 ml-1">{allNeighborhoods.length} bairros em {selectedCity}</p>
+          )}
         </div>
       </div>
 
