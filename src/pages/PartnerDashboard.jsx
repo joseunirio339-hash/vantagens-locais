@@ -30,6 +30,7 @@ import NewsPostManager from '@/components/news/NewsPostManager';
 import PartnerStatsPanel from '@/components/partner/PartnerStatsPanel';
 import SubscriptionBillingPanel from '@/components/partner/SubscriptionBillingPanel';
 import PremiumMetricsPanel from '@/components/partner/PremiumMetricsPanel';
+import AddToCalendarButton from '@/components/partner/AddToCalendarButton';
 import { Megaphone } from 'lucide-react';
 
 export default function PartnerDashboard() {
@@ -215,17 +216,21 @@ export default function PartnerDashboard() {
           type="partner"
           status={subscription?.status}
           expiresAt={subscription?.expires_at}
+          businessName={partner?.business_name}
         />
 
         {isBlocked && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6">
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-red-800">Acesso Bloqueado</h3>
                 <p className="text-red-600 mt-1">
                   Sua assinatura expirou. Renove para continuar gerenciando seus produtos e receber novos clientes.
                 </p>
+                <div className="mt-3">
+                  <AddToCalendarButton subscription={subscription} businessName={partner?.business_name} />
+                </div>
               </div>
             </div>
           </div>

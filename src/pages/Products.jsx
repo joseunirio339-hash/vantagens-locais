@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { Search, Tag, SlidersHorizontal, MapPin, X, Utensils, Shirt, Zap, Sparkles, Heart, ShoppingCart, Briefcase, Music, Package } from 'lucide-react';
+import { Search, Tag, SlidersHorizontal, MapPin, X, Utensils, Shirt, Zap, Sparkles, Heart, ShoppingCart, Briefcase, Music, Package, Navigation, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +10,34 @@ import ProductCard from '@/components/products/ProductCard';
 import FeaturedVideoStrip from '@/components/products/FeaturedVideoStrip';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import { useFavorites } from '@/hooks/useFavorites';
+
+// Haversine distance in km
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function geocodePartner(partner) {
+  if (partner.lat && partner.lng) return { lat: partner.lat, lng: partner.lng };
+  const query = [partner.address, partner.neighborhood, partner.city, partner.state, 'Brasil']
+    .filter(Boolean).join(', ');
+  if (!query.trim()) return null;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`
+    );
+    const data = await res.json();
+    if (data.length === 0) return null;
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch { return null; }
+}
 
 export default function Products() {
   const [user, setUser] = useState(null);
@@ -22,6 +50,10 @@ export default function Products() {
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [proximityMode, setProximityMode] = useState(false);
+  const [proximityLoading, setProximityLoading] = useState(false);
+  const [proximityError, setProximityError] = useState('');
+  const [sortedByProximity, setSortedByProximity] = useState([]);
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
 
@@ -106,15 +138,20 @@ export default function Products() {
     return activeProducts.filter(p => filteredPartnerIds.includes(p.partner_id));
   }, [activeProducts, partners, cityFilter, neighborhoodFilter]);
 
-  const filteredProducts = locationFilteredProducts
-    .filter(p => {
-      const matchesSearch = !searchTerm ||
-        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !categoryFilter || p.category === categoryFilter;
-      return matchesSearch && matchesCategory;
-    })
+  const baseProductList = proximityMode 
+    ? sortedByProximity.filter(p => {
+        // Apply location filters on top of proximity results
+        if (cityFilter || neighborhoodFilter) {
+          const partner = p._partner || partners.find(pp => pp.id === p.partner_id);
+          if (!partner) return false;
+          if (cityFilter && partner.city !== cityFilter) return false;
+          if (neighborhoodFilter && partner.neighborhood !== neighborhoodFilter) return false;
+        }
+        return true;
+      })
+    : locationFilteredProducts;
+
+  const filteredProducts = (proximityMode ? baseProductList : baseProductList
     .sort((a, b) => {
       switch (sortBy) {
         case 'price_low':
@@ -130,7 +167,57 @@ export default function Products() {
         default:
           return new Date(b.created_date) - new Date(a.created_date);
       }
+    }))
+    .filter(p => {
+      const matchesSearch = !searchTerm ||
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.category?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !categoryFilter || p.category === categoryFilter;
+      return matchesSearch && matchesCategory;
     });
+
+  const handleProximitySort = () => {
+    if (!navigator.geolocation) {
+      setProximityError('Geolocalização não suportada neste navegador.');
+      return;
+    }
+    setProximityLoading(true);
+    setProximityError('');
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const userLat = pos.coords.latitude;
+        const userLng = pos.coords.longitude;
+        const sorted = await Promise.all(
+          activeProducts.map(async (product) => {
+            const partner = partners.find(p => p.id === product.partner_id);
+            if (!partner) return { ...product, distance: Infinity };
+            const coords = await geocodePartner(partner);
+            if (!coords) return { ...product, distance: Infinity };
+            const dist = haversine(userLat, userLng, coords.lat, coords.lng);
+            return { ...product, distance: dist, _partner: partner };
+          })
+        );
+        const sortedFiltered = sorted
+          .filter(p => p.distance !== Infinity)
+          .sort((a, b) => a.distance - b.distance)
+          .concat(sorted.filter(p => p.distance === Infinity));
+        setSortedByProximity(sortedFiltered);
+        setProximityMode(true);
+        setProximityLoading(false);
+      },
+      () => {
+        setProximityError('Não foi possível obter sua localização. Verifique as permissões do navegador.');
+        setProximityLoading(false);
+      }
+    );
+  };
+
+  const clearProximity = () => {
+    setProximityMode(false);
+    setSortedByProximity([]);
+    setProximityError('');
+  };
 
   const handleProductClick = async (product) => {
     if (!user) {
@@ -233,15 +320,43 @@ export default function Products() {
                 <MapPin className="w-4 h-4 text-violet-600" />
               </div>
               <span className="font-semibold text-slate-700 text-sm">Filtrar por Localidade</span>
-              {(cityFilter || neighborhoodFilter) && (
-                <button
-                  onClick={() => { setCityFilter(''); setNeighborhoodFilter(''); }}
-                  className="ml-auto text-xs text-slate-400 hover:text-red-500 flex items-center gap-1"
-                >
-                  <X className="w-3 h-3" /> Limpar
-                </button>
-              )}
+              <div className="ml-auto flex items-center gap-2">
+                {proximityMode ? (
+                  <button
+                    onClick={clearProximity}
+                    className="text-xs bg-violet-100 text-violet-700 hover:bg-violet-200 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1"
+                  >
+                    <Navigation className="w-3 h-3" /> Próximos <X className="w-3 h-3" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleProximitySort}
+                    disabled={proximityLoading}
+                    className="text-xs border border-violet-200 text-violet-600 hover:bg-violet-50 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 disabled:opacity-50"
+                  >
+                    {proximityLoading ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Navigation className="w-3 h-3" />
+                    )}
+                    {proximityLoading ? 'Localizando...' : 'Perto de mim'}
+                  </button>
+                )}
+                {(cityFilter || neighborhoodFilter) && (
+                  <button
+                    onClick={() => { setCityFilter(''); setNeighborhoodFilter(''); }}
+                    className="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> Limpar
+                  </button>
+                )}
+              </div>
             </div>
+            {proximityError && (
+              <p className="text-xs text-red-500 flex items-center gap-1 mb-2">
+                <MapPin className="w-3 h-3" /> {proximityError}
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
                 <label className="text-xs text-slate-500 mb-1 block font-medium">Cidade</label>
@@ -315,17 +430,28 @@ export default function Products() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredProducts.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                partner={partners.find(p => p.id === product.partner_id)}
-                onClick={() => handleProductClick(product)}
-                isFavorite={favoriteIds.has(product.id)}
-                onToggleFavorite={user ? () => toggleFavorite(product, partners.find(p => p.id === product.partner_id)) : undefined}
-                isPremium={premiumPartnerIds.has(product.partner_id)}
-              />
-            ))}
+            {filteredProducts.map(product => {
+              const productPartner = product._partner || partners.find(p => p.id === product.partner_id);
+              const distance = product.distance;
+              return (
+                <div key={product.id} className="relative">
+                  {proximityMode && distance != null && distance !== Infinity && (
+                    <div className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-semibold text-violet-700 shadow-sm flex items-center gap-1">
+                      <Navigation className="w-3 h-3" />
+                      {distance < 1 ? `${(distance * 1000).toFixed(0)}m` : `${distance.toFixed(1)}km`}
+                    </div>
+                  )}
+                  <ProductCard
+                    product={product}
+                    partner={productPartner}
+                    onClick={() => handleProductClick(product)}
+                    isFavorite={favoriteIds.has(product.id)}
+                    onToggleFavorite={user ? () => toggleFavorite(product, productPartner) : undefined}
+                    isPremium={premiumPartnerIds.has(product.partner_id)}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
