@@ -1,0 +1,57 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "representative_id": {
+      "type": "string",
+      "description": "ID do representante"
+    },
+    "representative_name": {
+      "type": "string",
+      "description": "Nome do representante (snapshot)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nome do cliente"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email do cliente"
+    },
+    "phone": {
+      "type": "string",
+      "description": "WhatsApp do cliente"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "prospect",
+        "contacted",
+        "signed_up",
+        "subscribed"
+      ],
+      "default": "prospect",
+      "description": "Status do cliente no funil"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es sobre o cliente"
+    },
+    "plan_interest": {
+      "type": "string",
+      "enum": [
+        "user",
+        "stander",
+        "lojista",
+        "partner",
+        "indefinido"
+      ],
+      "default": "indefinido",
+      "description": "Plano de interesse do cliente"
+    }
+  },
+  "required": [
+    "representative_id",
+    "name"
+  ]
+}
