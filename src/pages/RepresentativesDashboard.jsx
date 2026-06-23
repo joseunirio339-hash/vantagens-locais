@@ -6,7 +6,7 @@ import { createPageUrl } from '@/utils';
 import {
   Users, Plus, Copy, Check, Trash2, TrendingUp,
   DollarSign, UserCheck, X, ExternalLink, ShieldAlert,
-  Trophy, Medal, Crown, Star
+  Trophy, Medal, Crown, Star, CheckCircle, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,6 +76,16 @@ export default function RepresentativesDashboard() {
   const handleToggleStatus = async (rep) => {
     await base44.entities.Representative.update(rep.id, { is_active: !rep.is_active });
     queryClient.invalidateQueries({ queryKey: ['representatives'] });
+  };
+
+  const handleMarkAsPaid = async (commission) => {
+    await base44.entities.RepresentativeCommission.update(commission.id, { status: 'paid' });
+    queryClient.invalidateQueries({ queryKey: ['representativeCommissions'] });
+  };
+
+  const handleMarkAsPending = async (commission) => {
+    await base44.entities.RepresentativeCommission.update(commission.id, { status: 'pending' });
+    queryClient.invalidateQueries({ queryKey: ['representativeCommissions'] });
   };
 
   const handleDelete = async (rep) => {
@@ -219,6 +229,66 @@ export default function RepresentativesDashboard() {
         </CardContent>
       </Card>
 
+      {/* Comissões Pendentes — Baixa Manual */}
+      {commissions.filter(c => c.status === 'pending').length > 0 && (
+        <Card className="mb-8 border-amber-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Clock className="w-5 h-5 text-amber-500" />
+              Comissões Pendentes de Baixa
+            </CardTitle>
+            <p className="text-sm text-slate-500">
+              Estas comissões já foram pagas externamente? Dê baixa manual em cada uma.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {commissions
+                .filter(c => c.status === 'pending')
+                .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+                .map(c => {
+                  const repName = reps.find(r => r.id === c.representative_id)?.name || c.representative_name;
+                  return (
+                    <div key={c.id} className="flex items-center justify-between gap-3 py-2 px-3 bg-white rounded-lg border">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm text-slate-800">{repName}</span>
+                          <span className="text-xs text-slate-400">·</span>
+                          <span className="text-xs text-slate-500 truncate">{c.customer_email}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
+                          <span>{c.subscription_type}</span>
+                          <span>·</span>
+                          <span>R$ {c.subscription_price?.toFixed(2).replace('.', ',')}</span>
+                          {c.created_date && (
+                            <>
+                              <span>·</span>
+                              <span>{new Date(c.created_date).toLocaleDateString('pt-BR')}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-amber-600 text-sm">
+                          R$ {c.commission_amount.toFixed(2).replace('.', ',')}
+                        </span>
+                        <Button
+                          size="sm"
+                          onClick={() => handleMarkAsPaid(c)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Dar Baixa
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Reps List */}
       {isLoading ? (
         <div className="space-y-3">
@@ -298,13 +368,24 @@ export default function RepresentativesDashboard() {
                       <p className="text-xs font-semibold text-slate-500 mb-2">Histórico de comissões</p>
                       <div className="space-y-1">
                         {repCommissions.slice(0, 5).map(c => (
-                          <div key={c.id} className="flex items-center justify-between text-xs">
-                            <span className="text-slate-600 truncate max-w-[200px]">{c.customer_email}</span>
-                            <span className="text-slate-400">{c.subscription_type}</span>
+                          <div key={c.id} className="flex items-center justify-between text-xs gap-2">
+                            <span className="text-slate-600 truncate max-w-[180px]">{c.customer_email}</span>
+                            <span className="text-slate-400 hidden sm:inline">{c.subscription_type}</span>
                             <span className="font-semibold text-emerald-600">R$ {c.commission_amount.toFixed(2).replace('.', ',')}</span>
                             <Badge variant={c.status === 'paid' ? 'default' : 'secondary'} className="text-xs">
                               {c.status === 'paid' ? 'Pago' : 'Pendente'}
                             </Badge>
+                            {c.status === 'pending' ? (
+                              <Button variant="ghost" size="sm" onClick={() => handleMarkAsPaid(c)}
+                                className="text-emerald-600 hover:text-emerald-700 h-6 px-1.5 text-xs">
+                                <CheckCircle className="w-3 h-3 mr-1" /> Baixa
+                              </Button>
+                            ) : (
+                              <Button variant="ghost" size="sm" onClick={() => handleMarkAsPending(c)}
+                                className="text-amber-600 hover:text-amber-700 h-6 px-1.5 text-xs">
+                                <X className="w-3 h-3 mr-1" /> Estornar
+                              </Button>
+                            )}
                           </div>
                         ))}
                       </div>
