@@ -26,16 +26,21 @@ export default function MyVouchers() {
   const [reviewedVoucherIds, setReviewedVoucherIds] = useState(new Set());
 
   useEffect(() => {
+    let cancelled = false;
     const loadUser = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (!isAuth) {
-        base44.auth.redirectToLogin(createPageUrl('MyVouchers'));
-        return;
-      }
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth || cancelled) {
+          if (!isAuth) base44.auth.redirectToLogin(createPageUrl('MyVouchers'));
+          return;
+        }
+        const currentUser = await base44.auth.me();
+        if (cancelled) return;
+        setUser(currentUser);
+      } catch (_) { /* rate limit / network error */ }
     };
     loadUser();
+    return () => { cancelled = true; };
   }, []);
 
   const { data: vouchers = [], isLoading } = useQuery({

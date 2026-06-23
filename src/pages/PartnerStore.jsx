@@ -45,27 +45,34 @@ export default function PartnerStore() {
   const partnerId = urlParams.get('id');
 
   useEffect(() => {
+    let cancelled = false;
     const loadUser = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth || cancelled) return;
         const currentUser = await base44.auth.me();
+        if (cancelled) return;
         setUser(currentUser);
 
-        const subs = await base44.entities.Subscription.filter({
-          user_email: currentUser.email,
-          type: 'user'
-        });
-        if (subs.length > 0) {
-          const sub = subs[0];
-          const isExpired = new Date(sub.expires_at) < new Date();
-          setSubscription({
-            ...sub,
-            status: isExpired ? 'expired' : sub.status
+        try {
+          const subs = await base44.entities.Subscription.filter({
+            user_email: currentUser.email,
+            type: 'user'
           });
-        }
-      }
+          if (cancelled) return;
+          if (subs.length > 0) {
+            const sub = subs[0];
+            const isExpired = new Date(sub.expires_at) < new Date();
+            setSubscription({
+              ...sub,
+              status: isExpired ? 'expired' : sub.status
+            });
+          }
+        } catch (_) { /* subscription check failed silently */ }
+      } catch (_) { /* rate limit / network error */ }
     };
     loadUser();
+    return () => { cancelled = true; };
   }, []);
 
   const { data: partner, isLoading: loadingPartner } = useQuery({
