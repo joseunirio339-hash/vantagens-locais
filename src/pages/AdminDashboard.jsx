@@ -188,8 +188,9 @@ export default function AdminDashboard() {
 
   // Rep stats
   const repTotalSales = reps.reduce((s, r) => s + (r.total_sales || 0), 0);
-  const repTotalEarned = reps.reduce((s, r) => s + (r.total_earned || 0), 0);
   const pendingCommissions = repCommissions.filter(c => c.status === 'pending');
+  const pendingCommsTotal = pendingCommissions.reduce((s, c) => s + (c.commission_amount || 0), 0);
+  const paidCommsTotal = repCommissions.filter(c => c.status === 'paid').reduce((s, c) => s + (c.commission_amount || 0), 0);
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const monthlyComms = repCommissions.filter(c => c.created_date >= monthStart);
@@ -232,15 +233,15 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-6 py-8">
+      <div className="bg-gradient-to-r from-stone-800 to-stone-900 text-white px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-2">
-            <ShieldAlert className="w-7 h-7 text-violet-400" />
+            <ShieldAlert className="w-7 h-7 text-amber-400" />
             <h1 className="text-2xl font-bold">Painel Administrativo</h1>
           </div>
-          <p className="text-slate-400 text-sm">Clube Max Descontos — Gestão completa da plataforma</p>
+          <p className="text-stone-400 text-sm">Clube Max Descontos — Gestão completa da plataforma</p>
         </div>
       </div>
 
@@ -441,8 +442,8 @@ export default function AdminDashboard() {
               </CardHeader>
 
               {/* Invite form */}
-              <div className="px-6 py-4 bg-violet-50/50 border-y border-violet-100">
-                <p className="text-sm font-semibold text-violet-800 mb-3">Convidar novo usuário</p>
+              <div className="px-6 py-4 bg-amber-50/50 border-y border-amber-100">
+                <p className="text-sm font-semibold text-amber-800 mb-3">Convidar novo usuário</p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Input
                     type="email"
@@ -461,7 +462,7 @@ export default function AdminDashboard() {
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button onClick={inviteUser} disabled={!inviteEmail || inviting} className="bg-violet-600 hover:bg-violet-700 h-9">
+                  <Button onClick={inviteUser} disabled={!inviteEmail || inviting} className="bg-amber-500 hover:bg-amber-600 h-9">
                     {inviting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
                     Convidar
                   </Button>
@@ -474,7 +475,7 @@ export default function AdminDashboard() {
                   {filteredUsers.map(u => (
                     <div key={u.id} className="px-6 py-3 flex items-center justify-between gap-3 hover:bg-slate-50">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-sm font-bold text-violet-700 flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-sm font-bold text-amber-700 flex-shrink-0">
                           {u.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </div>
                         <div className="min-w-0">
@@ -488,7 +489,7 @@ export default function AdminDashboard() {
                             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => updateUserRole(u, 'user')}>
                               Usuário
                             </Button>
-                            <Button size="sm" className="h-7 text-xs bg-violet-600 hover:bg-violet-700" onClick={() => updateUserRole(u, 'admin')}>
+                            <Button size="sm" className="h-7 text-xs bg-amber-500 hover:bg-amber-600" onClick={() => updateUserRole(u, 'admin')}>
                               Admin
                             </Button>
                             <Button size="sm" variant="ghost" className="h-7 text-xs text-slate-400" onClick={() => setEditingUserId(null)}>
@@ -497,7 +498,7 @@ export default function AdminDashboard() {
                           </div>
                         ) : (
                           <>
-                            <Badge variant={u.role === 'admin' ? 'default' : 'outline'} className={`text-xs ${u.role === 'admin' ? 'bg-violet-600' : ''}`}>
+                            <Badge variant={u.role === 'admin' ? 'default' : 'outline'} className={`text-xs ${u.role === 'admin' ? 'bg-amber-500' : ''}`}>
                               {u.role === 'admin' ? 'Admin' : 'Usuário'}
                             </Badge>
                             <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingUserId(u.id)}>
@@ -529,8 +530,8 @@ export default function AdminDashboard() {
                 {[
                   { label: 'Representantes', value: reps.length, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
                   { label: 'Total de Vendas', value: repTotalSales, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                  { label: 'Comissões a Pagar', value: `R$ ${repTotalEarned.toFixed(2).replace('.', ',')}`, icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
-                  { label: 'Comissão Padrão', value: '50%', icon: Star, color: 'text-violet-600', bg: 'bg-violet-50' },
+                  { label: 'Comissões a Pagar', value: `R$ ${pendingCommsTotal.toFixed(2).replace('.', ',')}`, icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
+                  { label: 'Comissão Padrão', value: '50%', icon: Star, color: 'text-amber-600', bg: 'bg-amber-50' },
                 ].map((m, i) => {
                   const Icon = m.icon;
                   return (
@@ -632,7 +633,7 @@ export default function AdminDashboard() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">Representantes ({reps.length})</CardTitle>
-                    <Button size="sm" onClick={() => setRepFormOpen(true)} className="bg-violet-600 hover:bg-violet-700 h-8 text-xs">
+                    <Button size="sm" onClick={() => setRepFormOpen(true)} className="bg-amber-500 hover:bg-amber-600 h-8 text-xs">
                       <Plus className="w-3 h-3 mr-1" /> Novo
                     </Button>
                   </div>
@@ -653,7 +654,7 @@ export default function AdminDashboard() {
                           <div key={rep.id} className={`px-4 py-3 ${!rep.is_active ? 'opacity-50' : ''}`}>
                             <div className="flex items-center justify-between gap-2 flex-wrap">
                               <div className="flex items-center gap-2 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-700 flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 flex-shrink-0">
                                   {rep.name?.charAt(0)?.toUpperCase() || '?'}
                                 </div>
                                 <div className="min-w-0">
@@ -670,11 +671,11 @@ export default function AdminDashboard() {
                                   </div>
                                   <p className="text-xs text-slate-500 truncate">{rep.email}{rep.phone ? ` · ${rep.phone}` : ''}</p>
                                   <div className="flex items-center gap-1.5 mt-0.5">
-                                    <code className="text-[11px] bg-violet-50 text-violet-700 px-1.5 py-0.5 rounded font-mono">/rep/{rep.code}</code>
-                                    <button onClick={() => copyRepLink(rep.code)} className="text-slate-400 hover:text-violet-600">
+                                    <code className="text-[11px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-mono">/rep/{rep.code}</code>
+                                    <button onClick={() => copyRepLink(rep.code)} className="text-stone-400 hover:text-amber-600">
                                       {copiedCode === rep.code ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                                     </button>
-                                    <a href={`/rep/${rep.code}`} target="_blank" rel="noopener" className="text-slate-400 hover:text-violet-600">
+                                    <a href={`/rep/${rep.code}`} target="_blank" rel="noopener" className="text-stone-400 hover:text-amber-600">
                                       <ExternalLink className="w-3 h-3" />
                                     </a>
                                   </div>
@@ -769,14 +770,14 @@ export default function AdminDashboard() {
               />
               <p className="text-xs text-slate-400 mt-1">Link: /rep/{newRep.code || 'CODIGO'}</p>
             </div>
-            <p className="text-sm text-slate-500 bg-violet-50 p-3 rounded-lg">
-              💰 Comissão padrão: <strong>50%</strong> sobre a 1ª mensalidade de cada venda
+            <p className="text-sm text-stone-600 bg-amber-50 p-3 rounded-lg">
+              Comissão padrão: <strong>50%</strong> sobre a 1ª mensalidade de cada venda
             </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRepFormOpen(false)}>Cancelar</Button>
             <Button onClick={handleCreateRep} disabled={!newRep.name || !newRep.email || !newRep.code}
-              className="bg-violet-600 hover:bg-violet-700">
+              className="bg-amber-500 hover:bg-amber-600">
               Criar Representante
             </Button>
           </DialogFooter>

@@ -30,7 +30,7 @@ export default function FeaturedVideoStrip({ products, partners, onProductClick 
     <div className="relative mb-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl flex items-center justify-center">
+        <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-rose-500 rounded-xl flex items-center justify-center">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
         <div>
@@ -43,7 +43,7 @@ export default function FeaturedVideoStrip({ products, partners, onProductClick 
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-lg rounded-full flex items-center justify-center text-slate-600 hover:text-violet-600 transition-colors"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-lg rounded-full flex items-center justify-center text-stone-600 hover:text-amber-600 transition-colors"
           style={{ marginTop: '16px' }}
         >
           <ChevronLeft className="w-5 h-5" />
@@ -52,7 +52,7 @@ export default function FeaturedVideoStrip({ products, partners, onProductClick 
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-lg rounded-full flex items-center justify-center text-slate-600 hover:text-violet-600 transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-white shadow-lg rounded-full flex items-center justify-center text-stone-600 hover:text-amber-600 transition-colors"
           style={{ marginTop: '16px' }}
         >
           <ChevronRight className="w-5 h-5" />
@@ -90,7 +90,7 @@ export default function FeaturedVideoStrip({ products, partners, onProductClick 
                 {/* Play icon */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-xl">
-                    <Play className="w-6 h-6 text-violet-600 ml-1" />
+                    <Play className="w-6 h-6 text-amber-600 ml-1" />
                   </div>
                 </div>
 

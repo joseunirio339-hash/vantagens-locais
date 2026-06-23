@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Percent, Eye, Star, Sparkles, ShoppingCart, Check, Play } from 'lucide-react';
+import { Tag, Percent, Eye, Star, Sparkles, ShoppingCart, Check, Play, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import FavoriteButton from './FavoriteButton';
@@ -23,98 +23,116 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
 
   return (
     <motion.div
-      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
+      whileHover={{ y: -5, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden cursor-pointer transition-all"
+      className="bg-white rounded-2xl border border-stone-200/80 overflow-hidden cursor-pointer transition-all hover:border-amber-200 group"
     >
-      <div className="relative aspect-square bg-slate-100">
+      {/* Image area */}
+      <div className="relative aspect-[4/3] bg-stone-100">
         {product.image_url ? (
           <div className="w-full h-full relative">
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
             {product.video_url && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                  <Play className="w-5 h-5 text-violet-600 ml-0.5" />
+                <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <Play className="w-5 h-5 text-amber-600 ml-0.5" />
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Tag className="w-12 h-12 text-slate-300" />
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-stone-300">
+            <Tag className="w-10 h-10" />
+            <span className="text-xs font-medium text-stone-400">Sem imagem</span>
           </div>
         )}
-        {/* Discount badge - top left */}
-        <div className="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+
+        {/* Discount badge */}
+        <div className="absolute top-2.5 left-2.5 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
           <Percent className="w-3 h-3" />
           {discountPercent}% OFF
         </div>
-        {/* Premium badge - top left below discount */}
+
+        {/* Premium badge */}
         {isPremium && (
-          <div className="absolute top-12 left-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg">
+          <div className="absolute top-12 left-2.5 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
             <Sparkles className="w-2.5 h-2.5" /> PREMIUM
           </div>
         )}
-        {/* Favorite button - top right */}
+
+        {/* Favorite button */}
         {onToggleFavorite && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-2.5 right-2.5">
             <FavoriteButton isFavorite={!!isFavorite} onToggle={onToggleFavorite} />
           </div>
         )}
-        {/* Bottom glassmorphism strip */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-fuchsia-600/80 to-transparent px-3 py-2">
-          <div className="flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-yellow-300 flex-shrink-0" />
-            <span className="text-white text-xs font-medium truncate">Ofertas imperdíveis perto de você</span>
-          </div>
-        </div>
       </div>
 
-      <div className="p-4">
+      {/* Card info */}
+      <div className="p-3.5">
+        {/* Partner name */}
         {partner && (
-          <p className="text-xs text-slate-400 mb-1 truncate font-medium">{partner.business_name}</p>
+          <div className="flex items-center gap-1 mb-1.5">
+            {partner.logo_url ? (
+              <img src={partner.logo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+            ) : (
+              <MapPin className="w-3.5 h-3.5 text-amber-500" />
+            )}
+            <p className="text-[11px] text-stone-400 truncate font-medium">{partner.business_name}</p>
+          </div>
         )}
-        <h3 className="font-bold text-slate-800 mb-2 line-clamp-2 text-sm">{product.name}</h3>
-        
-        <div className="flex items-baseline gap-2">
-          <span className="text-base font-extrabold text-emerald-600">
+
+        {/* Product name */}
+        <h3 className="font-semibold text-stone-800 mb-1 line-clamp-2 text-sm leading-snug">{product.name}</h3>
+
+        {/* Short description if available */}
+        {product.description && (
+          <p className="text-xs text-stone-400 line-clamp-2 mb-2 leading-relaxed">{product.description}</p>
+        )}
+
+        {/* Price */}
+        <div className="flex items-baseline gap-2 mb-2">
+          <span className="text-lg font-extrabold text-emerald-600">
             R$ {product.discount_price?.toFixed(2).replace('.', ',')}
           </span>
-          <span className="text-xs text-slate-400 line-through">
+          <span className="text-xs text-stone-400 line-through">
             R$ {product.original_price?.toFixed(2).replace('.', ',')}
           </span>
         </div>
 
-        {avgRating ? (
-          <div className="flex items-center gap-1 mt-1.5">
-            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-            <span className="text-xs font-semibold text-slate-700">{Number(avgRating).toFixed(1)}</span>
-            {reviewCount !== undefined && (
-              <span className="text-xs text-slate-400">({reviewCount})</span>
-            )}
-          </div>
-        ) : null}
-        {showViews && (
-          <div className="flex items-center gap-1 mt-1 text-xs text-slate-400">
-            <Eye className="w-3 h-3" />
-            {product.views_count || 0}
-          </div>
-        )}
+        {/* Rating + views row */}
+        <div className="flex items-center justify-between text-xs text-stone-400 mb-0.5">
+          {avgRating ? (
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+              <span className="font-semibold text-stone-600">{Number(avgRating).toFixed(1)}</span>
+              {reviewCount !== undefined && (
+                <span>({reviewCount})</span>
+              )}
+            </div>
+          ) : <span />}
+          {showViews && (
+            <div className="flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              {product.views_count || 0}
+            </div>
+          )}
+        </div>
 
         {/* Add to cart button */}
         <button
           onClick={handleAddToCart}
-          className={`mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`mt-2 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
             added
-              ? 'bg-emerald-500 text-white'
+              ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md'
               : inCart
-              ? 'bg-violet-100 text-violet-700 hover:bg-violet-200'
-              : 'bg-slate-100 text-slate-700 hover:bg-fuchsia-100 hover:text-fuchsia-700'
+              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+              : 'bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800 border border-amber-200/60'
           }`}
         >
           {added ? (
