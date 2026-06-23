@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Check, CreditCard, Store, Users, Loader2, Crown, Sparkles, Gift, Ticket } from 'lucide-react';
+import { Check, CreditCard, Store, Users, Loader2, Crown, Sparkles, Gift, Ticket, Headphones, Video, Infinity, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -290,6 +290,88 @@ export default function Subscription() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Seção Destaque Premium */}
+        <div className="mt-12 max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 rounded-full px-4 py-2 mb-4">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">Por que escolher o Premium?</span>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-800 mb-3">
+              Benefícios Exclusivos do Plano Premium
+            </h2>
+            <p className="text-slate-500 max-w-lg mx-auto">
+              Além de tudo que o Stander oferece, o Premium leva sua loja para o próximo nível
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                icon: Gift,
+                title: '1º Mês Grátis',
+                desc: 'Comece sem pagar nada. Teste todos os recursos Premium por 30 dias antes de decidir.',
+                accent: 'from-emerald-500 to-teal-500'
+              },
+              {
+                icon: Infinity,
+                title: 'Produtos Ilimitados',
+                desc: 'Cadastre quantos produtos quiser. Sem limite de 20 — sua vitrine não tem barreiras.',
+                accent: 'from-blue-500 to-cyan-500'
+              },
+              {
+                icon: Ticket,
+                title: 'Vouchers Ilimitados',
+                desc: 'Gere quantos vouchers precisar para atrair e fidelizar mais clientes todos os dias.',
+                accent: 'from-amber-500 to-orange-500'
+              },
+              {
+                icon: Headphones,
+                title: 'Suporte Prioritário',
+                desc: 'Atendimento VIP com resposta em até 2 horas. Sua loja sempre em primeiro lugar.',
+                accent: 'from-pink-500 to-rose-500'
+              },
+              {
+                icon: Video,
+                title: 'Vídeo do Produto (5s)',
+                desc: 'Destaque seus produtos com vídeos curtos e atrativos direto no mostruário da loja.',
+                accent: 'from-purple-500 to-violet-500'
+              },
+              {
+                icon: LayoutDashboard,
+                title: 'Painel de Gestão Completo',
+                desc: 'Controle total: análises de vendas, métricas de desempenho, roleta de prêmios e muito mais.',
+                accent: 'from-indigo-500 to-blue-500'
+              }
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-violet-100 p-5 flex gap-4 hover:shadow-lg hover:shadow-violet-50 transition-all group"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.accent} flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-800 mb-1">{item.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-2xl px-6 py-4 shadow-lg">
+              <Crown className="w-5 h-5" />
+              <span className="font-semibold">Premium: R$ 149,99/mês</span>
+              <span className="text-violet-200">—</span>
+              <span className="text-sm">Tudo incluso, sem surpresas</span>
+            </div>
+          </div>
         </div>
 
         <div className="mt-10 bg-white rounded-2xl border border-slate-200 p-6 text-center shadow-sm">
