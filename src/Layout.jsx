@@ -7,6 +7,7 @@ import {
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
+import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -255,6 +256,9 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <main>{children}</main>
 
+      {/* Floating WhatsApp Button */}
+      <FloatingWhatsApp />
+
       {/* Footer */}
       <footer className="bg-slate-900 mt-auto text-white">
         <div className="max-w-6xl mx-auto px-4 py-10">
@@ -289,9 +293,9 @@ export default function Layout({ children }) {
             <div>
               <p className="font-semibold text-slate-300 mb-3 text-sm uppercase tracking-wide">Contato</p>
               <div className="space-y-2">
-                <a href="https://wa.me/5535988397979" target="_blank" rel="noopener noreferrer"
+                <a href="https://wa.me/5521997914496" target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-                  <span>💬</span> (35) 98839-7979 (WhatsApp)
+                  <span>💬</span> (21) 99791-4496 (WhatsApp)
                 </a>
                 <a href="mailto:clubemaxdescontos@gmail.com"
                   className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
