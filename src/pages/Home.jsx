@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Search, Store, Tag, ChevronRight, Sparkles, Heart, Megaphone } from 'lucide-react';
+import { Search, Store, Tag, ChevronRight, Heart, Megaphone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,7 +20,6 @@ import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
-import SmartSearchBar from '@/components/home/SmartSearchBar';
 import NewsFeed from '@/components/news/NewsFeed';
 
 export default function Home() {
@@ -218,41 +217,46 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Text side */}
             <div className="flex-1 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5 border border-white/30">
-                <Sparkles className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-semibold text-white">🛍️ Vantagens Locais</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight leading-tight">
-                <span className="text-white drop-shadow-lg">Descontos do</span>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 tracking-tight leading-tight">
+                <span className="text-white drop-shadow-lg">Os melhores descontos</span>
                 <br />
-                <span className="text-yellow-300 drop-shadow-lg">Club Max</span>
+                <span className="text-white drop-shadow-lg">da sua cidade em um só lugar</span>
               </h1>
-              <p className="text-base md:text-lg text-white/90 max-w-xl mb-8 font-medium leading-relaxed">
-                Vantagens Locais reúne ofertas de lojistas parceiros. Encontre descontos e vouchers via CPF. Comerciantes divulgam produtos e gerenciam vendas.
+              <p className="text-base md:text-lg text-white/90 max-w-xl mb-6 leading-relaxed">
+                Tenha acesso a ofertas exclusivas, vouchers personalizados e vantagens especiais em dezenas de estabelecimentos parceiros. Economize mais em cada compra com o Base 44.
               </p>
 
-              {/* Stats bar */}
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start mb-8">
+              {/* Benefícios */}
+              <div className="flex flex-col gap-2 mb-8">
                 {[
-                  { v: '100+', l: 'Parceiros' },
-                  { v: 'R$50', l: 'Economia média' },
-                  { v: '30 dias', l: 'Grátis para testar' },
-                ].map((s, i) => (
-                  <div key={i} className="bg-white/15 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
-                    <p className="text-white font-black text-lg leading-none">{s.v}</p>
-                    <p className="text-white/70 text-xs">{s.l}</p>
+                  'Mais de 100 empresas participantes',
+                  'Benefícios exclusivos para membros',
+                  'Economia real em produtos e serviços',
+                  'Ativação rápida pelo CPF',
+                ].map((text, i) => (
+                  <div key={i} className="flex items-center gap-2 text-white/90 text-sm">
+                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-xs">
+                      {['🏪','🎁','💰','⚡'][i]}
+                    </span>
+                    {text}
                   </div>
                 ))}
               </div>
 
-              <SmartSearchBar
-                products={products}
-                partners={partners}
-                searchTerm={searchTerm}
-                selectedCategory={selectedCategory}
-                onSearch={setSearchTerm}
-                onCategoryChange={setSelectedCategory}
-              />
+              <p className="text-white font-semibold text-sm mb-4">Encontre sua próxima oferta agora mesmo.</p>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link to={createPageUrl('Subscription')}>
+                  <Button size="lg" className="w-full sm:w-auto bg-white text-[#FF527C] hover:bg-white/90 font-bold shadow-lg text-base px-8">
+                    Quero Economizar
+                  </Button>
+                </Link>
+                <Link to={createPageUrl('Products')}>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/15 font-semibold text-base px-8">
+                    Conhecer as Ofertas
+                  </Button>
+                </Link>
+              </div>
             </div>
             {/* Image side */}
             <div className="flex-shrink-0 w-full md:w-72 lg:w-80">
