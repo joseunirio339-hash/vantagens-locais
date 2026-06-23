@@ -153,27 +153,45 @@ export default function FinancialPanel({ vouchers = [] }) {
           )}
         </div>
 
-        {/* Receita mensal */}
+        {/* Receita mensal e Vouchers */}
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Receita — últimos 6 meses</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Receita e Vouchers — últimos 6 meses</p>
           {totalSales > 0 ? (
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={monthlyData} barSize={28}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={monthlyData} barSize={22}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip
-                  formatter={(value) => [`R$ ${value.toFixed(2).replace('.', ',')}`, 'Receita']}
+                  formatter={(value, name) => {
+                    if (name === 'receita') return [`R$ ${Number(value).toFixed(2).replace('.', ',')}`, 'Receita'];
+                    return [value, 'Vouchers Resgatados'];
+                  }}
                   contentStyle={{ borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: 12 }}
                 />
-                <Bar dataKey="receita" fill="#10b981" radius={[6, 6, 0, 0]} />
+                <Bar yAxisId="left" dataKey="receita" name="receita" fill="#10b981" radius={[6, 6, 0, 0]} />
+                <Bar yAxisId="right" dataKey="vendas" name="vendas" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[180px] flex items-center justify-center bg-slate-50 rounded-xl">
+            <div className="h-[220px] flex items-center justify-center bg-slate-50 rounded-xl">
               <div className="text-center text-slate-400">
                 <ShoppingBag className="w-8 h-8 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">Nenhuma venda registrada ainda</p>
+              </div>
+            </div>
+          )}
+          {/* Legend */}
+          {totalSales > 0 && (
+            <div className="flex justify-center gap-6 mt-2">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="w-3 h-3 rounded-sm bg-emerald-500" />
+                Receita (R$)
+              </div>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="w-3 h-3 rounded-sm bg-violet-500" />
+                Vouchers Resgatados
               </div>
             </div>
           )}
