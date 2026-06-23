@@ -44,6 +44,7 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
     phone: partner?.phone || '',
     whatsapp_business_enabled: partner?.whatsapp_business_enabled || false,
     whatsapp_business_number: partner?.whatsapp_business_number || '',
+    monthly_report_email: partner?.monthly_report_email || false,
     lat: partner?.lat || '',
     lng: partner?.lng || ''
   });
@@ -265,6 +266,33 @@ export default function PartnerSettings({ partner, subscription, onUpdate }) {
                 Usar minha localização atual
               </Button>
               <p className="text-xs text-slate-400">Preencha para aparecer no mapa interativo de parceiros</p>
+            </div>
+
+            {/* Relatório Mensal por Email */}
+            <div className={`border-2 rounded-xl p-4 space-y-3 transition-all ${formData.monthly_report_email ? 'border-violet-400 bg-violet-50' : 'border-slate-200 bg-slate-50'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.monthly_report_email ? 'bg-violet-500' : 'bg-slate-200'}`}>
+                    <Calendar className={`w-4 h-4 ${formData.monthly_report_email ? 'text-white' : 'text-slate-400'}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">Relatório Mensal por Email</p>
+                    <p className="text-xs text-slate-500">Receba métricas de vendas e acessos todos os meses</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, monthly_report_email: !prev.monthly_report_email }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${formData.monthly_report_email ? 'bg-violet-500' : 'bg-slate-300'}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${formData.monthly_report_email ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+              {formData.monthly_report_email && (
+                <p className="text-xs text-violet-600">
+                  ✅ Você receberá o relatório completo no email <strong>{partner?.owner_email}</strong> todo dia 1º de cada mês.
+                </p>
+              )}
             </div>
 
             {/* WhatsApp Business */}

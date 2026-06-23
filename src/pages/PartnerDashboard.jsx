@@ -23,6 +23,7 @@ import RaffleManager from '@/components/raffle/RaffleManager';
 import PartnerPerformance from '@/components/partner/PartnerPerformance';
 import AppointmentsCalendar from '@/components/partner/AppointmentsCalendar';
 import FinancialPanel from '@/components/partner/FinancialPanel';
+import DailySalesSummary from '@/components/partner/DailySalesSummary';
 import LoyaltyRewardsManager from '@/components/loyalty/LoyaltyRewardsManager';
 import StampCardsManager from '@/components/loyalty/StampCardsManager';
 import ExportSalesButton from '@/components/partner/ExportSalesButton';
@@ -294,6 +295,8 @@ export default function PartnerDashboard() {
           vouchers={vouchers}
           isPremium={isPremium}
         />
+
+        <DailySalesSummary vouchers={vouchers} />
 
         <FinancialPanel vouchers={vouchers} />
 

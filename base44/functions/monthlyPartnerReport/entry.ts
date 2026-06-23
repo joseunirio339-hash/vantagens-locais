@@ -37,6 +37,7 @@ Deno.serve(async (req) => {
 
     for (const partner of partners) {
       if (!partner.owner_email) continue;
+      if (!partner.monthly_report_email) continue;
 
       const partnerVouchers = monthVouchers.filter(v => v.partner_id === partner.id);
       const totalVouchers = partnerVouchers.length;

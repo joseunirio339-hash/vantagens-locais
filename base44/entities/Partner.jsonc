@@ -102,6 +102,11 @@
     "owner_email": {
       "type": "string",
       "description": "Email do propriet\u00e1rio"
+    },
+    "monthly_report_email": {
+      "type": "boolean",
+      "default": false,
+      "description": "Lojista optou por receber relat\u00f3rio mensal por email"
     }
   },
   "required": [
