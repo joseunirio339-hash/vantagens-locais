@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   Users, Store, Ticket, CreditCard, Search, CheckCircle,
   XCircle, Clock, Loader2, ShieldAlert, TrendingUp, BarChart2,
-  Trash2, Edit2, RefreshCw, Plus, Copy, Check, Trophy, Medal, Crown, Star, ExternalLink, DollarSign
+  Trash2, Edit2, RefreshCw, Plus, Copy, Check, Trophy, Medal, Crown, Star, ExternalLink, DollarSign, PieChart
 } from 'lucide-react';
+import ConsolidatedCharts from '@/components/admin/ConsolidatedCharts';
 import { toast } from 'sonner';
 
 export default function AdminDashboard() {
@@ -290,6 +291,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="representatives" className="flex items-center gap-1">
               <Users className="w-4 h-4" /> Representantes
+            </TabsTrigger>
+            <TabsTrigger value="consolidated" className="flex items-center gap-1">
+              <PieChart className="w-4 h-4" /> Consolidado
             </TabsTrigger>
           </TabsList>
 
@@ -722,6 +726,16 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* CONSOLIDADO */}
+          <TabsContent value="consolidated">
+            <ConsolidatedCharts
+              vouchers={vouchers}
+              partners={partners}
+              reps={reps}
+              repCommissions={repCommissions}
+            />
           </TabsContent>
         </Tabs>
       </div>

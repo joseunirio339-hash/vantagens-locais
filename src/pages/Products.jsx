@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { Search, Tag, SlidersHorizontal, MapPin, X, Utensils, Shirt, Zap, Sparkles, Heart, ShoppingCart, Briefcase, Music, Package, Navigation, Loader2 } from 'lucide-react';
+import { Search, Tag, SlidersHorizontal, MapPin, X, Utensils, Shirt, Zap, Sparkles, Heart, ShoppingCart, Briefcase, Music, Package, Navigation, Loader2, DollarSign, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -54,6 +54,8 @@ export default function Products() {
   const [proximityLoading, setProximityLoading] = useState(false);
   const [proximityError, setProximityError] = useState('');
   const [sortedByProximity, setSortedByProximity] = useState([]);
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [maxDistance, setMaxDistance] = useState('');
 
   const { favoriteIds, toggleFavorite } = useFavorites(user);
 
@@ -179,7 +181,13 @@ export default function Products() {
         p.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.category?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = !categoryFilter || p.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+      const minOk = !priceRange.min || p.discount_price >= Number(priceRange.min);
+      const maxOk = !priceRange.max || p.discount_price <= Number(priceRange.max);
+      return matchesSearch && matchesCategory && minOk && maxOk;
+    })
+    .filter(p => {
+      if (!maxDistance || !proximityMode) return true;
+      return p.distance != null && p.distance <= Number(maxDistance);
     });
 
   const handleProximitySort = () => {
@@ -317,6 +325,41 @@ export default function Products() {
               </button>
             ))}
           </div>
+
+          {/* Filtro de Preço */}
+          <div className="mt-4 pt-4 border-t border-stone-100">
+            <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-3">Filtrar por Preço</p>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-stone-500 whitespace-nowrap">De R$</label>
+                <input
+                  type="number"
+                  placeholder="Mín"
+                  value={priceRange.min}
+                  onChange={e => setPriceRange(p => ({ ...p, min: e.target.value }))}
+                  className="w-24 h-9 px-3 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-stone-500 whitespace-nowrap">Até R$</label>
+                <input
+                  type="number"
+                  placeholder="Máx"
+                  value={priceRange.max}
+                  onChange={e => setPriceRange(p => ({ ...p, max: e.target.value }))}
+                  className="w-24 h-9 px-3 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                />
+              </div>
+              {(priceRange.min || priceRange.max) && (
+                <button
+                  onClick={() => setPriceRange({ min: '', max: '' })}
+                  className="text-xs text-stone-400 hover:text-red-500 flex items-center gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" /> Limpar
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -365,6 +408,26 @@ export default function Products() {
               <p className="text-xs text-red-500 flex items-center gap-1 mb-2">
                 <MapPin className="w-3 h-3" /> {proximityError}
               </p>
+            )}
+            {proximityMode && (
+              <div className="flex items-center gap-3 mb-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-stone-500 whitespace-nowrap">Distância máx.:</label>
+                  <input
+                    type="number"
+                    placeholder="km"
+                    value={maxDistance}
+                    onChange={e => setMaxDistance(e.target.value)}
+                    className="w-20 h-8 px-2 rounded-lg border border-stone-200 bg-white text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  />
+                  <span className="text-xs text-stone-400">km</span>
+                </div>
+                {maxDistance && (
+                  <button onClick={() => setMaxDistance('')} className="text-xs text-stone-400 hover:text-red-500 flex items-center gap-1">
+                    <X className="w-3 h-3" /> Limpar
+                  </button>
+                )}
+              </div>
             )}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
