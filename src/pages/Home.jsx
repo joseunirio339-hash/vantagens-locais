@@ -31,6 +31,7 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
+  const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
   const [productCounts, setProductCounts] = useState({});
@@ -114,11 +115,12 @@ export default function Home() {
   // Filtro de localidade
   const locationFilteredPartners = React.useMemo(() => {
     return partners.filter(p => {
+      if (selectedState && p.state !== selectedState) return false;
       if (selectedCity && p.city !== selectedCity) return false;
       if (selectedNeighborhood && p.neighborhood !== selectedNeighborhood) return false;
       return true;
     });
-  }, [partners, selectedCity, selectedNeighborhood]);
+  }, [partners, selectedState, selectedCity, selectedNeighborhood]);
 
   const locationFilteredPartnerIds = locationFilteredPartners.map(p => p.id);
   const locationFilteredProducts = activeProducts.filter(p => locationFilteredPartnerIds.includes(p.partner_id));
@@ -325,8 +327,10 @@ export default function Home() {
         <LocationFilter
           partners={partners}
           products={activeProducts}
+          selectedState={selectedState}
           selectedCity={selectedCity}
           selectedNeighborhood={selectedNeighborhood}
+          onStateChange={setSelectedState}
           onCityChange={setSelectedCity}
           onNeighborhoodChange={setSelectedNeighborhood}
           avgRatings={avgRatings}

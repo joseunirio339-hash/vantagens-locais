@@ -10,7 +10,7 @@ import ProductCard from '@/components/products/ProductCard';
 import FeaturedVideoStrip from '@/components/products/FeaturedVideoStrip';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import { useFavorites } from '@/hooks/useFavorites';
-import { getAllCities, getNeighborhoods } from '@/lib/brazilianCities';
+import { getCitiesByState, getNeighborhoods, BRAZILIAN_STATES } from '@/lib/brazilianCities';
 
 // Haversine distance in km
 function haversine(lat1, lon1, lat2, lon2) {
@@ -45,6 +45,7 @@ export default function Products() {
   const [subscription, setSubscription] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [stateFilter, setStateFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -132,27 +133,28 @@ export default function Products() {
     return new Set(partners.filter(p => premiumEmails.has(p.owner_email)).map(p => p.id));
   }, [premiumSubs, partners]);
 
-  const allCities = React.useMemo(() => getAllCities(), []);
+  const allCities = React.useMemo(() => getCitiesByState(stateFilter), [stateFilter]);
   const allNeighborhoods = React.useMemo(() => getNeighborhoods(cityFilter), [cityFilter]);
 
   const locationFilteredProducts = React.useMemo(() => {
-    if (!cityFilter && !neighborhoodFilter) return activeProducts;
+    if (!stateFilter && !cityFilter && !neighborhoodFilter) return activeProducts;
     const filteredPartnerIds = partners
       .filter(p => {
+        if (stateFilter && p.state !== stateFilter) return false;
         if (cityFilter && p.city !== cityFilter) return false;
         if (neighborhoodFilter && p.neighborhood !== neighborhoodFilter) return false;
         return true;
       })
       .map(p => p.id);
     return activeProducts.filter(p => filteredPartnerIds.includes(p.partner_id));
-  }, [activeProducts, partners, cityFilter, neighborhoodFilter]);
+  }, [activeProducts, partners, stateFilter, cityFilter, neighborhoodFilter]);
 
   const baseProductList = proximityMode 
     ? sortedByProximity.filter(p => {
-        // Apply location filters on top of proximity results
-        if (cityFilter || neighborhoodFilter) {
+        if (stateFilter || cityFilter || neighborhoodFilter) {
           const partner = p._partner || partners.find(pp => pp.id === p.partner_id);
           if (!partner) return false;
+          if (stateFilter && partner.state !== stateFilter) return false;
           if (cityFilter && partner.city !== cityFilter) return false;
           if (neighborhoodFilter && partner.neighborhood !== neighborhoodFilter) return false;
         }
@@ -396,9 +398,9 @@ export default function Products() {
                     {proximityLoading ? 'Localizando...' : 'Perto de mim'}
                   </button>
                 )}
-                {(cityFilter || neighborhoodFilter) && (
+                {(stateFilter || cityFilter || neighborhoodFilter) && (
                   <button
-                    onClick={() => { setCityFilter(''); setNeighborhoodFilter(''); }}
+                    onClick={() => { setStateFilter(''); setCityFilter(''); setNeighborhoodFilter(''); }}
                     className="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1"
                   >
                     <X className="w-3 h-3" /> Limpar
@@ -433,17 +435,37 @@ export default function Products() {
             )}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
+                <label className="text-xs text-slate-500 mb-1 block font-medium">Estado</label>
+                <input
+                  type="text"
+                  placeholder="Buscar estado..."
+                  value={stateFilter}
+                  onChange={(e) => {
+                    setStateFilter(e.target.value);
+                    setCityFilter('');
+                    setNeighborhoodFilter('');
+                  }}
+                  list="products-state-list"
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                />
+                <datalist id="products-state-list">
+                  <option value="">Todos os estados</option>
+                  {BRAZILIAN_STATES.map(s => <option key={s.uf} value={s.uf}>{s.name}</option>)}
+                </datalist>
+              </div>
+              <div className="flex-1">
                 <label className="text-xs text-slate-500 mb-1 block font-medium">Cidade</label>
                 <input
                   type="text"
-                  placeholder="Buscar cidade..."
+                  placeholder={stateFilter ? 'Buscar cidade...' : 'Selecione um estado'}
                   value={cityFilter}
                   onChange={(e) => {
                     setCityFilter(e.target.value);
                     setNeighborhoodFilter('');
                   }}
                   list="products-city-list"
-                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  disabled={!stateFilter}
+                  className="w-full h-10 pl-3 pr-8 rounded-xl border border-stone-200 bg-white text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-50"
                 />
                 <datalist id="products-city-list">
                   <option value="">Todas as cidades</option>

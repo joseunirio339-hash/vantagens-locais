@@ -189,3 +189,73 @@ export function getNeighborhoods(city) {
   if (!city) return [];
   return BRAZILIAN_CITIES[city] || [];
 }
+
+// Brazilian states (UF) with name and abbreviation
+export const BRAZILIAN_STATES = [
+  { uf: 'AC', name: 'Acre' },
+  { uf: 'AL', name: 'Alagoas' },
+  { uf: 'AP', name: 'Amapá' },
+  { uf: 'AM', name: 'Amazonas' },
+  { uf: 'BA', name: 'Bahia' },
+  { uf: 'CE', name: 'Ceará' },
+  { uf: 'DF', name: 'Distrito Federal' },
+  { uf: 'ES', name: 'Espírito Santo' },
+  { uf: 'GO', name: 'Goiás' },
+  { uf: 'MA', name: 'Maranhão' },
+  { uf: 'MT', name: 'Mato Grosso' },
+  { uf: 'MS', name: 'Mato Grosso do Sul' },
+  { uf: 'MG', name: 'Minas Gerais' },
+  { uf: 'PA', name: 'Pará' },
+  { uf: 'PB', name: 'Paraíba' },
+  { uf: 'PR', name: 'Paraná' },
+  { uf: 'PE', name: 'Pernambuco' },
+  { uf: 'PI', name: 'Piauí' },
+  { uf: 'RJ', name: 'Rio de Janeiro' },
+  { uf: 'RN', name: 'Rio Grande do Norte' },
+  { uf: 'RS', name: 'Rio Grande do Sul' },
+  { uf: 'RO', name: 'Rondônia' },
+  { uf: 'RR', name: 'Roraima' },
+  { uf: 'SC', name: 'Santa Catarina' },
+  { uf: 'SP', name: 'São Paulo' },
+  { uf: 'SE', name: 'Sergipe' },
+  { uf: 'TO', name: 'Tocantins' },
+];
+
+// Get cities by state UF
+export function getCitiesByState(uf) {
+  if (!uf) return getAllCities();
+  const allCities = getAllCities();
+  // Map cities to their likely state based on our data
+  // We approximate by common knowledge of city-state relationships
+  const stateCities = {
+    'AC': ['Rio Branco'],
+    'AL': ['Maceió'],
+    'AP': ['Macapá'],
+    'AM': ['Manaus'],
+    'BA': ['Salvador', 'Feira de Santana', 'Vitória da Conquista', 'Ilhéus', 'Porto Seguro', 'Itabuna', 'Camaçari', 'Lauro de Freitas'],
+    'CE': ['Fortaleza', 'Juazeiro do Norte', 'Caucaia', 'Maracanaú'],
+    'DF': ['Brasília'],
+    'ES': ['Vitória', 'Serra', 'Vila Velha', 'Cariacica', 'Linhares', 'Colatina', 'Guarapari'],
+    'GO': ['Goiânia', 'Aparecida de Goiânia', 'Anápolis', 'Luziânia', 'Águas Lindas de Goiás', 'Valparaíso de Goiás', 'Rio Verde', 'Caldas Novas'],
+    'MA': ['São Luís', 'Imperatriz'],
+    'MT': ['Cuiabá', 'Rondonópolis', 'Barra do Garças', 'Sinop'],
+    'MS': ['Campo Grande', 'Dourados', 'Três Lagoas', 'Corumbá'],
+    'MG': ['Belo Horizonte', 'Uberlândia', 'Juiz de Fora', 'Contagem', 'Betim', 'Uberaba', 'Montes Claros', 'Divinópolis', 'Sete Lagoas', 'Ipatinga', 'Governador Valadares'],
+    'PA': ['Belém'],
+    'PB': ['João Pessoa', 'Campina Grande'],
+    'PR': ['Curitiba', 'Londrina', 'Maringá', 'Ponta Grossa', 'Cascavel', 'Foz do Iguaçu', 'São José dos Pinhais', 'Colombo', 'Araucária', 'Pinhais'],
+    'PE': ['Recife', 'Jaboatão dos Guararapes', 'Olinda', 'Caruaru', 'Petrolina'],
+    'PI': ['Teresina'],
+    'RJ': ['Rio de Janeiro', 'São Gonçalo', 'Duque de Caxias', 'Nova Iguaçu', 'Niterói', 'Belford Roxo', 'São João de Meriti', 'Petrópolis', 'Campos dos Goytacazes', 'Volta Redonda', 'Macaé', 'Cabo Frio', 'Nova Friburgo', 'Teresópolis', 'Resende', 'Araruama', 'Maricá', 'Saquarema', 'Itaboraí', 'Nilópolis', 'Mesquita', 'Magé', 'Armação dos Búzios', 'Angra dos Reis', 'Paraty'],
+    'RN': ['Natal', 'Mossoró', 'Parnamirim'],
+    'RS': ['Porto Alegre', 'Caxias do Sul', 'Canoas', 'Gravataí', 'Novo Hamburgo', 'Santa Maria', 'Pelotas', 'Rio Grande', 'Passo Fundo', 'Uruguaiana', 'Bagé', 'Santana do Livramento'],
+    'RO': ['Porto Velho'],
+    'RR': ['Boa Vista'],
+    'SC': ['Florianópolis', 'Joinville', 'Blumenau', 'São José (SC)', 'Itajaí', 'Balneário Camboriú', 'Chapecó', 'Criciúma', 'Jaraguá do Sul', 'Palhoça', 'Lages'],
+    'SP': ['São Paulo', 'Guarulhos', 'Campinas', 'Santos', 'São Bernardo do Campo', 'Santo André', 'Osasco', 'São José dos Campos', 'Ribeirão Preto', 'Sorocaba', 'Bauru', 'São José do Rio Preto', 'Piracicaba', 'Jundiaí', 'Marília', 'Presidente Prudente', 'Araçatuba'],
+    'SE': ['Aracaju'],
+    'TO': ['Palmas'],
+  };
+  const cities = stateCities[uf] || [];
+  return allCities.filter(c => cities.includes(c));
+}
