@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import {
   Users, Plus, Copy, Check, Trash2, TrendingUp,
-  DollarSign, UserCheck, X, ExternalLink, ShieldAlert
+  DollarSign, UserCheck, X, ExternalLink, ShieldAlert,
+  Trophy, Medal, Crown, Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -103,6 +104,23 @@ export default function RepresentativesDashboard() {
   const totalSales = reps.reduce((sum, r) => sum + (r.total_sales || 0), 0);
   const totalEarned = reps.reduce((sum, r) => sum + (r.total_earned || 0), 0);
 
+  // Ranking mensal: comissões do mês atual por representante
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthlyCommissions = commissions.filter(c => c.created_date >= monthStart);
+  const ranking = reps
+    .map(rep => {
+      const repMonthly = monthlyCommissions.filter(c => c.representative_id === rep.id);
+      const total = repMonthly.reduce((sum, c) => sum + (c.commission_amount || 0), 0);
+      const count = repMonthly.length;
+      return { ...rep, monthlyTotal: total, monthlyCount: count };
+    })
+    .sort((a, b) => b.monthlyTotal - a.monthlyTotal);
+
+  const monthName = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const rankColors = ['bg-amber-400', 'bg-slate-300', 'bg-amber-700'];
+  const rankIcons = [Crown, Medal, Star];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
@@ -147,6 +165,59 @@ export default function RepresentativesDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Ranking Mensal */}
+      <Card className="mb-8 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            Ranking de Vendas — {monthName}
+          </CardTitle>
+          <p className="text-sm text-slate-500">Volume total de assinaturas vendidas por cada representante neste mês</p>
+        </CardHeader>
+        <CardContent>
+          {ranking.length === 0 ? (
+            <p className="text-center text-slate-400 py-4 text-sm">Nenhuma venda registrada este mês.</p>
+          ) : (
+            <div className="space-y-2">
+              {ranking.map((rep, idx) => {
+                const RankIcon = idx < 3 ? rankIcons[idx] : null;
+                const rankBg = idx < 3 ? rankColors[idx] : 'bg-slate-100';
+                const rankText = idx < 3 ? 'text-white' : 'text-slate-500';
+                return (
+                  <div key={rep.id} className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-white/60 transition-colors">
+                    {/* Posição */}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${rankBg} ${rankText}`}>
+                      {RankIcon ? <RankIcon className="w-4 h-4" /> : idx + 1}
+                    </div>
+                    {/* Nome */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-800 text-sm truncate">{rep.name}</p>
+                      <p className="text-xs text-slate-400">{rep.monthlyCount} venda{rep.monthlyCount !== 1 ? 's' : ''} no mês</p>
+                    </div>
+                    {/* Barra de progresso */}
+                    <div className="flex-1 max-w-[200px] hidden md:block">
+                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all"
+                          style={{ width: `${ranking[0]?.monthlyTotal > 0 ? (rep.monthlyTotal / ranking[0].monthlyTotal) * 100 : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                    {/* Valor */}
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-amber-700 text-sm">
+                        R$ {rep.monthlyTotal.toFixed(2).replace('.', ',')}
+                      </p>
+                      <p className="text-xs text-slate-400">em comissões</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Reps List */}
       {isLoading ? (

@@ -491,24 +491,29 @@ export default function RepresentativePortal() {
             )}
           </TabsContent>
 
-          {/* Tab Comissões */}
+          {/* Tab Comissões — Extrato Detalhado */}
           <TabsContent value="commissions">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-semibold text-slate-800">Histórico de Comissões</h3>
+                <h3 className="font-semibold text-slate-800">💵 Extrato de Comissões</h3>
                 <p className="text-sm text-slate-500">
-                  Comissão de 50% sobre a 1ª mensalidade de cada venda fechada pelo seu link
+                  50% sobre a 1ª mensalidade de cada venda fechada pelo seu link
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-slate-400">Total recebido</p>
-                <p className="text-xl font-bold text-emerald-600">R$ {totalEarned.toFixed(2).replace('.', ',')}</p>
+              <div className="text-right bg-emerald-50 rounded-xl px-4 py-2">
+                <p className="text-xs text-emerald-600 font-medium">Total a Receber</p>
+                <p className="text-xl font-bold text-emerald-700">R$ {(totalEarned + totalPending).toFixed(2).replace('.', ',')}</p>
+                <p className="text-xs text-slate-400">
+                  <span className="text-emerald-600 font-medium">R$ {totalEarned.toFixed(2).replace('.', ',')} recebido</span>
+                  {' · '}
+                  <span className="text-amber-600 font-medium">R$ {totalPending.toFixed(2).replace('.', ',')} pendente</span>
+                </p>
               </div>
             </div>
 
             {loadingCommissions ? (
               <div className="space-y-2">
-                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
               </div>
             ) : commissions.length === 0 ? (
               <Card>
@@ -519,33 +524,62 @@ export default function RepresentativePortal() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {commissions.map(c => (
-                  <Card key={c.id}>
-                    <CardContent className="p-3 flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-700 truncate">{c.customer_email}</p>
-                        <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                          <span>Plano: {c.subscription_type}</span>
-                          <span>·</span>
-                          <span>R$ {c.subscription_price?.toFixed(2).replace('.', ',')}</span>
-                          {c.created_date && (
-                            <>
-                              <span>·</span>
-                              <span>{new Date(c.created_date).toLocaleDateString('pt-BR')}</span>
-                            </>
-                          )}
+              <div className="space-y-3">
+                {commissions.map((c, idx) => {
+                  const subscriptionPrice = c.subscription_price || 0;
+                  const commissionValue = c.commission_amount || 0;
+                  const planNames = {
+                    user: 'Usuário',
+                    stander: 'Stander',
+                    lojista: 'Lojista',
+                    partner: 'Partner'
+                  };
+                  return (
+                    <Card key={c.id} className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="flex flex-col sm:flex-row">
+                          {/* Info da venda */}
+                          <div className="flex-1 p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant={c.status === 'paid' ? 'default' : 'secondary'} className="text-xs">
+                                {c.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                Plano {planNames[c.subscription_type] || c.subscription_type}
+                              </Badge>
+                            </div>
+                            <p className="font-medium text-slate-800 text-sm">{c.customer_email}</p>
+                            {c.created_date && (
+                              <p className="text-xs text-slate-400 mt-0.5">
+                                Venda realizada em {new Date(c.created_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Cálculo da comissão */}
+                          <div className="sm:border-l bg-slate-50 p-4 sm:min-w-[240px]">
+                            <div className="space-y-1.5 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Valor do plano</span>
+                                <span className="font-medium text-slate-700">R$ {subscriptionPrice.toFixed(2).replace('.', ',')}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Comissão (50%)</span>
+                                <span className="font-medium text-slate-700">R$ {commissionValue.toFixed(2).replace('.', ',')}</span>
+                              </div>
+                              <div className="border-t pt-1.5 mt-1.5 flex justify-between">
+                                <span className="font-semibold text-slate-700">Você recebe</span>
+                                <span className={`font-bold text-lg ${c.status === 'paid' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                  R$ {commissionValue.toFixed(2).replace('.', ',')}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right ml-4">
-                        <p className="font-bold text-emerald-600">R$ {c.commission_amount.toFixed(2).replace('.', ',')}</p>
-                        <Badge variant={c.status === 'paid' ? 'default' : 'secondary'} className="text-xs mt-0.5">
-                          {c.status === 'paid' ? 'Pago' : 'Pendente'}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
