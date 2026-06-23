@@ -257,7 +257,7 @@ export default function RepresentativesDashboard() {
                           <span className="text-xs text-slate-500 truncate">{c.customer_email}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
-                          <span>{c.subscription_type}</span>
+                          <span>{{user:'Usuário',stander:'Stander',lojista:'Lojista',partner:'Parceiro'}[c.subscription_type] || c.subscription_type}</span>
                           <span>·</span>
                           <span>R$ {c.subscription_price?.toFixed(2).replace('.', ',')}</span>
                           {c.created_date && (
@@ -370,7 +370,7 @@ export default function RepresentativesDashboard() {
                         {repCommissions.slice(0, 5).map(c => (
                           <div key={c.id} className="flex items-center justify-between text-xs gap-2">
                             <span className="text-slate-600 truncate max-w-[180px]">{c.customer_email}</span>
-                            <span className="text-slate-400 hidden sm:inline">{c.subscription_type}</span>
+                            <span className="text-slate-400 hidden sm:inline">{{user:'Usuário',stander:'Stander',lojista:'Lojista',partner:'Parceiro'}[c.subscription_type] || c.subscription_type}</span>
                             <span className="font-semibold text-emerald-600">R$ {c.commission_amount.toFixed(2).replace('.', ',')}</span>
                             <Badge variant={c.status === 'paid' ? 'default' : 'secondary'} className="text-xs">
                               {c.status === 'paid' ? 'Pago' : 'Pendente'}

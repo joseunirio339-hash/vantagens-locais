@@ -26,7 +26,7 @@ import {
 import { toast } from 'sonner';
 
 const clientStatusMap = {
-  prospect: { label: 'Prospect', color: 'bg-slate-100 text-slate-700', icon: UserPlus },
+  prospect: { label: 'Prospecção', color: 'bg-slate-100 text-slate-700', icon: UserPlus },
   contacted: { label: 'Contatado', color: 'bg-amber-100 text-amber-700', icon: Phone },
   signed_up: { label: 'Cadastrado', color: 'bg-blue-100 text-blue-700', icon: UserCheck },
   subscribed: { label: 'Assinante', color: 'bg-emerald-100 text-emerald-700', icon: Check },
@@ -172,7 +172,7 @@ export default function RepresentativePortal() {
 
   // Export CSV
   const exportCSV = () => {
-    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Partner' };
+    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Parceiro' };
 
     // Totais mensais
     const monthlyTotals = {};
@@ -414,7 +414,7 @@ export default function RepresentativePortal() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="prospect">Prospects</SelectItem>
+                    <SelectItem value="prospect">Prospecção</SelectItem>
                     <SelectItem value="contacted">Contatados</SelectItem>
                     <SelectItem value="signed_up">Cadastrados</SelectItem>
                     <SelectItem value="subscribed">Assinantes</SelectItem>
@@ -599,7 +599,7 @@ export default function RepresentativePortal() {
                     user: 'Usuário',
                     stander: 'Stander',
                     lojista: 'Lojista',
-                    partner: 'Partner'
+                    partner: 'Parceiro'
                   };
                   return (
                     <Card key={c.id} className="overflow-hidden">
@@ -720,7 +720,7 @@ export default function RepresentativePortal() {
                 {commissions
                   .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
                   .map((c, idx) => {
-                    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Partner' };
+                    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Parceiro' };
                     const isPaid = c.status === 'paid';
                     return (
                       <div key={c.id} className="relative pl-10">
@@ -846,7 +846,7 @@ export default function RepresentativePortal() {
                     <SelectItem value="user">Usuário</SelectItem>
                     <SelectItem value="stander">Stander</SelectItem>
                     <SelectItem value="lojista">Lojista</SelectItem>
-                    <SelectItem value="partner">Partner</SelectItem>
+                    <SelectItem value="partner">Parceiro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
