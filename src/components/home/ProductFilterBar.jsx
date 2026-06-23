@@ -36,8 +36,8 @@ export default function ProductFilterBar({ selectedCategory, onCategoryChange, s
               onClick={() => onCategoryChange(cat.value)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${
                 selectedCategory === cat.value
-                  ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                  : 'bg-white text-slate-600 border-slate-200 hover:border-violet-300 hover:text-violet-600'
+                  ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                  : 'bg-white text-stone-600 border-stone-200 hover:border-amber-300 hover:text-amber-600'
               }`}
             >
               {cat.label}
@@ -58,8 +58,8 @@ export default function ProductFilterBar({ selectedCategory, onCategoryChange, s
                 onClick={() => onSortChange(opt.value)}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${
                   sortBy === opt.value
-                    ? 'bg-fuchsia-600 text-white border-fuchsia-600'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-fuchsia-300 hover:text-fuchsia-600'
+                    ? 'bg-rose-500 text-white border-rose-500'
+                    : 'bg-white text-stone-600 border-stone-200 hover:border-rose-300 hover:text-rose-600'
                 }`}
               >
                 {opt.label}

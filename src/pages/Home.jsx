@@ -14,6 +14,7 @@ import VoucherModal from '@/components/voucher/VoucherModal';
 import EntrepreneurVoucherModal from '@/components/voucher/EntrepreneurVoucherModal';
 import LocationFilter from '@/components/home/LocationFilter';
 import ProductFilterBar from '@/components/home/ProductFilterBar';
+import SmartSearchBar from '@/components/home/SmartSearchBar';
 import NearbyPartnersMap from '@/components/home/NearbyPartnersMap';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
@@ -224,7 +225,7 @@ export default function Home() {
                 <span className="text-white drop-shadow-lg">da sua cidade em um só lugar</span>
               </h1>
               <p className="text-base md:text-lg text-white/90 max-w-xl mb-6 leading-relaxed">
-                Tenha acesso a ofertas exclusivas, vouchers personalizados e vantagens especiais em dezenas de estabelecimentos parceiros. Economize mais em cada compra com o Base 44.
+                Tenha acesso a ofertas exclusivas, vouchers personalizados e vantagens especiais em dezenas de estabelecimentos parceiros. Economize mais em cada compra com o Clube Max.
               </p>
 
               {/* Benefícios */}
@@ -244,7 +245,19 @@ export default function Home() {
                 ))}
               </div>
 
-              <p className="text-white font-semibold text-sm mb-4">Encontre sua próxima oferta agora mesmo.</p>
+              <p className="text-white font-semibold text-sm mb-3">Encontre sua próxima oferta agora mesmo.</p>
+
+              {/* Smart Search Bar */}
+              <div className="mb-5">
+                <SmartSearchBar
+                  products={activeProducts}
+                  partners={partners}
+                  searchTerm={searchTerm}
+                  selectedCategory={selectedCategory}
+                  onSearch={setSearchTerm}
+                  onCategoryChange={setSelectedCategory}
+                />
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to={createPageUrl('Subscription')}>

@@ -70,6 +70,11 @@ export default function Products() {
   ];
 
   useEffect(() => {
+    // Read search query from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSearch = urlParams.get('search');
+    if (urlSearch) setSearchTerm(urlSearch);
+
     const loadUser = async () => {
       const isAuth = await base44.auth.isAuthenticated();
       if (isAuth) {

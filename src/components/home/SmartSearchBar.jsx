@@ -77,7 +77,7 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
   return (
     <div ref={containerRef} className="relative w-full max-w-2xl mx-auto">
       {/* Main input */}
-      <div className={`flex items-center gap-2 bg-white rounded-2xl shadow-2xl border-2 transition-all ${showDropdown || showCategories ? 'border-violet-400' : 'border-white'}`}>
+      <div className={`flex items-center gap-2 bg-white rounded-2xl shadow-2xl border-2 transition-all ${showDropdown || showCategories ? 'border-amber-400' : 'border-white'}`}>
         <Search className="w-5 h-5 text-slate-400 ml-4 flex-shrink-0" />
         <input
           ref={inputRef}
@@ -101,8 +101,8 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
           onClick={() => { setShowCategories(!showCategories); setShowDropdown(false); }}
           className={`flex-shrink-0 flex items-center gap-1.5 mr-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
             selectedCategory
-              ? 'bg-violet-600 text-white border-violet-600'
-              : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-violet-50 hover:text-violet-700 hover:border-violet-200'
+              ? 'bg-amber-500 text-white border-amber-500'
+              : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200'
           }`}
         >
           {selectedCategory
@@ -122,8 +122,8 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
                 onClick={() => handleCategoryClick(cat.value)}
                 className={`text-left px-3 py-2 rounded-xl text-sm transition-colors ${
                   selectedCategory === cat.value
-                    ? 'bg-violet-100 text-violet-700 font-semibold'
-                    : 'hover:bg-slate-50 text-slate-700'
+                    ? 'bg-amber-100 text-amber-700 font-semibold'
+                    : 'hover:bg-stone-50 text-stone-700'
                 }`}
               >
                 {cat.label}
@@ -152,7 +152,7 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
                   key={p.id}
                   to={createPageUrl(`PartnerStore?id=${p.id}`)}
                   onClick={() => { setShowDropdown(false); }}
-                  className="flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-violet-50 transition-colors"
+                  className="flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-amber-50 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                     {p.logo_url
@@ -181,7 +181,7 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
                   <button
                     key={p.id}
                     onClick={() => { setShowDropdown(false); onSearch(p.name); setInputValue(p.name); }}
-                    className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-fuchsia-50 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-amber-50 transition-colors text-left"
                   >
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                       {p.image_url
@@ -211,7 +211,7 @@ export default function SmartSearchBar({ products = [], partners = [], onSearch,
           <div className="border-t border-slate-100 px-5 py-2.5">
             <button
               onClick={() => setShowDropdown(false)}
-              className="text-xs text-violet-600 font-semibold hover:underline"
+              className="text-xs text-amber-600 font-semibold hover:underline"
             >
               Ver todos os resultados para "{inputValue}" ↓
             </button>

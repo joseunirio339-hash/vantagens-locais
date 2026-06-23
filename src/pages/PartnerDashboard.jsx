@@ -289,6 +289,11 @@ export default function PartnerDashboard() {
 
         <PartnerStatsPanel vouchers={vouchers} products={products} views={views} />
 
+        {/* Quick Export */}
+        <div className="flex justify-end mb-6">
+          <ExportSalesButton vouchers={vouchers} products={products} views={views} partnerName={partner?.business_name} />
+        </div>
+
         <PremiumMetricsPanel
           products={products}
           views={views}

@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users,
-  MessageCircle, Mail, Camera
+  MessageCircle, Mail, Camera, Search
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -24,6 +24,7 @@ export default function Layout({ children }) {
   const [user, setUser] = useState(null);
   const [isPartner, setIsPartner] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
   const location = useLocation();
 
   useEffect(() => {
@@ -98,8 +99,27 @@ export default function Layout({ children }) {
               })}
             </nav>
 
-            {/* User Menu */}
+            {/* Global Search + User Menu */}
             <div className="flex items-center gap-3">
+              {/* Compact Search Bar */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (headerSearch.trim()) {
+                    window.location.href = createPageUrl(`Products?search=${encodeURIComponent(headerSearch.trim())}`);
+                  }
+                }}
+                className="hidden md:flex items-center relative"
+              >
+                <Search className="absolute left-3 w-4 h-4 text-stone-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={headerSearch}
+                  onChange={(e) => setHeaderSearch(e.target.value)}
+                  placeholder="Buscar ofertas..."
+                  className="w-40 lg:w-52 pl-9 pr-3 py-2 rounded-xl border border-stone-200 bg-stone-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300 transition-all"
+                />
+              </form>
               {/* Cart Icon */}
               <Link to="/Cart" className="relative p-2 rounded-xl hover:bg-stone-100 transition-colors">
                 <ShoppingCart className="w-5 h-5 text-stone-600" />
