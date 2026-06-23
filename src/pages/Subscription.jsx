@@ -17,6 +17,17 @@ const plans = [
     color: 'emerald',
     trialDays: 30,
     features: [
+      'A definir...'
+    ]
+  },
+  {
+    type: 'stander',
+    name: 'Stander',
+    price: 99.99,
+    period: 'mês',
+    icon: Crown,
+    color: 'amber',
+    features: [
       '🎁 1º mês GRÁTIS (período de teste)',
       'Acesso a todos os descontos',
       'Geração ilimitada de vouchers',
@@ -27,8 +38,8 @@ const plans = [
   },
   {
     type: 'lojista',
-    name: 'Lojista Parceiro',
-    price: 99.99,
+    name: 'Plano Premium',
+    price: 149.99,
     period: 'mês',
     icon: Store,
     color: 'violet',
@@ -155,7 +166,7 @@ export default function Subscription() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
            {plans.map(plan => {
              const sub = getSubscriptionStatus(plan.type);
              const isActive = sub?.status === 'active';
@@ -174,6 +185,7 @@ export default function Subscription() {
 
              const descriptions = {
                user: 'Para consumidores que querem economizar',
+               stander: 'Para consumidores que querem economizar',
                lojista: 'Para lojistas estabelecidos com CNPJ'
              };
 
@@ -283,7 +295,7 @@ export default function Subscription() {
           </p>
           <p className="text-xs text-slate-400 mb-3">Assinatura mensal recorrente · Cancele a qualquer momento · Suporte por e-mail incluído</p>
           <p className="text-xs text-emerald-600 flex items-center justify-center gap-1">
-            <Gift className="w-3 h-3" /> Plano Usuário: 1º mês GRÁTIS para novos usuários (depois R$ 19,99/mês).
+            <Gift className="w-3 h-3" /> Plano Usuário: 1º mês GRÁTIS para novos usuários.
           </p>
         </div>
       </div>

@@ -5,7 +5,8 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
 const PRICE_MAP = {
   user: "price_1TY8efLsB3SzuNJItliAzOIn",
-  lojista: "price_1TY8efLsB3SzuNJIgs5Hw2ka"
+  stander: "price_1TlVAZLsB3SzuNJINp3y63jX",
+  lojista: "price_1TlVAZLsB3SzuNJI9WCkdyNW"
 };
 
 Deno.serve(async (req) => {
