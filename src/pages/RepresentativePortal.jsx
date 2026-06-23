@@ -8,7 +8,8 @@ import {
   Store, Tag, Copy, Check, ExternalLink, TrendingUp,
   DollarSign, ShoppingBag, Users, Sparkles, Loader2,
   UserPlus, Phone, Mail, ChevronDown, Search, Plus,
-  Pencil, UserCheck, UserX, Clock, Filter, Trash2
+  Pencil, UserCheck, UserX, Clock, Filter, Trash2,
+  FileDown, Wallet, Receipt, History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -168,6 +169,62 @@ export default function RepresentativePortal() {
   const totalPending = pendingCommissions.reduce((sum, c) => sum + c.commission_amount, 0);
   const subscribedClients = clients.filter(c => c.status === 'subscribed').length;
   const totalClients = clients.length;
+
+  // Export CSV
+  const exportCSV = () => {
+    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Partner' };
+
+    // Totais mensais
+    const monthlyTotals = {};
+    commissions.forEach(c => {
+      if (!c.created_date) return;
+      const month = new Date(c.created_date).toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+      if (!monthlyTotals[month]) monthlyTotals[month] = { total: 0, paid: 0, pending: 0, count: 0 };
+      monthlyTotals[month].total += c.commission_amount || 0;
+      monthlyTotals[month].count += 1;
+      if (c.status === 'paid') monthlyTotals[month].paid += c.commission_amount || 0;
+      else monthlyTotals[month].pending += c.commission_amount || 0;
+    });
+
+    // Cabeçalho BOM + CSV
+    const BOM = '\uFEFF';
+    const sep = ';';
+    let csv = BOM;
+
+    csv += 'RELATÓRIO DE COMISSÕES — ' + rep.name + '\n';
+    csv += 'Código: ' + rep.code + '\n';
+    csv += 'Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '\n\n';
+
+    csv += 'RESUMO MENSAL\n';
+    csv += ['Mês', 'Total Vendas', 'Comissão Total', 'Recebido', 'Pendente'].join(sep) + '\n';
+    Object.entries(monthlyTotals).sort().forEach(([month, data]) => {
+      csv += [month, data.count, data.total.toFixed(2).replace('.', ','), data.paid.toFixed(2).replace('.', ','), data.pending.toFixed(2).replace('.', ',')].join(sep) + '\n';
+    });
+    csv += '\n';
+
+    csv += 'TOTAIS GERAIS\n';
+    csv += ['Total de Vendas', 'Total em Comissões', 'Total Recebido', 'Total Pendente'].join(sep) + '\n';
+    csv += [commissions.length, (totalEarned + totalPending).toFixed(2).replace('.', ','), totalEarned.toFixed(2).replace('.', ','), totalPending.toFixed(2).replace('.', ',')].join(sep) + '\n\n';
+
+    csv += 'DETALHAMENTO POR VENDA\n';
+    csv += ['Data', 'Cliente', 'Plano', 'Valor Plano', 'Comissão (50%)', 'Status'].join(sep) + '\n';
+    commissions.forEach(c => {
+      const date = c.created_date ? new Date(c.created_date).toLocaleDateString('pt-BR') : '-';
+      const price = (c.subscription_price || 0).toFixed(2).replace('.', ',');
+      const commission = (c.commission_amount || 0).toFixed(2).replace('.', ',');
+      const status = c.status === 'paid' ? 'Recebido' : 'Pendente';
+      csv += [date, c.customer_email, planNames[c.subscription_type] || c.subscription_type, price, commission, status].join(sep) + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `comissoes_${rep.code}_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Relatório CSV baixado!');
+  };
 
   // Login screen
   if (!rep) {
@@ -331,6 +388,9 @@ export default function RepresentativePortal() {
             </TabsTrigger>
             <TabsTrigger value="commissions" className="data-[state=active]:bg-violet-50 data-[state=active]:text-violet-700">
               <DollarSign className="w-4 h-4 mr-2" /> Comissões
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="data-[state=active]:bg-violet-50 data-[state=active]:text-violet-700">
+              <Wallet className="w-4 h-4 mr-2" /> Pagamentos
             </TabsTrigger>
           </TabsList>
 
@@ -500,14 +560,21 @@ export default function RepresentativePortal() {
                   50% sobre a 1ª mensalidade de cada venda fechada pelo seu link
                 </p>
               </div>
-              <div className="text-right bg-emerald-50 rounded-xl px-4 py-2">
-                <p className="text-xs text-emerald-600 font-medium">Total a Receber</p>
-                <p className="text-xl font-bold text-emerald-700">R$ {(totalEarned + totalPending).toFixed(2).replace('.', ',')}</p>
-                <p className="text-xs text-slate-400">
-                  <span className="text-emerald-600 font-medium">R$ {totalEarned.toFixed(2).replace('.', ',')} recebido</span>
-                  {' · '}
-                  <span className="text-amber-600 font-medium">R$ {totalPending.toFixed(2).replace('.', ',')} pendente</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="text-right bg-emerald-50 rounded-xl px-4 py-2">
+                  <p className="text-xs text-emerald-600 font-medium">Total a Receber</p>
+                  <p className="text-xl font-bold text-emerald-700">R$ {(totalEarned + totalPending).toFixed(2).replace('.', ',')}</p>
+                  <p className="text-xs text-slate-400">
+                    <span className="text-emerald-600 font-medium">R$ {totalEarned.toFixed(2).replace('.', ',')} recebido</span>
+                    {' · '}
+                    <span className="text-amber-600 font-medium">R$ {totalPending.toFixed(2).replace('.', ',')} pendente</span>
+                  </p>
+                </div>
+                {commissions.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={exportCSV} className="text-violet-600 border-violet-300 hover:bg-violet-50 shrink-0">
+                    <FileDown className="w-4 h-4 mr-2" /> CSV
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -580,6 +647,139 @@ export default function RepresentativePortal() {
                     </Card>
                   );
                 })}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Tab Pagamentos — Histórico visual de baixas */}
+          <TabsContent value="payments">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-violet-600" />
+                  Histórico de Pagamentos
+                </h3>
+                <p className="text-sm text-slate-500">
+                  Acompanhe quais comissões já foram quitadas pelo sistema e quais ainda aguardam baixa
+                </p>
+              </div>
+              {commissions.length > 0 && (
+                <Button variant="outline" size="sm" onClick={exportCSV} className="text-violet-600 border-violet-300 hover:bg-violet-50">
+                  <FileDown className="w-4 h-4 mr-2" /> Exportar CSV
+                </Button>
+              )}
+            </div>
+
+            {/* Cards de status visual */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <Card className="border-emerald-200 bg-emerald-50/50">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                      <Check className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-emerald-700">Comissões Quitadas</p>
+                      <p className="text-2xl font-bold text-emerald-600">R$ {totalEarned.toFixed(2).replace('.', ',')}</p>
+                      <p className="text-xs text-emerald-500">{paidCommissions.length} venda{paidCommissions.length !== 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-amber-200 bg-amber-50/50">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-amber-700">Aguardando Baixa</p>
+                      <p className="text-2xl font-bold text-amber-600">R$ {totalPending.toFixed(2).replace('.', ',')}</p>
+                      <p className="text-xs text-amber-500">{pendingCommissions.length} venda{pendingCommissions.length !== 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {loadingCommissions ? (
+              <div className="space-y-3">
+                {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+              </div>
+            ) : commissions.length === 0 ? (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <History className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500">Nenhum pagamento registrado ainda.</p>
+                  <p className="text-sm text-slate-400 mt-1">Os pagamentos aparecem aqui quando suas comissões recebem baixa no sistema.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {/* Linha do tempo */}
+                {commissions
+                  .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+                  .map((c, idx) => {
+                    const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Partner' };
+                    const isPaid = c.status === 'paid';
+                    return (
+                      <div key={c.id} className="relative pl-10">
+                        {/* Linha conectando */}
+                        {idx < commissions.length - 1 && (
+                          <div className="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-200" />
+                        )}
+                        {/* Ícone de status */}
+                        <div className={`absolute left-0 top-1 w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                          isPaid
+                            ? 'bg-emerald-50 border-emerald-300'
+                            : 'bg-amber-50 border-amber-300'
+                        }`}>
+                          {isPaid
+                            ? <Check className="w-5 h-5 text-emerald-600" />
+                            : <Clock className="w-5 h-5 text-amber-600" />
+                          }
+                        </div>
+                        {/* Card */}
+                        <Card className={`border-l-4 ${
+                          isPaid ? 'border-l-emerald-500 bg-white' : 'border-l-amber-400 bg-white'
+                        }`}>
+                          <CardContent className="p-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                    isPaid
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-amber-100 text-amber-700'
+                                  }`}>
+                                    {isPaid ? '✅ Quitado' : '⏳ Pendente de Baixa'}
+                                  </span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {planNames[c.subscription_type] || c.subscription_type}
+                                  </Badge>
+                                </div>
+                                <p className="font-medium text-slate-800">{c.customer_email}</p>
+                                {c.created_date && (
+                                  <p className="text-xs text-slate-400 mt-0.5">
+                                    Venda: {new Date(c.created_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="text-right bg-slate-50 rounded-xl px-4 py-2 sm:min-w-[140px]">
+                                <p className="text-xs text-slate-400">Valor da comissão</p>
+                                <p className={`text-lg font-bold ${isPaid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                  R$ {c.commission_amount.toFixed(2).replace('.', ',')}
+                                </p>
+                                <p className={`text-xs ${isPaid ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                  {isPaid ? 'Baixa realizada' : 'Aguardando confirmação'}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    );
+                  })}
               </div>
             )}
           </TabsContent>
