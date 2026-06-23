@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const ALL_BADGES_COUNT = 9;
+const ALL_BADGES_COUNT = 16;
 
 export default function HomeBadgesWidget({ userEmail }) {
   const { data: earnedBadges = [] } = useQuery({

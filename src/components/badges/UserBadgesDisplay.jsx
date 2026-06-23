@@ -8,15 +8,22 @@ import BadgeCard from './BadgeCard';
 
 // All possible badges in the system
 const ALL_BADGES = [
-  { badge_id: 'first_voucher',   badge_name: 'Primeiro Passo',      badge_icon: '🎫', badge_category: 'compras',     description: 'Use seu primeiro voucher' },
-  { badge_id: 'five_vouchers',   badge_name: 'Frequente',            badge_icon: '⚡', badge_category: 'compras',     description: 'Use 5 vouchers' },
-  { badge_id: 'ten_vouchers',    badge_name: 'Fiel',                 badge_icon: '🔥', badge_category: 'fidelidade',  description: 'Use 10 vouchers' },
-  { badge_id: 'twenty_five',     badge_name: 'Lenda Local',          badge_icon: '🏆', badge_category: 'fidelidade',  description: 'Use 25 vouchers' },
-  { badge_id: 'three_partners',  badge_name: 'Explorador',           badge_icon: '🗺️', badge_category: 'exploracao',  description: 'Visite 3 parceiros diferentes' },
-  { badge_id: 'five_partners',   badge_name: 'Globetrotter',         badge_icon: '🌟', badge_category: 'exploracao',  description: 'Visite 5 parceiros diferentes' },
-  { badge_id: 'first_referral',  badge_name: 'Primeiro Convite',     badge_icon: '🤝', badge_category: 'indicacoes',  description: 'Indique 1 amigo com sucesso' },
-  { badge_id: 'five_referrals',  badge_name: 'Super Indicador',      badge_icon: '🚀', badge_category: 'indicacoes',  description: 'Indique 5 amigos com sucesso' },
-  { badge_id: 'top_referrer',    badge_name: 'Top 10 Ranking',       badge_icon: '👑', badge_category: 'indicacoes',  description: 'Entre no Top 10 do ranking' },
+  { badge_id: 'first_voucher',    badge_name: 'Primeiro Passo',      badge_icon: '🎫', badge_category: 'compras',     description: 'Use seu 1º voucher' },
+  { badge_id: 'five_vouchers',    badge_name: 'Frequente',            badge_icon: '⚡', badge_category: 'compras',     description: 'Use 5 vouchers' },
+  { badge_id: 'ten_vouchers',     badge_name: 'Fiel',                 badge_icon: '🔥', badge_category: 'fidelidade',  description: 'Use 10 vouchers' },
+  { badge_id: 'twenty_five',      badge_name: 'Lenda Local',          badge_icon: '🏆', badge_category: 'fidelidade',  description: 'Use 25 vouchers' },
+  { badge_id: 'fifty_vouchers',   badge_name: 'Elite',                badge_icon: '💎', badge_category: 'fidelidade',  description: 'Use 50 vouchers' },
+  { badge_id: 'hundred_vouchers', badge_name: 'Lendário',             badge_icon: '🌟', badge_category: 'fidelidade',  description: 'Use 100 vouchers' },
+  { badge_id: 'saved_100',        badge_name: 'Economizador',         badge_icon: '💰', badge_category: 'compras',     description: 'Economize R$100' },
+  { badge_id: 'saved_500',        badge_name: 'Caça-Pechinchas',      badge_icon: '💸', badge_category: 'compras',     description: 'Economize R$500' },
+  { badge_id: 'saved_1000',       badge_name: 'Mestre da Economia',   badge_icon: '💎', badge_category: 'compras',     description: 'Economize R$1.000' },
+  { badge_id: 'three_partners',   badge_name: 'Explorador de Lojas',  badge_icon: '🗺️', badge_category: 'exploracao',  description: 'Visite 3 parceiros' },
+  { badge_id: 'five_partners',    badge_name: 'Globetrotter',         badge_icon: '🌟', badge_category: 'exploracao',  description: 'Visite 5 parceiros' },
+  { badge_id: 'ten_partners',     badge_name: 'Conhecedor',           badge_icon: '🏙️', badge_category: 'exploracao',  description: 'Visite 10 parceiros' },
+  { badge_id: 'fifteen_partners', badge_name: 'Viajante Master',      badge_icon: '🌍', badge_category: 'exploracao',  description: 'Visite 15 parceiros' },
+  { badge_id: 'first_referral',   badge_name: 'Primeiro Convite',     badge_icon: '🤝', badge_category: 'indicacoes',  description: 'Indique 1 amigo' },
+  { badge_id: 'five_referrals',   badge_name: 'Super Indicador',      badge_icon: '🚀', badge_category: 'indicacoes',  description: 'Indique 5 amigos' },
+  { badge_id: 'ten_referrals',    badge_name: 'Embaixador',           badge_icon: '👑', badge_category: 'indicacoes',  description: 'Indique 10 amigos' },
 ];
 
 export default function UserBadgesDisplay({ userEmail }) {

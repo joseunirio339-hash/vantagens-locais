@@ -57,7 +57,46 @@ Deno.serve(async (req) => {
       reference_id: referral.id
     });
 
-    console.log(`[referralReward] Rewarded ${referral.referrer_email} with ${POINTS_REWARD} points for referring ${referred_email}`);
+    // Check referral badges
+    const allRewardedReferrals = await base44.asServiceRole.entities.Referral.filter({
+      referrer_email: referral.referrer_email,
+      status: 'rewarded'
+    });
+    const referralCount = allRewardedReferrals.length;
+
+    const REFERRAL_BADGES = [
+      { id: 'first_referral', name: 'Primeiro Convite', icon: '🤝', category: 'indicacoes', threshold: 1,  desc: '1 amigo indicado com sucesso' },
+      { id: 'five_referrals', name: 'Super Indicador',  icon: '🚀', category: 'indicacoes', threshold: 5,  desc: '5 amigos indicados' },
+      { id: 'ten_referrals',  name: 'Embaixador',       icon: '👑', category: 'indicacoes', threshold: 10, desc: '10 amigos indicados' },
+    ];
+
+    for (const badge of REFERRAL_BADGES) {
+      if (referralCount < badge.threshold) continue;
+      const existing = await base44.asServiceRole.entities.Badge.filter({
+        user_email: referral.referrer_email,
+        badge_id: badge.id
+      });
+      if (existing.length === 0) {
+        await base44.asServiceRole.entities.Badge.create({
+          user_email: referral.referrer_email,
+          badge_id: badge.id,
+          badge_name: badge.name,
+          badge_icon: badge.icon,
+          badge_category: badge.category,
+          description: badge.desc
+        });
+        await base44.asServiceRole.entities.UserNotification.create({
+          user_email: referral.referrer_email,
+          type: 'badge_earned',
+          title: `${badge.icon} Conquista desbloqueada!`,
+          message: `Você ganhou a medalha "${badge.name}"! ${badge.desc}.`,
+          is_read: false,
+          reference_id: `badge_${badge.id}`
+        });
+      }
+    }
+
+    console.log(`[referralReward] Rewarded ${referral.referrer_email} with ${POINTS_REWARD} points for referring ${referred_email} (total referrals: ${referralCount})`);
     return Response.json({ success: true, points_earned: POINTS_REWARD, referrer: referral.referrer_email });
 
   } catch (error) {

@@ -12,17 +12,28 @@ const LEVELS = [
 ];
 
 const BADGES = [
-  { id: 'first_voucher',  name: 'Primeiro Passo',     icon: '🎫', category: 'compras',    threshold: 1,  type: 'used',     desc: '1 voucher utilizado' },
-  { id: 'five_vouchers',  name: 'Frequente',           icon: '⚡', category: 'compras',    threshold: 5,  type: 'used',     desc: '5 vouchers utilizados' },
-  { id: 'ten_vouchers',   name: 'Fiel',                icon: '🔥', category: 'fidelidade', threshold: 10, type: 'used',     desc: '10 vouchers utilizados' },
-  { id: 'twenty_five',    name: 'Lenda Local',         icon: '🏆', category: 'fidelidade', threshold: 25, type: 'used',     desc: '25 vouchers utilizados' },
-  { id: 'fifty_vouchers', name: 'Elite',               icon: '💎', category: 'fidelidade', threshold: 50, type: 'used',     desc: '50 vouchers utilizados' },
-  { id: 'three_partners', name: 'Explorador de Lojas', icon: '🗺️', category: 'exploracao', threshold: 3,  type: 'partners', desc: '3 parceiros visitados' },
-  { id: 'five_partners',  name: 'Globetrotter',        icon: '🌟', category: 'exploracao', threshold: 5,  type: 'partners', desc: '5 parceiros visitados' },
-  { id: 'ten_partners',   name: 'Conhecedor',          icon: '🏙️', category: 'exploracao', threshold: 10, type: 'partners', desc: '10 parceiros visitados' },
+  // Compras / Fidelidade
+  { id: 'first_voucher',    name: 'Primeiro Passo',       icon: '🎫', category: 'compras',    threshold: 1,   type: 'used',     desc: '1 voucher utilizado' },
+  { id: 'five_vouchers',    name: 'Frequente',             icon: '⚡', category: 'compras',    threshold: 5,   type: 'used',     desc: '5 vouchers utilizados' },
+  { id: 'ten_vouchers',     name: 'Fiel',                  icon: '🔥', category: 'fidelidade', threshold: 10,  type: 'used',     desc: '10 vouchers utilizados' },
+  { id: 'twenty_five',      name: 'Lenda Local',           icon: '🏆', category: 'fidelidade', threshold: 25,  type: 'used',     desc: '25 vouchers utilizados' },
+  { id: 'fifty_vouchers',   name: 'Elite',                 icon: '💎', category: 'fidelidade', threshold: 50,  type: 'used',     desc: '50 vouchers utilizados' },
+  { id: 'hundred_vouchers', name: 'Lendário',              icon: '🌟', category: 'fidelidade', threshold: 100, type: 'used',     desc: '100 vouchers utilizados' },
+  // Exploração
+  { id: 'three_partners',   name: 'Explorador de Lojas',   icon: '🗺️', category: 'exploracao', threshold: 3,   type: 'partners', desc: '3 parceiros visitados' },
+  { id: 'five_partners',    name: 'Globetrotter',          icon: '🌟', category: 'exploracao', threshold: 5,   type: 'partners', desc: '5 parceiros visitados' },
+  { id: 'ten_partners',     name: 'Conhecedor',            icon: '🏙️', category: 'exploracao', threshold: 10,  type: 'partners', desc: '10 parceiros visitados' },
+  { id: 'fifteen_partners', name: 'Viajante Master',       icon: '🌍', category: 'exploracao', threshold: 15,  type: 'partners', desc: '15 parceiros visitados' },
+  // Economia
+  { id: 'saved_100',        name: 'Economizador',          icon: '💰', category: 'compras',    threshold: 100,  type: 'saved',    desc: 'R$100 economizados' },
+  { id: 'saved_500',        name: 'Caça-Pechinchas',       icon: '💸', category: 'compras',    threshold: 500,  type: 'saved',    desc: 'R$500 economizados' },
+  { id: 'saved_1000',       name: 'Mestre da Economia',    icon: '💎', category: 'compras',    threshold: 1000, type: 'saved',    desc: 'R$1.000 economizados' },
+  // Indicações
+  { id: 'first_referral',   name: 'Primeiro Convite',      icon: '🤝', category: 'indicacoes', threshold: 1,   type: 'referral', desc: '1 amigo indicado com sucesso' },
+  { id: 'five_referrals',   name: 'Super Indicador',       icon: '🚀', category: 'indicacoes', threshold: 5,   type: 'referral', desc: '5 amigos indicados' },
+  { id: 'ten_referrals',    name: 'Embaixador',            icon: '👑', category: 'indicacoes', threshold: 10,  type: 'referral', desc: '10 amigos indicados' },
 ];
 
-// Points per voucher used (base 10, bonus for higher discounts)
 const POINTS_PER_VOUCHER = 10;
 
 function getLevel(points) {
@@ -63,8 +74,19 @@ Deno.serve(async (req) => {
     const usedCount = allVouchers.length;
     const uniquePartners = new Set(allVouchers.map(v => v.partner_id)).size;
 
+    // Calculate total savings
+    const totalSaved = allVouchers.reduce((sum, v) => {
+      return sum + ((v.original_price || 0) - (v.discount_price || 0));
+    }, 0);
+
+    // Get referral count
+    const referrals = await base44.asServiceRole.entities.Referral.filter({
+      referrer_email: userEmail,
+      status: 'rewarded'
+    });
+    const referralCount = referrals.length;
+
     // --- AWARD POINTS ---
-    // Calculate bonus points: bigger discount = more points
     let pointsToAdd = POINTS_PER_VOUCHER;
     if (voucherData) {
       const saved = (voucherData.original_price || 0) - (voucherData.discount_price || 0);
@@ -72,7 +94,6 @@ Deno.serve(async (req) => {
       else if (saved >= 20) pointsToAdd = 15;
     }
 
-    // Only award points if called from automation (voucherData present)
     let totalPoints = 0;
     if (voucherData) {
       const existingPoints = await base44.asServiceRole.entities.UserPoints.filter({ user_email: userEmail });
@@ -136,56 +157,61 @@ Deno.serve(async (req) => {
 
     // Check badges
     for (const badge of BADGES) {
-      const reached = badge.type === 'used' ? usedCount >= badge.threshold
-                    : badge.type === 'partners' ? uniquePartners >= badge.threshold
-                    : false;
+      let reached = false;
+      if (badge.type === 'used') reached = usedCount >= badge.threshold;
+      else if (badge.type === 'partners') reached = uniquePartners >= badge.threshold;
+      else if (badge.type === 'saved') reached = totalSaved >= badge.threshold;
+      else if (badge.type === 'referral') reached = referralCount >= badge.threshold;
 
       if (!reached) continue;
 
-      const existing = await base44.asServiceRole.entities.UserNotification.filter({
+      // Check if already notified for this badge
+      const existingNotif = await base44.asServiceRole.entities.UserNotification.filter({
         user_email: userEmail,
         type: 'badge_earned',
         reference_id: `badge_${badge.id}`
       });
 
-      if (existing.length === 0) {
-        // Check if badge already in Badge entity
-        const existingBadge = await base44.asServiceRole.entities.Badge.filter({
-          user_email: userEmail,
-          badge_id: badge.id
-        });
+      if (existingNotif.length > 0) continue;
 
-        if (existingBadge.length === 0) {
-          await base44.asServiceRole.entities.Badge.create({
-            user_email: userEmail,
-            badge_id: badge.id,
-            badge_name: badge.name,
-            badge_icon: badge.icon,
-            badge_category: badge.category,
-            description: badge.desc
-          });
-        }
+      // Check if badge already in Badge entity
+      const existingBadge = await base44.asServiceRole.entities.Badge.filter({
+        user_email: userEmail,
+        badge_id: badge.id
+      });
 
-        await base44.asServiceRole.entities.UserNotification.create({
+      if (existingBadge.length === 0) {
+        await base44.asServiceRole.entities.Badge.create({
           user_email: userEmail,
-          type: 'badge_earned',
-          title: `${badge.icon} Conquista desbloqueada!`,
-          message: `Você ganhou a medalha "${badge.name}"! ${badge.desc}.`,
-          is_read: false,
-          reference_id: `badge_${badge.id}`
+          badge_id: badge.id,
+          badge_name: badge.name,
+          badge_icon: badge.icon,
+          badge_category: badge.category,
+          description: badge.desc
         });
-        notifCount++;
       }
+
+      await base44.asServiceRole.entities.UserNotification.create({
+        user_email: userEmail,
+        type: 'badge_earned',
+        title: `${badge.icon} Conquista desbloqueada!`,
+        message: `Você ganhou a medalha "${badge.name}"! ${badge.desc}.`,
+        is_read: false,
+        reference_id: `badge_${badge.id}`
+      });
+      notifCount++;
     }
 
-    console.log(`checkLevelUp: ${notifCount} notifications for ${userEmail}, points=${totalPoints}, level=${currentLevel.level}, used=${usedCount}`);
+    console.log(`checkLevelUp: ${notifCount} notifications for ${userEmail}, points=${totalPoints}, level=${currentLevel.level}, used=${usedCount}, saved=${totalSaved}, referrals=${referralCount}`);
     return Response.json({
       success: true,
       notifications_created: notifCount,
       level: currentLevel.level,
       used_count: usedCount,
       total_points: totalPoints,
-      points_added: voucherData ? pointsToAdd : 0
+      points_added: voucherData ? pointsToAdd : 0,
+      total_saved: totalSaved,
+      referral_count: referralCount
     });
   } catch (error) {
     console.error('checkLevelUp error:', error);

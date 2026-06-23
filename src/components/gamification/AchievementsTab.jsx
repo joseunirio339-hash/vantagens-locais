@@ -9,19 +9,25 @@ import UserProgressCard, { getLevel, LEVELS } from './UserProgressCard';
 
 const ALL_BADGES = [
   // Compras
-  { badge_id: 'first_voucher',  badge_name: 'Primeiro Passo',     badge_icon: '🎫', badge_category: 'compras',    description: 'Use seu 1º voucher',          threshold: 1,  type: 'used'     },
-  { badge_id: 'five_vouchers',  badge_name: 'Frequente',           badge_icon: '⚡', badge_category: 'compras',    description: 'Use 5 vouchers',               threshold: 5,  type: 'used'     },
-  { badge_id: 'ten_vouchers',   badge_name: 'Fiel',                badge_icon: '🔥', badge_category: 'fidelidade', description: 'Use 10 vouchers',              threshold: 10, type: 'used'     },
-  { badge_id: 'twenty_five',    badge_name: 'Lenda Local',         badge_icon: '🏆', badge_category: 'fidelidade', description: 'Use 25 vouchers',              threshold: 25, type: 'used'     },
-  { badge_id: 'fifty_vouchers', badge_name: 'Elite',               badge_icon: '💎', badge_category: 'fidelidade', description: 'Use 50 vouchers',              threshold: 50, type: 'used'     },
+  { badge_id: 'first_voucher',    badge_name: 'Primeiro Passo',       badge_icon: '🎫', badge_category: 'compras',    description: 'Use seu 1º voucher',             threshold: 1,    type: 'used'     },
+  { badge_id: 'five_vouchers',    badge_name: 'Frequente',             badge_icon: '⚡', badge_category: 'compras',    description: 'Use 5 vouchers',                  threshold: 5,    type: 'used'     },
+  { badge_id: 'ten_vouchers',     badge_name: 'Fiel',                  badge_icon: '🔥', badge_category: 'fidelidade', description: 'Use 10 vouchers',                 threshold: 10,   type: 'used'     },
+  { badge_id: 'twenty_five',      badge_name: 'Lenda Local',           badge_icon: '🏆', badge_category: 'fidelidade', description: 'Use 25 vouchers',                 threshold: 25,   type: 'used'     },
+  { badge_id: 'fifty_vouchers',   badge_name: 'Elite',                 badge_icon: '💎', badge_category: 'fidelidade', description: 'Use 50 vouchers',                 threshold: 50,   type: 'used'     },
+  { badge_id: 'hundred_vouchers', badge_name: 'Lendário',              badge_icon: '🌟', badge_category: 'fidelidade', description: 'Use 100 vouchers',                threshold: 100,  type: 'used'     },
+  // Economia
+  { badge_id: 'saved_100',        badge_name: 'Economizador',          badge_icon: '💰', badge_category: 'compras',    description: 'Economize R$100',                 threshold: 100,  type: 'saved'    },
+  { badge_id: 'saved_500',        badge_name: 'Caça-Pechinchas',       badge_icon: '💸', badge_category: 'compras',    description: 'Economize R$500',                 threshold: 500,  type: 'saved'    },
+  { badge_id: 'saved_1000',       badge_name: 'Mestre da Economia',    badge_icon: '💎', badge_category: 'compras',    description: 'Economize R$1.000',               threshold: 1000, type: 'saved'    },
   // Exploração
-  { badge_id: 'three_partners', badge_name: 'Explorador de Lojas', badge_icon: '🗺️', badge_category: 'exploracao', description: 'Visite 3 parceiros diferentes', threshold: 3,  type: 'partners' },
-  { badge_id: 'five_partners',  badge_name: 'Globetrotter',        badge_icon: '🌟', badge_category: 'exploracao', description: 'Visite 5 parceiros diferentes', threshold: 5,  type: 'partners' },
-  { badge_id: 'ten_partners',   badge_name: 'Conhecedor',          badge_icon: '🏙️', badge_category: 'exploracao', description: 'Visite 10 parceiros',           threshold: 10, type: 'partners' },
+  { badge_id: 'three_partners',   badge_name: 'Explorador de Lojas',   badge_icon: '🗺️', badge_category: 'exploracao', description: 'Visite 3 parceiros',              threshold: 3,    type: 'partners' },
+  { badge_id: 'five_partners',    badge_name: 'Globetrotter',          badge_icon: '🌟', badge_category: 'exploracao', description: 'Visite 5 parceiros',              threshold: 5,    type: 'partners' },
+  { badge_id: 'ten_partners',     badge_name: 'Conhecedor',            badge_icon: '🏙️', badge_category: 'exploracao', description: 'Visite 10 parceiros',             threshold: 10,   type: 'partners' },
+  { badge_id: 'fifteen_partners', badge_name: 'Viajante Master',       badge_icon: '🌍', badge_category: 'exploracao', description: 'Visite 15 parceiros',             threshold: 15,   type: 'partners' },
   // Indicações
-  { badge_id: 'first_referral', badge_name: 'Primeiro Convite',    badge_icon: '🤝', badge_category: 'indicacoes', description: 'Indique 1 amigo',               threshold: 1,  type: 'referral' },
-  { badge_id: 'five_referrals', badge_name: 'Super Indicador',     badge_icon: '🚀', badge_category: 'indicacoes', description: 'Indique 5 amigos',              threshold: 5,  type: 'referral' },
-  { badge_id: 'top_referrer',   badge_name: 'Top Influencer',      badge_icon: '👑', badge_category: 'indicacoes', description: 'Top 10 do ranking',             threshold: 10, type: 'referral' },
+  { badge_id: 'first_referral',   badge_name: 'Primeiro Convite',      badge_icon: '🤝', badge_category: 'indicacoes', description: 'Indique 1 amigo com sucesso',     threshold: 1,    type: 'referral' },
+  { badge_id: 'five_referrals',   badge_name: 'Super Indicador',       badge_icon: '🚀', badge_category: 'indicacoes', description: 'Indique 5 amigos com sucesso',    threshold: 5,    type: 'referral' },
+  { badge_id: 'ten_referrals',    badge_name: 'Embaixador',            badge_icon: '👑', badge_category: 'indicacoes', description: 'Indique 10 amigos com sucesso',   threshold: 10,   type: 'referral' },
 ];
 
 const CATEGORY_CONFIG = {
@@ -108,10 +114,13 @@ export default function AchievementsTab({ vouchers = [], userEmail }) {
 
   const earnedIds = new Set(earnedBadges.map(b => b.badge_id));
 
+  const totalSaved = usedVouchers.reduce((sum, v) => sum + ((v.original_price || 0) - (v.discount_price || 0)), 0);
+
   const getProgress = (badge) => {
     if (badge.type === 'used') return { progress: usedCount, total: badge.threshold };
     if (badge.type === 'partners') return { progress: uniquePartnersCount, total: badge.threshold };
     if (badge.type === 'referral') return { progress: successfulReferrals, total: badge.threshold };
+    if (badge.type === 'saved') return { progress: Math.floor(totalSaved), total: badge.threshold };
     return { progress: 0, total: 0 };
   };
 
