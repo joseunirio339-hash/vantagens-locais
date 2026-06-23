@@ -490,7 +490,7 @@ export default function Home() {
                     </Button>
                   </Link>
                   <Link to={createPageUrl('PartnerSignup')}>
-                    <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/15 font-semibold whitespace-nowrap">
+                    <Button size="lg" variant="outline" className="border-white/50 text-white bg-transparent hover:bg-white/15 font-semibold whitespace-nowrap">
                       Cadastrar Agora <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </Link>
