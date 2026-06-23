@@ -31,6 +31,7 @@ const plans = [
       '🎁 1º mês GRÁTIS (período de teste)',
       'Acesso a todos os descontos',
       'Geração ilimitada de vouchers',
+      'Acesso a produtos ilimitados',
       'Busca de produtos e lojas',
       'Histórico de compras',
       'Suporte por email'
@@ -44,12 +45,14 @@ const plans = [
     icon: Store,
     color: 'violet',
     features: [
-      'Cadastro de até 20 produtos',
-      'Painel de gestão completo',
-      'Análises de vendas e acessos',
-      'Logo e perfil da loja',
-      'Validação de vouchers',
-      'Suporte prioritário'
+      '📦 Tudo do plano Stander',
+      '+ Cadastro de produtos ilimitados',
+      '+ Painel de gestão completo',
+      '+ Análises de vendas e acessos',
+      '+ Logo e perfil da loja',
+      '+ Validação de vouchers',
+      '+ Roleta de prêmios',
+      '+ Suporte prioritário'
     ]
   },
 ];
