@@ -207,7 +207,7 @@ export default function RepresentativePortal() {
     csv += [commissions.length, (totalEarned + totalPending).toFixed(2).replace('.', ','), totalEarned.toFixed(2).replace('.', ','), totalPending.toFixed(2).replace('.', ',')].join(sep) + '\n\n';
 
     csv += 'DETALHAMENTO POR VENDA\n';
-    csv += ['Data', 'Cliente', 'Plano', 'Valor Plano', 'Comissão (50%)', 'Status'].join(sep) + '\n';
+    csv += ['Data', 'Cliente', 'Plano', 'Valor Plano', 'Comissão (5%)', 'Status'].join(sep) + '\n';
     commissions.forEach(c => {
       const date = c.created_date ? new Date(c.created_date).toLocaleDateString('pt-BR') : '-';
       const price = (c.subscription_price || 0).toFixed(2).replace('.', ',');
@@ -360,7 +360,7 @@ export default function RepresentativePortal() {
               <div className="flex-1">
                 <h3 className="font-semibold text-slate-800">🔗 Seu link de vendas</h3>
                 <p className="text-sm text-slate-500">
-                  Compartilhe com seus clientes. A cada assinatura, você recebe <strong className="text-violet-700">50%</strong> da 1ª mensalidade.
+                  Compartilhe com seus clientes. A cada assinatura, você recebe <strong className="text-violet-700">5%</strong> de comissão.
                 </p>
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
@@ -557,7 +557,7 @@ export default function RepresentativePortal() {
               <div>
                 <h3 className="font-semibold text-slate-800">💵 Extrato de Comissões</h3>
                 <p className="text-sm text-slate-500">
-                  50% sobre a 1ª mensalidade de cada venda fechada pelo seu link
+                  5% de comissão sobre cada venda fechada pelo seu link
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -631,7 +631,7 @@ export default function RepresentativePortal() {
                                 <span className="font-medium text-slate-700">R$ {subscriptionPrice.toFixed(2).replace('.', ',')}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-slate-500">Comissão (50%)</span>
+                                <span className="text-slate-500">Comissão (5%)</span>
                                 <span className="font-medium text-slate-700">R$ {commissionValue.toFixed(2).replace('.', ',')}</span>
                               </div>
                               <div className="border-t pt-1.5 mt-1.5 flex justify-between">

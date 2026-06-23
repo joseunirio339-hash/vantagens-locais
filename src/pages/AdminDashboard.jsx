@@ -146,7 +146,7 @@ export default function AdminDashboard() {
     if (!newRep.name || !newRep.email || !newRep.code) return;
     await base44.entities.Representative.create({
       name: newRep.name, email: newRep.email, phone: newRep.phone,
-      code: newRep.code, commission_percentage: 50,
+      code: newRep.code, commission_percentage: 5,
     });
     setRepFormOpen(false);
     setNewRep({ name: '', email: '', phone: '', code: '' });
@@ -771,7 +771,7 @@ export default function AdminDashboard() {
               <p className="text-xs text-slate-400 mt-1">Link: /rep/{newRep.code || 'CODIGO'}</p>
             </div>
             <p className="text-sm text-stone-600 bg-amber-50 p-3 rounded-lg">
-              Comissão padrão: <strong>50%</strong> sobre a 1ª mensalidade de cada venda
+              Comissão padrão: <strong>5%</strong> sobre cada venda
             </p>
           </div>
           <DialogFooter>

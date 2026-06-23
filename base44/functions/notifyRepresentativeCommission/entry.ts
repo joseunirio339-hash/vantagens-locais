@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
     <div style="background: #f0fdf4; border: 2px dashed #10b981; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
       <p style="color: #059669; font-size: 13px; margin: 0 0 8px; font-weight: 600;">SUA COMISSÃO</p>
       <p style="font-size: 36px; font-weight: 900; color: #065f46; margin: 0;">R$ ${commissionValue}</p>
-      <p style="color: #6b7280; font-size: 12px; margin: 8px 0 0;">50% da 1ª mensalidade</p>
+      <p style="color: #6b7280; font-size: 12px; margin: 8px 0 0;">5% de comissão sobre a venda</p>
     </div>
 
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
         <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">R$ ${planPrice}</td>
       </tr>
       <tr>
-        <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">📊 Sua comissão (50%)</td>
+        <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">📊 Sua comissão (5%)</td>
         <td style="padding: 10px 0; font-weight: 900; color: #059669; font-size: 16px; text-align: right;">R$ ${commissionValue}</td>
       </tr>
     </table>

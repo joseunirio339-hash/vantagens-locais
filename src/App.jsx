@@ -12,6 +12,7 @@ import Cart from './pages/Cart';
 import LoyaltyStore from './pages/LoyaltyStore';
 import SystemReport from './pages/SystemReport';
 import RepresentativeLanding from './pages/RepresentativeLanding';
+import RepresentativePortal from './pages/RepresentativePortal';
 import { CartProvider } from '@/context/CartContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -84,6 +85,7 @@ function App() {
           <NavigationTracker />
           <Routes>
             <Route path="/rep/:code" element={<RepresentativeLanding />} />
+            <Route path="/RepresentativePortal" element={<RepresentativePortal />} />
             <Route path="*" element={<AuthenticatedApp />} />
           </Routes>
         </Router>
