@@ -154,7 +154,9 @@ export default function UserProfile() {
   const [user, setUser] = useState(null);
   const [dbSubs, setDbSubs] = useState([]);
   const [portalLoading, setPortalLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const params = new URLSearchParams(window.location.search);
+  const initialTab = params.get('tab') || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (auth) => {

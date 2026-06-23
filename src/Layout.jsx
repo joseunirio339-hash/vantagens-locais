@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users,
-  MessageCircle, Mail, Camera, Search
+  MessageCircle, Mail, Camera, Search, Heart
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -176,6 +176,12 @@ export default function Layout({ children }) {
                         Meus Vouchers
                       </DropdownMenuItem>
                     </Link>
+                    <Link to="/UserProfile?tab=favorites">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Heart className="w-4 h-4 mr-2" />
+                        Meus Favoritos
+                      </DropdownMenuItem>
+                    </Link>
                     <Link to={createPageUrl('ReferralPage')}>
                       <DropdownMenuItem className="cursor-pointer text-fuchsia-600 font-medium">
                         <Sparkles className="w-4 h-4 mr-2" />
@@ -331,6 +337,7 @@ export default function Layout({ children }) {
               <div className="space-y-2.5">
                 <Link to="/Home" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Início</Link>
                 <Link to="/Partners" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Parceiros</Link>
+                <Link to="/Products" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Produtos</Link>
                 <Link to="/ParceiroContato" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Seja Parceiro</Link>
                 <Link to="/Subscription" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Planos e Preços</Link>
                 <Link to="/LoyaltyStore" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Loja de Fidelidade</Link>
