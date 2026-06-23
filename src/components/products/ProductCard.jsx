@@ -26,7 +26,7 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
       whileHover={{ y: -5, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className="bg-white rounded-2xl border border-stone-200/80 overflow-hidden cursor-pointer transition-all hover:border-amber-200 group"
+      className="bg-[#fefcf8] rounded-3xl border border-amber-100/80 overflow-hidden cursor-pointer transition-all hover:border-amber-300 hover:shadow-lg hover:shadow-amber-100/50 group"
     >
       {/* Image area */}
       <div className="relative aspect-[4/3] bg-stone-100">
@@ -35,33 +35,36 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-900/10 via-transparent to-transparent pointer-events-none" />
             {product.video_url && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <Play className="w-5 h-5 text-amber-600 ml-0.5" />
+                <div className="w-11 h-11 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg shadow-amber-200/30 group-hover:scale-110 transition-transform">
+                  <Play className="w-5 h-5 text-amber-500 ml-0.5" />
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-stone-300">
-            <Tag className="w-10 h-10" />
-            <span className="text-xs font-medium text-stone-400">Sem imagem</span>
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-amber-50 to-orange-50">
+            <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
+              <Tag className="w-6 h-6 text-amber-400" />
+            </div>
+            <span className="text-xs font-medium text-amber-300/80">Em breve</span>
           </div>
         )}
 
         {/* Discount badge */}
-        <div className="absolute top-2.5 left-2.5 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
+        <div className="absolute top-3 left-3 bg-gradient-to-br from-rose-400 to-rose-500 text-white text-[11px] font-semibold px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-md shadow-rose-200/50">
           <Percent className="w-3 h-3" />
-          {discountPercent}% OFF
+          -{discountPercent}%
         </div>
 
         {/* Premium badge */}
         {isPremium && (
-          <div className="absolute top-12 left-2.5 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-            <Sparkles className="w-2.5 h-2.5" /> PREMIUM
+          <div className="absolute top-12 left-3 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-[10px] font-semibold px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-md shadow-amber-200/50">
+            <Sparkles className="w-2.5 h-2.5" /> Premium
           </div>
         )}
 
@@ -97,7 +100,7 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
 
         {/* Price */}
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-lg font-extrabold text-emerald-600">
+          <span className="text-lg font-extrabold text-rose-600">
             R$ {product.discount_price?.toFixed(2).replace('.', ',')}
           </span>
           <span className="text-xs text-stone-400 line-through">
@@ -127,12 +130,12 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
         {/* Add to cart button */}
         <button
           onClick={handleAddToCart}
-          className={`mt-2 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`mt-2.5 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
             added
-              ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-md'
+              ? 'bg-gradient-to-r from-rose-400 to-rose-500 text-white shadow-md shadow-rose-200/40'
               : inCart
-              ? 'bg-amber-50 text-amber-700 border border-amber-200'
-              : 'bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800 border border-amber-200/60'
+              ? 'bg-amber-100 text-amber-800 border border-amber-300'
+              : 'bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-200'
           }`}
         >
           {added ? (
