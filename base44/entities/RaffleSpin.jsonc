@@ -21,6 +21,11 @@
     "prize_won": {
       "type": "string",
       "description": "Pr\u00eamio ganho"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Descri\u00e7\u00e3o opcional"
     }
   },
   "required": [
