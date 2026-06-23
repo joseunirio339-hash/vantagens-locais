@@ -11,6 +11,7 @@ import {
   TrendingDown, ShoppingBag, BadgePercent, Store, Heart, BookOpen, MapPin, Award
 } from 'lucide-react';
 import FavoritesTab from '@/components/profile/FavoritesTab';
+import VoucherHistory from '@/components/profile/VoucherHistory';
 import AchievementsTab from '@/components/gamification/AchievementsTab';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -275,6 +276,11 @@ export default function UserProfile() {
             <TabsTrigger value="vouchers" className="flex-1 gap-1 text-xs sm:text-sm">
               <Ticket className="w-4 h-4" />
               Vouchers
+            </TabsTrigger>
+            <TabsTrigger value="historico" className="flex-1 gap-1 text-xs sm:text-sm">
+              <Receipt className="w-4 h-4" />
+              <span className="hidden sm:inline">Histórico</span>
+              <span className="sm:hidden">Hist.</span>
             </TabsTrigger>
             <TabsTrigger value="favorites" className="flex-1 gap-1 text-xs sm:text-sm">
               <Heart className="w-4 h-4" />
@@ -694,6 +700,11 @@ export default function UserProfile() {
           {/* === CONQUISTAS === */}
           <TabsContent value="conquistas" className="mt-5">
             <AchievementsTab vouchers={vouchers || []} userEmail={user?.email} />
+          </TabsContent>
+
+          {/* === HISTÓRICO === */}
+          <TabsContent value="historico" className="mt-5">
+            <VoucherHistory user={user} />
           </TabsContent>
 
           {/* === FAVORITES === */}
