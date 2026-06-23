@@ -262,7 +262,7 @@ export default function Home() {
             <div className="flex-shrink-0 w-full md:w-72 lg:w-80">
               <div className="relative">
                 <img
-                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/7319561ea_clubemax.png"
+                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/88c9f08fd_ChatGPTImage23dejunde202612_06_47.png"
                   alt="Vantagens Locais — Descontos do Club Max"
                   className="w-full h-56 md:h-72 object-contain rounded-3xl"
                 />
