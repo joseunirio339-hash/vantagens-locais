@@ -1,0 +1,47 @@
+{
+  "name": "Representative",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome completo do representante"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email do representante"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefone/WhatsApp do representante"
+    },
+    "code": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico do link de vendas (ex: MARCOS10)"
+    },
+    "commission_percentage": {
+      "type": "number",
+      "default": 50,
+      "description": "Percentual de comiss\u00e3o sobre a 1\u00aa mensalidade"
+    },
+    "total_earned": {
+      "type": "number",
+      "default": 0,
+      "description": "Total acumulado de comiss\u00f5es recebidas"
+    },
+    "total_sales": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero total de vendas fechadas"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Representante ativo"
+    }
+  },
+  "required": [
+    "name",
+    "email",
+    "code"
+  ]
+}

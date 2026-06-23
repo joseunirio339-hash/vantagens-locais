@@ -67,6 +67,43 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Check for representative commission
+      const repCode = subscription.metadata?.representative_code;
+      if (repCode && isActive) {
+        const reps = await base44.asServiceRole.entities.Representative.filter({ code: repCode, is_active: true });
+        if (reps.length > 0) {
+          const rep = reps[0];
+          const subPrice = subscription.items.data[0]?.price?.unit_amount / 100 || 0;
+          const commissionAmount = subPrice * (rep.commission_percentage / 100);
+
+          // Check if commission already exists for this session
+          const existingCommissions = await base44.asServiceRole.entities.RepresentativeCommission.filter({
+            stripe_session_id: subscription.id
+          });
+
+          if (existingCommissions.length === 0 && commissionAmount > 0) {
+            await base44.asServiceRole.entities.RepresentativeCommission.create({
+              representative_id: rep.id,
+              representative_name: rep.name,
+              customer_email: userEmail,
+              subscription_type: subscriptionType,
+              subscription_price: subPrice,
+              commission_amount: commissionAmount,
+              status: 'pending',
+              stripe_session_id: subscription.id,
+            });
+
+            // Update rep totals
+            await base44.asServiceRole.entities.Representative.update(rep.id, {
+              total_sales: (rep.total_sales || 0) + 1,
+              total_earned: (rep.total_earned || 0) + commissionAmount,
+            });
+
+            console.log(`Commission created: ${rep.name} earned R$ ${commissionAmount.toFixed(2)} from ${userEmail}`);
+          }
+        }
+      }
+
       console.log(`Subscription ${subscription.id} processed for ${userEmail} (${subscriptionType})`);
     }
 

@@ -1,0 +1,50 @@
+{
+  "name": "RepresentativeCommission",
+  "type": "object",
+  "properties": {
+    "representative_id": {
+      "type": "string",
+      "description": "ID do representante"
+    },
+    "representative_name": {
+      "type": "string",
+      "description": "Nome do representante (snapshot)"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Email do cliente que assinou"
+    },
+    "subscription_type": {
+      "type": "string",
+      "description": "Tipo do plano assinado (user, stander, lojista, partner)"
+    },
+    "subscription_price": {
+      "type": "number",
+      "description": "Valor da 1\u00aa mensalidade paga"
+    },
+    "commission_amount": {
+      "type": "number",
+      "description": "Valor da comiss\u00e3o calculada"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Status da comiss\u00e3o"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "description": "ID da sess\u00e3o Stripe"
+    }
+  },
+  "required": [
+    "representative_id",
+    "representative_name",
+    "customer_email",
+    "commission_amount"
+  ]
+}

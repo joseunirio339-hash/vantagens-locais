@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -184,12 +184,20 @@ export default function Layout({ children }) {
                       </>
                     )}
                     {user.role === 'admin' && (
-                      <Link to={createPageUrl('AdminDashboard')}>
-                        <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
-                          <ShieldAlert className="w-4 h-4 mr-2" />
-                          Painel Admin
-                        </DropdownMenuItem>
-                      </Link>
+                      <>
+                        <Link to={createPageUrl('AdminDashboard')}>
+                          <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
+                            <ShieldAlert className="w-4 h-4 mr-2" />
+                            Painel Admin
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link to={createPageUrl('RepresentativesDashboard')}>
+                          <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
+                            <Users className="w-4 h-4 mr-2" />
+                            Representantes
+                          </DropdownMenuItem>
+                        </Link>
+                      </>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 

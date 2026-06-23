@@ -11,6 +11,7 @@ import UserProfile from './pages/UserProfile';
 import Cart from './pages/Cart';
 import LoyaltyStore from './pages/LoyaltyStore';
 import SystemReport from './pages/SystemReport';
+import RepresentativeLanding from './pages/RepresentativeLanding';
 import { CartProvider } from '@/context/CartContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -81,7 +82,10 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
-          <AuthenticatedApp />
+          <Routes>
+            <Route path="/rep/:code" element={<RepresentativeLanding />} />
+            <Route path="*" element={<AuthenticatedApp />} />
+          </Routes>
         </Router>
         <Toaster />
       </QueryClientProvider>

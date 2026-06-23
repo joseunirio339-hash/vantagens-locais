@@ -65,6 +65,9 @@ import ReferralLanding from './pages/ReferralLanding';
 import Leaderboard from './pages/Leaderboard';
 import ParceiroContato from './pages/ParceiroContato';
 import SystemReport from './pages/SystemReport';
+import RepresentativesDashboard from './pages/RepresentativesDashboard';
+import RepresentativePortal from './pages/RepresentativePortal';
+import RepresentativeLanding from './pages/RepresentativeLanding';
 import __Layout from './Layout.jsx';
 
 
@@ -87,6 +90,9 @@ export const PAGES = {
     "Leaderboard": Leaderboard,
     "ParceiroContato": ParceiroContato,
     "SystemReport": SystemReport,
+    "RepresentativesDashboard": RepresentativesDashboard,
+    "RepresentativePortal": RepresentativePortal,
+    "RepresentativeLanding": RepresentativeLanding,
 }
 
 export const pagesConfig = {

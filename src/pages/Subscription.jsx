@@ -63,6 +63,10 @@ export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [existingSubscriptions, setExistingSubscriptions] = useState([]);
 
+  // Captura código do representante da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const representativeCode = urlParams.get('rep');
+
   useEffect(() => {
     const loadData = async () => {
       const isAuth = await base44.auth.isAuthenticated();
@@ -132,7 +136,8 @@ export default function Subscription() {
 
       // Redireciona para checkout do Stripe
       const response = await base44.functions.invoke('stripeCheckout', {
-        subscriptionType: planType
+        subscriptionType: planType,
+        ...(representativeCode ? { representative_code: representativeCode } : {})
       });
 
       if (response.data.isIframe) {

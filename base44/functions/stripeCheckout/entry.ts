@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { subscriptionType } = body;
+    const { subscriptionType, representative_code } = body;
 
     if (!subscriptionType || !PRICE_MAP[subscriptionType]) {
       return Response.json({ error: 'Invalid subscription type' }, { status: 400 });
@@ -46,6 +46,7 @@ Deno.serve(async (req) => {
         base44_app_id: Deno.env.get("BASE44_APP_ID"),
         user_email: user.email,
         subscription_type: subscriptionType,
+        ...(representative_code ? { representative_code } : {}),
       },
     });
 
