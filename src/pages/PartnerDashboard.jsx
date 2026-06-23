@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { 
   Store, Package, Eye, Ticket, TrendingUp, 
-  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, Gift, CalendarDays
+  Settings, BarChart3, AlertTriangle, Star, ShoppingBag, QrCode, ChevronDown, Gift, CalendarDays, CreditCard
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import StampCardsManager from '@/components/loyalty/StampCardsManager';
 import ExportSalesButton from '@/components/partner/ExportSalesButton';
 import NewsPostManager from '@/components/news/NewsPostManager';
 import PartnerStatsPanel from '@/components/partner/PartnerStatsPanel';
+import SubscriptionBillingPanel from '@/components/partner/SubscriptionBillingPanel';
 import { Megaphone } from 'lucide-react';
 
 export default function PartnerDashboard() {
@@ -331,6 +332,10 @@ export default function PartnerDashboard() {
               <Megaphone className="w-4 h-4" />
               Novidades
             </TabsTrigger>
+            <TabsTrigger value="billing" className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Faturamento
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -411,6 +416,13 @@ export default function PartnerDashboard() {
 
           <TabsContent value="news">
             <NewsPostManager partner={partner} />
+          </TabsContent>
+
+          <TabsContent value="billing">
+            <SubscriptionBillingPanel 
+              subscription={subscription} 
+              userEmail={user?.email}
+            />
           </TabsContent>
 
           <TabsContent value="settings">

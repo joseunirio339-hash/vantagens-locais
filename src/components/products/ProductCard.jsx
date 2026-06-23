@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import FavoriteButton from './FavoriteButton';
 import { useCart } from '@/context/CartContext';
 
-export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount, isFavorite, onToggleFavorite }) {
+export default function ProductCard({ product, partner, onClick, showViews = false, avgRating, reviewCount, isFavorite, onToggleFavorite, isPremium = false }) {
   const { addItem, items } = useCart();
   const [added, setAdded] = React.useState(false);
   const inCart = items.some(i => i.product.id === product.id);
@@ -54,6 +54,12 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
           <Percent className="w-3 h-3" />
           {discountPercent}% OFF
         </div>
+        {/* Premium badge - top left below discount */}
+        {isPremium && (
+          <div className="absolute top-12 left-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg">
+            <Sparkles className="w-2.5 h-2.5" /> PREMIUM
+          </div>
+        )}
         {/* Favorite button - top right */}
         {onToggleFavorite && (
           <div className="absolute top-3 right-3">

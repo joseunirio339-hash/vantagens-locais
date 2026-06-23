@@ -71,8 +71,19 @@ export default function Products() {
     queryFn: () => base44.entities.Product.filter({ is_active: true })
   });
 
+  // Detect Premium partners (active lojista subscriptions)
+  const { data: premiumSubs = [] } = useQuery({
+    queryKey: ['premiumSubs'],
+    queryFn: () => base44.entities.Subscription.filter({ type: 'lojista', status: 'active' })
+  });
+
   const activePartnerIds = partners.map(p => p.id);
   const activeProducts = products.filter(p => activePartnerIds.includes(p.partner_id));
+
+  const premiumPartnerIds = useMemo(() => {
+    const premiumEmails = new Set(premiumSubs.map(s => s.user_email));
+    return new Set(partners.filter(p => premiumEmails.has(p.owner_email)).map(p => p.id));
+  }, [premiumSubs, partners]);
 
   const cities = React.useMemo(() => {
     return Array.from(new Set(partners.filter(p => p.city).map(p => p.city))).sort();
@@ -312,6 +323,7 @@ export default function Products() {
                 onClick={() => handleProductClick(product)}
                 isFavorite={favoriteIds.has(product.id)}
                 onToggleFavorite={user ? () => toggleFavorite(product, partners.find(p => p.id === product.partner_id)) : undefined}
+                isPremium={premiumPartnerIds.has(product.partner_id)}
               />
             ))}
           </div>

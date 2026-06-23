@@ -81,6 +81,14 @@ export default function Partners() {
     queryFn: () => base44.entities.Review.list()
   });
 
+  // Detect Premium partners
+  const { data: premiumSubs = [] } = useQuery({
+    queryKey: ['premiumSubscriptions'],
+    queryFn: () => base44.entities.Subscription.filter({ type: 'lojista', status: 'active' })
+  });
+
+  const premiumEmails = useMemo(() => new Set(premiumSubs.map(s => s.user_email)), [premiumSubs]);
+
   // Build avg rating map
   const avgRatings = {};
   reviews.forEach(r => {
@@ -360,6 +368,7 @@ export default function Partners() {
                     isFavorite={favPartnerIds.has(partner.id)}
                     onToggleFavorite={user ? () => togglePartnerFav(partner.id) : undefined}
                     distanceKm={distKm}
+                    isPremium={premiumEmails.has(partner.owner_email)}
                   />
                 </Link>
               );

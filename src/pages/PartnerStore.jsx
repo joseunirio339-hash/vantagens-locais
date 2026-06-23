@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
-import { MapPin, Phone, Tag, ArrowLeft, Star, Gift } from 'lucide-react';
+import { MapPin, Phone, Tag, ArrowLeft, Star, Gift, Sparkles } from 'lucide-react';
 import PartnerLocationMap from '@/components/partners/PartnerLocationMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -204,9 +204,16 @@ export default function PartnerStore() {
 
             <div className="flex-1">
               <div className="flex items-start gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold text-slate-800">
-                  {partner.business_name}
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-slate-800">
+                    {partner.business_name}
+                  </h1>
+                  {isPartnerPremium && (
+                    <span className="text-xs bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-full px-2.5 py-1 flex items-center gap-1 font-bold shadow-md">
+                      <Sparkles className="w-3 h-3" /> PREMIUM
+                    </span>
+                  )}
+                </div>
                 {partner.category && (
                   <Badge variant="secondary">
                     {categoryLabels[partner.category]}
@@ -273,6 +280,7 @@ export default function PartnerStore() {
                 onClick={() => handleProductClick(product)}
                 avgRating={avgRating}
                 reviewCount={reviews.length}
+                isPremium={isPartnerPremium}
               />
             ))}
           </div>

@@ -3,6 +3,7 @@ import { MapPin, Tag, Star, Navigation } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import PartnerFavoriteButton from './PartnerFavoriteButton';
+import { Sparkles } from 'lucide-react';
 
 const categoryLabels = {
   restaurante: 'Restaurante', moda: 'Moda', eletronicos: 'Eletrônicos',
@@ -23,7 +24,7 @@ const categoryColors = {
   outros: 'bg-slate-100 text-slate-700'
 };
 
-export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick, isFavorite, onToggleFavorite, distanceKm }) {
+export default function PartnerCard({ partner, productCount = 0, avgRating = 0, reviewCount = 0, onClick, isFavorite, onToggleFavorite, distanceKm, isPremium = false }) {
   const isEmpreendedor = partner?.partner_type === 'empreendedor';
   const distanceLabel = distanceKm != null
     ? (distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m` : `${distanceKm.toFixed(1)}km`)
@@ -63,6 +64,11 @@ export default function PartnerCard({ partner, productCount = 0, avgRating = 0, 
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <h3 className="font-semibold text-slate-800 truncate">{partner.business_name}</h3>
+              {isPremium && (
+                <span className="text-[10px] bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-full px-2 py-0.5 whitespace-nowrap flex-shrink-0 flex items-center gap-0.5 font-bold">
+                  <Sparkles className="w-2.5 h-2.5" /> PREMIUM
+                </span>
+              )}
               {isEmpreendedor && (
                 <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-1.5 py-0.5 whitespace-nowrap flex-shrink-0">🤝 Autônomo</span>
               )}
