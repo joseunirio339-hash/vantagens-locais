@@ -4,7 +4,8 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
-  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users
+  CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users,
+  MessageCircle, Mail, Camera
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -58,7 +59,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
@@ -68,11 +69,11 @@ export default function Layout({ children }) {
               <img
                 src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/188f1bafc_clubemax.png"
                 alt="Descontos do Club Max"
-                className="w-10 h-10 rounded-xl object-cover shadow-md"
+                className="w-10 h-10 rounded-2xl object-cover"
               />
               <div className="hidden sm:flex flex-col leading-none">
-                <span className="font-black text-sm text-slate-800 tracking-tight">Descontos do Club Max</span>
-                <span className="text-xs text-slate-400 font-medium">Vantagens Locais</span>
+                <span className="font-extrabold text-sm text-stone-800 tracking-tight">Descontos do Club Max</span>
+                <span className="text-[11px] text-stone-400 font-medium">Vantagens Locais</span>
               </div>
             </Link>
 
@@ -86,8 +87,8 @@ export default function Layout({ children }) {
                     to={createPageUrl(item.href)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                       isActive(item.href)
-                        ? 'bg-violet-100 text-violet-700'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'text-stone-600 hover:bg-stone-100'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -100,10 +101,10 @@ export default function Layout({ children }) {
             {/* User Menu */}
             <div className="flex items-center gap-3">
               {/* Cart Icon */}
-              <Link to="/Cart" className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors">
-                <ShoppingCart className="w-5 h-5 text-slate-600" />
+              <Link to="/Cart" className="relative p-2 rounded-xl hover:bg-stone-100 transition-colors">
+                <ShoppingCart className="w-5 h-5 text-stone-600" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-fuchsia-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {totalItems > 9 ? '9+' : totalItems}
                   </span>
                 )}
@@ -113,21 +114,21 @@ export default function Layout({ children }) {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-semibold text-emerald-700">
+                      <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-amber-700">
                           {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
                         </span>
                       </div>
-                      <span className="hidden sm:block text-sm font-medium text-slate-700">
+                      <span className="hidden sm:block text-sm font-medium text-stone-700">
                         {user.full_name?.split(' ')[0] || 'Usuário'}
                       </span>
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-stone-400" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="px-2 py-1.5">
                       <p className="text-sm font-medium">{user.full_name}</p>
-                      <p className="text-xs text-slate-500">{user.email}</p>
+                      <p className="text-xs text-stone-400">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
                     <Link to="/UserProfile">
@@ -151,7 +152,7 @@ export default function Layout({ children }) {
                     <Link to="/LoyaltyStore">
                       <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
                         <Gift className="w-4 h-4 mr-2" />
-                        Loja de Fidelidade 🪙
+                        Loja de Fidelidade
                       </DropdownMenuItem>
                     </Link>
 
@@ -212,7 +213,7 @@ export default function Layout({ children }) {
               ) : (
                 <Button
                   onClick={() => base44.auth.redirectToLogin()}
-                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white border-0"
+                  className="bg-amber-500 hover:bg-amber-600 text-white border-0"
                 >
                   <User className="w-4 h-4 mr-2" />
                   Entrar
@@ -249,8 +250,8 @@ export default function Layout({ children }) {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors flex items-center gap-3 ${
                       isActive(item.href)
-                        ? 'bg-violet-100 text-violet-700'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'text-stone-600 hover:bg-stone-100'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -270,65 +271,69 @@ export default function Layout({ children }) {
       <FloatingWhatsApp />
 
       {/* Footer */}
-      <footer className="bg-slate-900 mt-auto text-white">
-        <div className="max-w-6xl mx-auto px-4 py-10">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+      <footer className="bg-stone-900 mt-auto text-white">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-3 gap-10 mb-10">
             {/* Brand */}
             <div>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-4">
                 <img
                   src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/188f1bafc_clubemax.png"
                   alt="Descontos do Club Max"
-                  className="w-10 h-10 rounded-xl object-cover shadow"
+                  className="w-11 h-11 rounded-2xl object-cover"
                 />
-                <div className="flex flex-col leading-none">
-                  <span className="font-black text-lg tracking-tight">Descontos do Club Max</span>
-                  <span className="text-xs text-slate-400">Vantagens Locais</span>
+                <div className="flex flex-col leading-tight">
+                  <span className="font-extrabold text-lg tracking-tight text-white">Descontos do Club Max</span>
+                  <span className="text-xs text-stone-400 font-medium">Vantagens Locais</span>
                 </div>
               </div>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Vantagens Locais reúne ofertas de lojistas parceiros. Encontre descontos e vouchers via CPF.
+              <p className="text-stone-400 text-sm leading-relaxed">
+                Conectamos você aos melhores descontos da sua região. 
+                São centenas de lojistas parceiros com ofertas exclusivas pra você economizar de verdade.
               </p>
             </div>
             {/* Links */}
             <div>
-              <p className="font-semibold text-slate-300 mb-3 text-sm uppercase tracking-wide">Links</p>
-              <div className="space-y-2">
-                <Link to="/Home" className="block text-sm text-slate-400 hover:text-white transition-colors">Início</Link>
-                <Link to="/Partners" className="block text-sm text-slate-400 hover:text-white transition-colors">Parceiros</Link>
-                <Link to="/ParceiroContato" className="block text-sm text-slate-400 hover:text-white transition-colors">Seja Parceiro</Link>
-                <Link to="/Subscription" className="block text-sm text-slate-400 hover:text-white transition-colors">Planos e Preços</Link>
-                <Link to="/LoyaltyStore" className="block text-sm text-slate-400 hover:text-white transition-colors">Loja de Fidelidade 🪙</Link>
+              <p className="font-semibold text-stone-300 mb-4 text-sm">Navegue</p>
+              <div className="space-y-2.5">
+                <Link to="/Home" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Início</Link>
+                <Link to="/Partners" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Parceiros</Link>
+                <Link to="/ParceiroContato" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Seja Parceiro</Link>
+                <Link to="/Subscription" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Planos e Preços</Link>
+                <Link to="/LoyaltyStore" className="block text-sm text-stone-400 hover:text-amber-400 transition-colors">Loja de Fidelidade</Link>
               </div>
             </div>
             {/* Contato */}
             <div>
-              <p className="font-semibold text-slate-300 mb-3 text-sm uppercase tracking-wide">Contato</p>
-              <div className="space-y-2">
+              <p className="font-semibold text-stone-300 mb-4 text-sm">Fale com a gente</p>
+              <div className="space-y-3">
                 <a href="https://wa.me/5521997914496" target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-                  <span>💬</span> (21) 99791-4496 (WhatsApp)
+                  className="flex items-center gap-2.5 text-sm text-emerald-400 hover:text-emerald-300 transition-colors group">
+                  <MessageCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  (21) 99791-4496
                 </a>
                 <a href="mailto:clubemaxdescontos@gmail.com"
-                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>✉️</span> clubemaxdescontos@gmail.com
+                  className="flex items-center gap-2.5 text-sm text-stone-400 hover:text-amber-400 transition-colors group">
+                  <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  clubemaxdescontos@gmail.com
                 </a>
                 <a href="https://instagram.com/clubemaxdescontos" target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                  <span>📸</span> @clubemaxdescontos
+                  className="flex items-center gap-2.5 text-sm text-stone-400 hover:text-amber-400 transition-colors group">
+                  <Camera className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  @clubemaxdescontos
                 </a>
               </div>
             </div>
           </div>
-          <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Vantagens Locais — Descontos do Club Max. Todos os direitos reservados.
+          <div className="border-t border-stone-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-sm text-stone-500">
+              © {new Date().getFullYear()} Descontos do Club Max · Feito com carinho pra você economizar
             </p>
-            <div className="flex gap-4">
-              <Link to="/PrivacyPolicy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                Política de Privacidade
+            <div className="flex gap-5">
+              <Link to="/PrivacyPolicy" className="text-xs text-stone-500 hover:text-stone-300 transition-colors">
+                Privacidade
               </Link>
-              <Link to="/TermsOfUse" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+              <Link to="/TermsOfUse" className="text-xs text-stone-500 hover:text-stone-300 transition-colors">
                 Termos de Uso
               </Link>
             </div>
