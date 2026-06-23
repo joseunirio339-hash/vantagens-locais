@@ -29,6 +29,7 @@ import ExportSalesButton from '@/components/partner/ExportSalesButton';
 import NewsPostManager from '@/components/news/NewsPostManager';
 import PartnerStatsPanel from '@/components/partner/PartnerStatsPanel';
 import SubscriptionBillingPanel from '@/components/partner/SubscriptionBillingPanel';
+import PremiumMetricsPanel from '@/components/partner/PremiumMetricsPanel';
 import { Megaphone } from 'lucide-react';
 
 export default function PartnerDashboard() {
@@ -282,6 +283,13 @@ export default function PartnerDashboard() {
 
         <PartnerStatsPanel vouchers={vouchers} products={products} views={views} />
 
+        <PremiumMetricsPanel
+          products={products}
+          views={views}
+          vouchers={vouchers}
+          isPremium={isPremium}
+        />
+
         <FinancialPanel vouchers={vouchers} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -362,7 +370,7 @@ export default function PartnerDashboard() {
 
           <TabsContent value="sales">
             <div className="flex justify-end mb-4">
-              <ExportSalesButton vouchers={vouchers} products={products} partnerName={partner?.business_name} />
+              <ExportSalesButton vouchers={vouchers} products={products} views={views} partnerName={partner?.business_name} />
             </div>
             <SalesOverview vouchers={vouchers} products={products} />
           </TabsContent>

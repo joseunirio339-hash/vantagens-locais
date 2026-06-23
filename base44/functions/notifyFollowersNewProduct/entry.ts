@@ -44,12 +44,17 @@ Deno.serve(async (req) => {
 
     console.log(`Notifying ${favorites.length} followers of ${partner.business_name} about new product: ${product.name}`);
 
-    // 1. Create in-app notifications for all followers
+    // Build WhatsApp link if partner has WhatsApp Business enabled
+    const whatsappLink = partner.whatsapp_business_enabled && partner.whatsapp_business_number
+      ? `\n\n💬 Fale direto com a loja: https://wa.me/${partner.whatsapp_business_number.replace(/[\s\+\-\(\)]/g, '')}`
+      : '';
+
+    // Create in-app notifications for each follower
     const notifications = favorites.map(fav => ({
       user_email: fav.user_email,
       type: 'new_coupon',
       title: `🛍️ Novo desconto em ${partner.business_name}!`,
-      message: `${product.name} por apenas R$ ${product.discount_price.toFixed(2).replace('.', ',')} — ${discountPct}% OFF. Corra para garantir!`,
+      message: `${product.name} por apenas R$ ${product.discount_price.toFixed(2).replace('.', ',')} — ${discountPct}% OFF. Corra para garantir!${whatsappLink}`,
       reference_id: product.id,
       is_read: false,
     }));
@@ -58,7 +63,17 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.UserNotification.bulkCreate(notifications);
     }
 
-    // 2. Send emails to followers (up to 50)
+    // Build WhatsApp button for email when available
+    const whatsappEmailButton = partner.whatsapp_business_enabled && partner.whatsapp_business_number
+      ? `<div style="text-align: center; margin-top: 12px;">
+           <a href="https://wa.me/${partner.whatsapp_business_number.replace(/[\s\+\-\(\)]/g, '')}"
+              style="background: #25D366; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">
+             💬 Falar com a loja no WhatsApp
+           </a>
+         </div>`
+      : '';
+
+    // Send emails to followers (up to 50)
     const emailTargets = favorites.slice(0, 50);
     const emailPromises = emailTargets.map(fav =>
       base44.asServiceRole.integrations.Core.SendEmail({
@@ -90,6 +105,7 @@ Deno.serve(async (req) => {
                   Ver Desconto Agora →
                 </a>
               </div>
+              ${whatsappEmailButton}
               <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 20px;">
                 Você recebeu este e-mail pois segue ${partner.business_name} no Clube Max Descontos.
               </p>
@@ -101,72 +117,11 @@ Deno.serve(async (req) => {
 
     await Promise.all(emailPromises);
 
-    // 3. WhatsApp notifications — only if partner has WhatsApp Business enabled
-    let whatsappSent = 0;
-    if (partner.whatsapp_business_enabled && partner.whatsapp_business_number) {
-      const accessToken = Deno.env.get('WHATSAPP_ACCESS_TOKEN');
-      const phoneNumberId = Deno.env.get('WHATSAPP_PHONE_NUMBER_ID');
-
-      if (accessToken && phoneNumberId) {
-        // Get follower users to find those with phone numbers
-        const followerEmails = favorites.map(f => f.user_email).filter(Boolean);
-        
-        // Fetch users by email to get their phone numbers (if stored)
-        const allUsers = await base44.asServiceRole.entities.User.list();
-        const followerUsers = allUsers.filter(u => followerEmails.includes(u.email));
-        
-        // For WhatsApp, we'd need user phone numbers. Since User entity doesn't have phone,
-        // we send WhatsApp only to followers who have provided their phone via updateMe or similar.
-        // For now, we can notify via WhatsApp using the partner's own number as a fallback,
-        // or we can skip WhatsApp if no user phones are available.
-        
-        // Attempt to send WhatsApp to followers who have phone data stored
-        const whatsappMsg = `🛍️ *Novo desconto em ${partner.business_name}!*\n\n` +
-          `${product.name}\n` +
-          `De R$ ${product.original_price.toFixed(2).replace('.', ',')} por R$ ${product.discount_price.toFixed(2).replace('.', ',')}\n` +
-          `${discountPct}% OFF — Aproveite!\n\n` +
-          `👉 Acesse o app Clube Max Descontos para garantir seu voucher.`;
-
-        // Send to followers who have phone in their user data
-        const followerPhones = followerUsers
-          .filter(u => u.phone)
-          .map(u => u.phone)
-          .slice(0, 20); // Max 20 WhatsApp messages per batch
-
-        for (const phone of followerPhones) {
-          try {
-            const cleanPhone = phone.replace(/[\s\+\-\(\)]/g, '');
-            await fetch(
-              `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
-              {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${accessToken}`,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  messaging_product: 'whatsapp',
-                  recipient_type: 'individual',
-                  to: cleanPhone,
-                  type: 'text',
-                  text: { preview_url: false, body: whatsappMsg },
-                }),
-              }
-            );
-            whatsappSent++;
-          } catch (e) {
-            console.warn(`WhatsApp failed for ${phone}:`, e.message);
-          }
-        }
-      }
-    }
-
-    console.log(`Successfully notified ${favorites.length} followers (${whatsappSent} via WhatsApp)`);
+    console.log(`Successfully notified ${favorites.length} followers`);
 
     return Response.json({
       success: true,
       notified: favorites.length,
-      whatsapp_sent: whatsappSent,
       partner: partner.business_name,
       product: product.name,
       discount: `${discountPct}%`
