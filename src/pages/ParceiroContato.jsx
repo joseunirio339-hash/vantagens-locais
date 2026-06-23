@@ -109,7 +109,7 @@ Mensagem: ${form.mensagem || '(sem mensagem)'}
               </Button>
             </a>
             <Link to={createPageUrl('PartnerSignup')}>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 font-semibold px-8">
+              <Button size="lg" className="bg-white text-violet-700 hover:bg-violet-50 font-bold shadow-xl px-8">
                 Cadastrar Meu Negócio
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
