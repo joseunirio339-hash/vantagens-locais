@@ -28,13 +28,10 @@ const plans = [
     icon: Crown,
     color: 'amber',
     features: [
-      '🎁 1º mês GRÁTIS (período de teste)',
-      'Acesso a todos os descontos',
-      'Geração ilimitada de vouchers',
-      'Acesso a produtos ilimitados',
-      'Busca de produtos e lojas',
-      'Histórico de compras',
-      'Suporte por email'
+      'Roleta de gamificação para lojistas',
+      'Validação de vouchers',
+      'Logo e perfil da loja',
+      'Análises de vendas e acessos'
     ]
   },
   {
@@ -46,15 +43,14 @@ const plans = [
     color: 'violet',
     features: [
       '📦 Tudo do plano Stander',
-      '+ Cadastro de produtos ilimitados',
-      '+ Auto gestão do sistema',
-      '+ Métricas e análises de vendas',
-      '+ Vídeo do produto (5 segundos)',
-      '+ Painel de gestão completo',
-      '+ Logo e perfil da loja',
-      '+ Validação de vouchers',
-      '+ Roleta de prêmios',
-      '+ Suporte prioritário'
+      '+ 🎁 1º mês GRÁTIS (período de teste)',
+      '+ Acesso a todos os descontos',
+      '+ Geração ilimitada de vouchers',
+      '+ Busca de produtos e lojas',
+      '+ Histórico de compras',
+      '+ Suporte por email',
+      '+ Suporte prioritário',
+      '+ Painel de gestão completo'
     ]
   },
 ];
@@ -190,7 +186,7 @@ export default function Subscription() {
 
              const descriptions = {
                user: 'Para consumidores que querem economizar',
-               stander: 'Para consumidores que querem economizar',
+               stander: 'Para lojistas estabelecidos com CNPJ',
                lojista: 'Para lojistas estabelecidos com CNPJ'
              };
 
