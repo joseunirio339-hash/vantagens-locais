@@ -66,7 +66,7 @@ export default function Layout({ children }) {
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
               <img
-                src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/25b0beae9_image.png"
+                src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/7319561ea_clubemax.png"
                 alt="Descontos do Club Max"
                 className="w-10 h-10 rounded-xl object-cover shadow-md"
               />
@@ -269,7 +269,7 @@ export default function Layout({ children }) {
             <div>
               <div className="flex items-center gap-3 mb-3">
                 <img
-                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/25b0beae9_image.png"
+                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/7319561ea_clubemax.png"
                   alt="Descontos do Club Max"
                   className="w-10 h-10 rounded-xl object-cover shadow"
                 />
