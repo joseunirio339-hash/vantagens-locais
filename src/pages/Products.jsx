@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductCard from '@/components/products/ProductCard';
+import FeaturedVideoStrip from '@/components/products/FeaturedVideoStrip';
 import VoucherModal from '@/components/voucher/VoucherModal';
 import { useFavorites } from '@/hooks/useFavorites';
 
@@ -257,6 +258,21 @@ export default function Products() {
             </div>
           </div>
         )}
+
+        {/* Destaque de Vídeos Premium */}
+        {(() => {
+          const videoProducts = filteredProducts.filter(p => p.video_url);
+          if (videoProducts.length > 0) {
+            return (
+              <FeaturedVideoStrip
+                products={videoProducts}
+                partners={partners}
+                onProductClick={handleProductClick}
+              />
+            );
+          }
+          return null;
+        })()}
 
         {/* Filtro de ordenação */}
         <div className="flex justify-end mb-6">
