@@ -19,6 +19,11 @@ export default function AdminDashboard() {
   const [authLoading, setAuthLoading] = useState(true);
   const [searchPartner, setSearchPartner] = useState('');
   const [searchSub, setSearchSub] = useState('');
+  const [searchUser, setSearchUser] = useState('');
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('user');
+  const [inviting, setInviting] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -82,6 +87,36 @@ export default function AdminDashboard() {
     toast.success('Parceiro excluído!');
   };
 
+  // User management
+  const inviteUser = async () => {
+    if (!inviteEmail || !inviteRole) return;
+    setInviting(true);
+    try {
+      await base44.users.inviteUser(inviteEmail.trim().toLowerCase(), inviteRole);
+      toast.success(`Convite enviado para ${inviteEmail}!`);
+      setInviteEmail('');
+      setInviteRole('user');
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    } catch (e) {
+      toast.error('Erro ao enviar convite: ' + (e.message || 'Tente novamente.'));
+    }
+    setInviting(false);
+  };
+
+  const updateUserRole = async (u, role) => {
+    await base44.entities.User.update(u.id, { role });
+    setEditingUserId(null);
+    queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    toast.success(`Função de ${u.full_name || u.email} alterada para ${role}!`);
+  };
+
+  const deleteUser = async (u) => {
+    if (!confirm(`Excluir usuário "${u.full_name || u.email}"? Esta ação não pode ser desfeita.`)) return;
+    await base44.entities.User.delete(u.id);
+    queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    toast.success('Usuário excluído!');
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -97,6 +132,12 @@ export default function AdminDashboard() {
 
   const filteredSubs = subscriptions.filter(s =>
     s.user_email?.toLowerCase().includes(searchSub.toLowerCase())
+  );
+
+  const filteredUsers = appUsers.filter(u =>
+    !searchUser ||
+    u.full_name?.toLowerCase().includes(searchUser.toLowerCase()) ||
+    u.email?.toLowerCase().includes(searchUser.toLowerCase())
   );
 
   const statusColor = {
@@ -302,27 +343,91 @@ export default function AdminDashboard() {
           {/* USUÁRIOS */}
           <TabsContent value="users">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Usuários Cadastrados ({appUsers.length})</CardTitle>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <CardTitle className="text-base">Usuários ({filteredUsers.length})</CardTitle>
+                  <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input className="pl-9 h-8 text-sm" placeholder="Buscar por nome ou email..." value={searchUser} onChange={e => setSearchUser(e.target.value)} />
+                  </div>
+                </div>
               </CardHeader>
+
+              {/* Invite form */}
+              <div className="px-6 py-4 bg-violet-50/50 border-y border-violet-100">
+                <p className="text-sm font-semibold text-violet-800 mb-3">Convidar novo usuário</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Input
+                    type="email"
+                    placeholder="email@exemplo.com"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    className="h-9 text-sm flex-1"
+                    onKeyDown={e => e.key === 'Enter' && inviteUser()}
+                  />
+                  <Select value={inviteRole} onValueChange={setInviteRole}>
+                    <SelectTrigger className="h-9 w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Usuário</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={inviteUser} disabled={!inviteEmail || inviting} className="bg-violet-600 hover:bg-violet-700 h-9">
+                    {inviting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                    Convidar
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">O usuário receberá um email para criar a conta. Admins têm acesso total ao painel.</p>
+              </div>
+
               <CardContent className="p-0">
                 <div className="divide-y">
-                  {appUsers.map(u => (
+                  {filteredUsers.map(u => (
                     <div key={u.id} className="px-6 py-3 flex items-center justify-between gap-3 hover:bg-slate-50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-sm font-bold text-violet-700">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-sm font-bold text-violet-700 flex-shrink-0">
                           {u.full_name?.charAt(0)?.toUpperCase() || '?'}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-slate-800">{u.full_name || '—'}</p>
-                          <p className="text-xs text-slate-500">{u.email}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-800 truncate">{u.full_name || '—'}</p>
+                          <p className="text-xs text-slate-500 truncate">{u.email}</p>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs capitalize">{u.role || 'user'}</Badge>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {editingUserId === u.id ? (
+                          <div className="flex items-center gap-1">
+                            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => updateUserRole(u, 'user')}>
+                              Usuário
+                            </Button>
+                            <Button size="sm" className="h-7 text-xs bg-violet-600 hover:bg-violet-700" onClick={() => updateUserRole(u, 'admin')}>
+                              Admin
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 text-xs text-slate-400" onClick={() => setEditingUserId(null)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <Badge variant={u.role === 'admin' ? 'default' : 'outline'} className={`text-xs ${u.role === 'admin' ? 'bg-violet-600' : ''}`}>
+                              {u.role === 'admin' ? 'Admin' : 'Usuário'}
+                            </Badge>
+                            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingUserId(u.id)}>
+                              <Edit2 className="w-3 h-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500 hover:bg-red-50" onClick={() => deleteUser(u)}>
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   ))}
-                  {appUsers.length === 0 && (
-                    <div className="py-12 text-center text-slate-400">Nenhum usuário encontrado</div>
+                  {filteredUsers.length === 0 && (
+                    <div className="py-12 text-center text-slate-400">
+                      {appUsers.length === 0 ? 'Nenhum usuário cadastrado' : 'Nenhum usuário encontrado com este filtro'}
+                    </div>
                   )}
                 </div>
               </CardContent>
