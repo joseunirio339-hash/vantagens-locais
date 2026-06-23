@@ -169,6 +169,15 @@ export default function Subscription() {
           </p>
         </div>
 
+        {/* Seção para Lojistas e Empreendedores */}
+        <div className="max-w-5xl mx-auto mb-10">
+          <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 border border-amber-200 rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-slate-800 mb-2">Para Lojistas e Empreendedores</h2>
+            <p className="text-3xl font-black text-amber-600 mb-1">Seu negócio aqui! 🚀</p>
+            <p className="text-lg text-slate-600">Alcance centenas de consumidores locais. Planos a partir de R$99,99/mês.</p>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
            {plans.map(plan => {
              const sub = getSubscriptionStatus(plan.type);
