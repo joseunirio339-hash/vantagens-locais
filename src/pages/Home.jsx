@@ -317,10 +317,13 @@ export default function Home() {
         {/* Location Filter */}
         <LocationFilter
           partners={partners}
+          products={activeProducts}
           selectedCity={selectedCity}
           selectedNeighborhood={selectedNeighborhood}
           onCityChange={setSelectedCity}
           onNeighborhoodChange={setSelectedNeighborhood}
+          avgRatings={avgRatings}
+          productCounts={productCounts}
         />
 
         {/* Novidades dos Parceiros */}
