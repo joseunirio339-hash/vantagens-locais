@@ -25,22 +25,33 @@ export default function Layout({ children }) {
   const [isPartner, setIsPartner] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [headerSearch, setHeaderSearch] = useState('');
+  const [authLoaded, setAuthLoaded] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
+    let cancelled = false;
     const loadUser = async () => {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
+      try {
+        const isAuth = await base44.auth.isAuthenticated();
+        if (!isAuth || cancelled) return;
         const currentUser = await base44.auth.me();
+        if (cancelled) return;
         setUser(currentUser);
-
-        const partners = await base44.entities.Partner.filter({
-          owner_email: currentUser.email
-        });
-        setIsPartner(partners.length > 0);
+        try {
+          const partners = await base44.entities.Partner.filter({
+            owner_email: currentUser.email
+          });
+          if (!cancelled) setIsPartner(partners.length > 0);
+        } catch (e) {
+          // Partner check failed silently — user still logged in without partner menu
+        }
+      } catch (e) {
+        // Rate limit / network error — user stays logged out until next page reload
       }
+      if (!cancelled) setAuthLoaded(true);
     };
     loadUser();
+    return () => { cancelled = true; };
   }, []);
 
   const handleLogout = () => {
@@ -130,7 +141,9 @@ export default function Layout({ children }) {
                 )}
               </Link>
               {user && <UserNotificationBell user={user} />}
-              {user ? (
+              {!authLoaded ? (
+                <div className="w-8 h-8 rounded-full bg-stone-200 animate-pulse" />
+              ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2">
