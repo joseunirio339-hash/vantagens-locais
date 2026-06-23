@@ -47,8 +47,10 @@ const plans = [
     features: [
       '📦 Tudo do plano Stander',
       '+ Cadastro de produtos ilimitados',
+      '+ Auto gestão do sistema',
+      '+ Métricas e análises de vendas',
+      '+ Vídeo do produto (5 segundos)',
       '+ Painel de gestão completo',
-      '+ Análises de vendas e acessos',
       '+ Logo e perfil da loja',
       '+ Validação de vouchers',
       '+ Roleta de prêmios',
