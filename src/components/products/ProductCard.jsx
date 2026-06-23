@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Percent, Eye, Star, Sparkles, ShoppingCart, Check } from 'lucide-react';
+import { Tag, Percent, Eye, Star, Sparkles, ShoppingCart, Check, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import FavoriteButton from './FavoriteButton';
@@ -30,11 +30,20 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
     >
       <div className="relative aspect-square bg-slate-100">
         {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          <div className="w-full h-full relative">
+            <img
+              src={product.image_url}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            {product.video_url && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                  <Play className="w-5 h-5 text-violet-600 ml-0.5" />
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Tag className="w-12 h-12 text-slate-300" />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Pencil, Trash2, Image, Package, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image, Package, Loader2, Video, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { toast } from 'sonner';
 import ProductCard from '@/components/products/ProductCard';
 
-export default function ProductManagement({ partner, products, isBlocked, onUpdate }) {
+export default function ProductManagement({ partner, products, isBlocked, isPremium, onUpdate }) {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -19,12 +19,15 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
     name: '',
     description: '',
     image_url: '',
+    video_url: '',
     original_price: '',
     discount_price: '',
     is_active: true
   });
 
-  const MAX_PRODUCTS = 20;
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+
+  const MAX_PRODUCTS = isPremium ? Infinity : 20;
   const canAddMore = products.length < MAX_PRODUCTS;
 
   const resetForm = () => {
@@ -32,6 +35,7 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
       name: '',
       description: '',
       image_url: '',
+      video_url: '',
       original_price: '',
       discount_price: '',
       is_active: true
@@ -45,6 +49,7 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
       name: product.name || '',
       description: product.description || '',
       image_url: product.image_url || '',
+      video_url: product.video_url || '',
       original_price: product.original_price?.toString() || '',
       discount_price: product.discount_price?.toString() || '',
       is_active: product.is_active !== false
@@ -75,6 +80,7 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
       name: formData.name,
       description: formData.description,
       image_url: formData.image_url,
+      video_url: formData.video_url || undefined,
       original_price: original,
       discount_price: discount,
       discount_percentage: Math.round(((original - discount) / original) * 100),
@@ -114,13 +120,51 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
     toast.success('Imagem enviada!');
   };
 
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate duration
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.src = URL.createObjectURL(file);
+
+    await new Promise((resolve, reject) => {
+      video.onloadedmetadata = () => {
+        if (video.duration > 5) {
+          toast.error('O vídeo deve ter no máximo 5 segundos');
+          URL.revokeObjectURL(video.src);
+          reject(new Error('Video too long'));
+        } else {
+          resolve();
+        }
+      };
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        reject(new Error('Invalid video'));
+      };
+    }).catch(() => {
+      setUploadingVideo(false);
+      return;
+    });
+
+    setUploadingVideo(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    URL.revokeObjectURL(video.src);
+    setFormData(prev => ({ ...prev, video_url: file_url }));
+    setUploadingVideo(false);
+    toast.success('Vídeo enviado!');
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Produtos ({products.length}/{MAX_PRODUCTS})</CardTitle>
+          <CardTitle>
+            Produtos ({products.length}{isPremium ? '' : `/${MAX_PRODUCTS}`})
+          </CardTitle>
           <p className="text-sm text-slate-500 mt-1">
-            Gerencie seus produtos com desconto
+            Gerencie seus produtos com desconto{isPremium ? ' — ilimitados' : ''}
           </p>
         </div>
         <Button
@@ -227,6 +271,53 @@ export default function ProductManagement({ partner, products, isBlocked, onUpda
                 className="hidden"
               />
             </div>
+
+            {/* Video Upload (Premium only) */}
+            {isPremium && (
+              <div className="space-y-2">
+                <Label>Vídeo do Produto <span className="text-xs text-violet-500 font-normal">(Premium — máx. 5s)</span></Label>
+                <div className="relative w-full aspect-video rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-violet-300 hover:border-violet-500 transition-colors cursor-pointer"
+                  onClick={() => document.getElementById('product-video-input').click()}
+                >
+                  {formData.video_url ? (
+                    <>
+                      <video
+                        src={formData.video_url}
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <p className="text-white font-medium text-sm flex items-center gap-2">
+                          <Video className="w-4 h-4" /> Trocar vídeo
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center p-6">
+                      {uploadingVideo ? (
+                        <Loader2 className="w-10 h-10 text-violet-400 mx-auto animate-spin" />
+                      ) : (
+                        <>
+                          <Video className="w-10 h-10 text-violet-400 mx-auto mb-2" />
+                          <p className="text-sm text-slate-500 font-medium">Clique para adicionar vídeo</p>
+                          <p className="text-xs text-slate-400 mt-1">MP4 até 5 segundos</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <input
+                  id="product-video-input"
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  onChange={handleVideoUpload}
+                  className="hidden"
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="name">Nome do Produto *</Label>

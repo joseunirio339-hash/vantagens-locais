@@ -18,6 +18,10 @@
       "type": "string",
       "description": "URL da imagem do produto"
     },
+    "video_url": {
+      "type": "string",
+      "description": "URL do v\u00eddeo do produto (at\u00e9 5 segundos, Premium)"
+    },
     "category": {
       "type": "string",
       "enum": [

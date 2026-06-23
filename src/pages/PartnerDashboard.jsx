@@ -140,7 +140,7 @@ export default function PartnerDashboard() {
     {
       label: 'Produtos',
       value: products.length,
-      max: 20,
+      
       icon: Package,
       color: 'emerald'
     },
@@ -342,6 +342,7 @@ export default function PartnerDashboard() {
               partner={partner} 
               products={products}
               isBlocked={isBlocked}
+              isPremium={isPremium}
               onUpdate={() => queryClient.invalidateQueries(['partnerProducts'])}
             />
           </TabsContent>

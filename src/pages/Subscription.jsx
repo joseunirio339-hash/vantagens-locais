@@ -48,6 +48,8 @@ const plans = [
       '+ Geração ilimitada de vouchers',
       '+ Busca de produtos e lojas',
       '+ Histórico de compras',
+      '+ Vídeo do produto (5 segundos)',
+      '+ Produtos ilimitados',
       '+ Suporte por email',
       '+ Suporte prioritário',
       '+ Painel de gestão completo'
