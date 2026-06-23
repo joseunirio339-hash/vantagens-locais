@@ -10,8 +10,7 @@
       "type": "string",
       "enum": [
         "user",
-        "partner",
-        "empreendedor"
+        "partner"
       ],
       "description": "Tipo de assinatura"
     },
@@ -42,7 +41,7 @@
     },
     "partner_id": {
       "type": "string",
-      "description": "ID do parceiro (se for assinatura de parceiro ou empreendedor)"
+      "description": "ID do parceiro (se for assinatura de parceiro)"
     },
     "is_trial": {
       "type": "boolean",

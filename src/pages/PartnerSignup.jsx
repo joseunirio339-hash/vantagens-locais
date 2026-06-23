@@ -173,8 +173,7 @@ export default function PartnerSignup() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-3">
               {[
-                { value: 'lojista', label: 'Lojista', desc: 'Tenho CNPJ' },
-                { value: 'empreendedor', label: 'Empreendedor', desc: 'Sem CNPJ' },
+                { value: 'lojista', label: 'Lojista', desc: 'Com CNPJ' },
               ].map(opt => (
                 <button
                   key={opt.value}

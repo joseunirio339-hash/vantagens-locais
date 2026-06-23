@@ -340,7 +340,7 @@ export default function EntrepreneurVoucherModal({
             {/* Instrução */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
               <p className="text-xs text-amber-700 text-center">
-                Apresente os códigos ao empreendedor e informe seu CPF para usar o desconto
+                Apresente os códigos ao lojista e informe seu CPF para usar o desconto
               </p>
               {partner?.phone && (
                 <p className="text-xs text-amber-600 text-center mt-1 flex items-center justify-center gap-1">

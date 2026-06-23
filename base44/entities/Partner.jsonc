@@ -38,11 +38,10 @@
     "partner_type": {
       "type": "string",
       "enum": [
-        "lojista",
-        "empreendedor"
+        "lojista"
       ],
       "default": "lojista",
-      "description": "Tipo de parceiro: lojista (com CNPJ) ou empreendedor individual (sem CNPJ)"
+      "description": "Tipo de parceiro: lojista (com CNPJ)"
     },
     "address": {
       "type": "string",

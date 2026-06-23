@@ -41,22 +41,6 @@ const plans = [
       'Suporte prioritário'
     ]
   },
-  {
-    type: 'empreendedor',
-    name: 'Empreendedor',
-    price: 29.99,
-    period: 'mês',
-    icon: Sparkles,
-    color: 'amber',
-    features: [
-      'Para autônomos e microempresas',
-      'Cadastro de até 10 produtos',
-      'Painel simplificado',
-      'Análises básicas',
-      'Perfil da loja',
-      'Validação de vouchers'
-    ]
-  }
 ];
 
 export default function Subscription() {
@@ -171,7 +155,7 @@ export default function Subscription() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
            {plans.map(plan => {
              const sub = getSubscriptionStatus(plan.type);
              const isActive = sub?.status === 'active';
@@ -190,7 +174,6 @@ export default function Subscription() {
 
              const descriptions = {
                user: 'Para consumidores que querem economizar',
-               empreendedor: 'Autônomos e empreendedores individuais',
                lojista: 'Para lojistas estabelecidos com CNPJ'
              };
 
