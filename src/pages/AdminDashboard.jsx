@@ -23,9 +23,10 @@ export default function AdminDashboard() {
   const [searchPartner, setSearchPartner] = useState('');
   const [searchSub, setSearchSub] = useState('');
   const [searchUser, setSearchUser] = useState('');
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('user');
-  const [inviting, setInviting] = useState(false);
+  const [createEmail, setCreateEmail] = useState('');
+  const [createPassword, setCreatePassword] = useState('');
+  const [createRole, setCreateRole] = useState('user');
+  const [creating, setCreating] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
   // Reps state
   const [repFormOpen, setRepFormOpen] = useState(false);
@@ -106,20 +107,33 @@ export default function AdminDashboard() {
     toast.success('Parceiro excluído!');
   };
 
-  // User management
-  const inviteUser = async () => {
-    if (!inviteEmail || !inviteRole) return;
-    setInviting(true);
+  // User management — direct creation with email + password
+  const createUser = async () => {
+    if (!createEmail || !createPassword || !createRole) return;
+    setCreating(true);
     try {
-      await base44.users.inviteUser(inviteEmail.trim().toLowerCase(), inviteRole);
-      toast.success(`Convite enviado para ${inviteEmail}!`);
-      setInviteEmail('');
-      setInviteRole('user');
+      await base44.auth.register({
+        email: createEmail.trim().toLowerCase(),
+        password: createPassword
+      });
+      // Small delay to ensure user record is created
+      await new Promise(r => setTimeout(r, 1500));
+      // Update role if needed
+      if (createRole !== 'user') {
+        const users = await base44.entities.User.filter({ email: createEmail.trim().toLowerCase() });
+        if (users.length > 0) {
+          await base44.entities.User.update(users[0].id, { role: createRole });
+        }
+      }
+      toast.success(`Usuário ${createEmail} criado com sucesso!`);
+      setCreateEmail('');
+      setCreatePassword('');
+      setCreateRole('user');
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     } catch (e) {
-      toast.error('Erro ao enviar convite: ' + (e.message || 'Tente novamente.'));
+      toast.error('Erro ao criar usuário: ' + (e.message || 'Tente novamente.'));
     }
-    setInviting(false);
+    setCreating(false);
   };
 
   const updateUserRole = async (u, role) => {
@@ -445,19 +459,26 @@ export default function AdminDashboard() {
                 </div>
               </CardHeader>
 
-              {/* Invite form */}
+              {/* Create user form */}
               <div className="px-6 py-4 bg-amber-50/50 border-y border-amber-100">
-                <p className="text-sm font-semibold text-amber-800 mb-3">Convidar novo usuário</p>
+                <p className="text-sm font-semibold text-amber-800 mb-3">Criar novo usuário</p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Input
                     type="email"
                     placeholder="email@exemplo.com"
-                    value={inviteEmail}
-                    onChange={e => setInviteEmail(e.target.value)}
+                    value={createEmail}
+                    onChange={e => setCreateEmail(e.target.value)}
                     className="h-9 text-sm flex-1"
-                    onKeyDown={e => e.key === 'Enter' && inviteUser()}
                   />
-                  <Select value={inviteRole} onValueChange={setInviteRole}>
+                  <Input
+                    type="password"
+                    placeholder="Senha"
+                    value={createPassword}
+                    onChange={e => setCreatePassword(e.target.value)}
+                    className="h-9 text-sm w-full sm:w-40"
+                    onKeyDown={e => e.key === 'Enter' && createUser()}
+                  />
+                  <Select value={createRole} onValueChange={setCreateRole}>
                     <SelectTrigger className="h-9 w-32">
                       <SelectValue />
                     </SelectTrigger>
@@ -466,12 +487,12 @@ export default function AdminDashboard() {
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button onClick={inviteUser} disabled={!inviteEmail || inviting} className="bg-amber-500 hover:bg-amber-600 h-9">
-                    {inviting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
-                    Convidar
+                  <Button onClick={createUser} disabled={!createEmail || !createPassword || creating} className="bg-amber-500 hover:bg-amber-600 h-9">
+                    {creating ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                    Criar
                   </Button>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">O usuário receberá um email para criar a conta. Admins têm acesso total ao painel.</p>
+                <p className="text-xs text-slate-500 mt-2">O usuário será criado com o email e senha fornecidos. Um código de verificação será enviado automaticamente.</p>
               </div>
 
               <CardContent className="p-0">
