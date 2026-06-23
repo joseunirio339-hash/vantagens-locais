@@ -18,6 +18,7 @@ import NearbyPartnersMap from '@/components/home/NearbyPartnersMap';
 import LeaderboardTop10 from '@/components/referral/LeaderboardTop10';
 import HomeBadgesWidget from '@/components/badges/HomeBadgesWidget';
 import TopRatedPartners from '@/components/home/TopRatedPartners';
+import MonthlyPurchaseRanking from '@/components/home/MonthlyPurchaseRanking';
 import { useFavorites } from '@/hooks/useFavorites';
 import { usePartnerFavorites } from '@/hooks/usePartnerFavorites';
 import NewsFeed from '@/components/news/NewsFeed';
@@ -422,6 +423,13 @@ export default function Home() {
         {!searchTerm && (
           <section className="mb-12">
             <LeaderboardTop10 />
+          </section>
+        )}
+
+        {/* Ranking de Compras do Mês */}
+        {!searchTerm && (
+          <section className="mb-12">
+            <MonthlyPurchaseRanking />
           </section>
         )}
 
