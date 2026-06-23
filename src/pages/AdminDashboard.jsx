@@ -5,12 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Users, Store, Ticket, CreditCard, Search, CheckCircle,
   XCircle, Clock, Loader2, ShieldAlert, TrendingUp, BarChart2,
-  Trash2, Edit2, RefreshCw
+  Trash2, Edit2, RefreshCw, Plus, Copy, Check, Trophy, Medal, Crown, Star, ExternalLink, DollarSign
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,6 +26,10 @@ export default function AdminDashboard() {
   const [inviteRole, setInviteRole] = useState('user');
   const [inviting, setInviting] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
+  // Reps state
+  const [repFormOpen, setRepFormOpen] = useState(false);
+  const [newRep, setNewRep] = useState({ name: '', email: '', phone: '', code: '' });
+  const [copiedCode, setCopiedCode] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -59,6 +65,18 @@ export default function AdminDashboard() {
   const { data: appUsers = [] } = useQuery({
     queryKey: ['admin-users'],
     queryFn: () => base44.entities.User.list('-created_date', 200),
+    enabled: !!user
+  });
+
+  const { data: reps = [], isLoading: repsLoading } = useQuery({
+    queryKey: ['admin-representatives'],
+    queryFn: () => base44.entities.Representative.list('-created_date', 50),
+    enabled: !!user
+  });
+
+  const { data: repCommissions = [] } = useQuery({
+    queryKey: ['admin-repCommissions'],
+    queryFn: () => base44.entities.RepresentativeCommission.list('-created_date', 200),
     enabled: !!user
   });
 
@@ -116,6 +134,72 @@ export default function AdminDashboard() {
     queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     toast.success('Usuário excluído!');
   };
+
+  // Representative helpers
+  const generateCode = (name) => {
+    const clean = name.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const random = Math.floor(Math.random() * 90 + 10);
+    return clean.substring(0, 10) + random;
+  };
+
+  const handleCreateRep = async () => {
+    if (!newRep.name || !newRep.email || !newRep.code) return;
+    await base44.entities.Representative.create({
+      name: newRep.name, email: newRep.email, phone: newRep.phone,
+      code: newRep.code, commission_percentage: 50,
+    });
+    setRepFormOpen(false);
+    setNewRep({ name: '', email: '', phone: '', code: '' });
+    queryClient.invalidateQueries({ queryKey: ['admin-representatives'] });
+    toast.success('Representante criado!');
+  };
+
+  const handleToggleRep = async (rep) => {
+    await base44.entities.Representative.update(rep.id, { is_active: !rep.is_active });
+    queryClient.invalidateQueries({ queryKey: ['admin-representatives'] });
+    toast.success(`Representante ${rep.is_active ? 'desativado' : 'ativado'}!`);
+  };
+
+  const handleDeleteRep = async (rep) => {
+    if (!confirm(`Remover ${rep.name}?`)) return;
+    await base44.entities.Representative.delete(rep.id);
+    queryClient.invalidateQueries({ queryKey: ['admin-representatives'] });
+    toast.success('Representante removido!');
+  };
+
+  const markCommPaid = async (c) => {
+    await base44.entities.RepresentativeCommission.update(c.id, { status: 'paid' });
+    queryClient.invalidateQueries({ queryKey: ['admin-repCommissions'] });
+    toast.success('Comissão baixada!');
+  };
+
+  const markCommPending = async (c) => {
+    await base44.entities.RepresentativeCommission.update(c.id, { status: 'pending' });
+    queryClient.invalidateQueries({ queryKey: ['admin-repCommissions'] });
+    toast.success('Comissão estornada!');
+  };
+
+  const copyRepLink = (code) => {
+    const link = `https://vantagens-locais-app.base44.app/rep/${code}`;
+    navigator.clipboard.writeText(link);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  // Rep stats
+  const repTotalSales = reps.reduce((s, r) => s + (r.total_sales || 0), 0);
+  const repTotalEarned = reps.reduce((s, r) => s + (r.total_earned || 0), 0);
+  const pendingCommissions = repCommissions.filter(c => c.status === 'pending');
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthlyComms = repCommissions.filter(c => c.created_date >= monthStart);
+  const repRanking = reps.map(r => {
+    const rm = monthlyComms.filter(c => c.representative_id === r.id);
+    return { ...r, monthlyTotal: rm.reduce((s, c) => s + (c.commission_amount || 0), 0), monthlyCount: rm.length };
+  }).sort((a, b) => b.monthlyTotal - a.monthlyTotal);
+  const monthName = now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const rankIcons = [Crown, Medal, Star];
+  const rankColors = ['bg-amber-400', 'bg-slate-300', 'bg-amber-700'];
 
   if (authLoading) {
     return (
@@ -202,6 +286,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-1">
               <Users className="w-4 h-4" /> Usuários
+            </TabsTrigger>
+            <TabsTrigger value="representatives" className="flex items-center gap-1">
+              <Users className="w-4 h-4" /> Representantes
             </TabsTrigger>
           </TabsList>
 
@@ -433,8 +520,268 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* REPRESENTANTES */}
+          <TabsContent value="representatives">
+            <div className="space-y-6">
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { label: 'Representantes', value: reps.length, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+                  { label: 'Total de Vendas', value: repTotalSales, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                  { label: 'Comissões a Pagar', value: `R$ ${repTotalEarned.toFixed(2).replace('.', ',')}`, icon: DollarSign, color: 'text-amber-600', bg: 'bg-amber-50' },
+                  { label: 'Comissão Padrão', value: '50%', icon: Star, color: 'text-violet-600', bg: 'bg-violet-50' },
+                ].map((m, i) => {
+                  const Icon = m.icon;
+                  return (
+                    <Card key={i}>
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg ${m.bg} flex items-center justify-center flex-shrink-0`}>
+                          <Icon className={`w-5 h-5 ${m.color}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-lg font-bold text-slate-800 truncate">{m.value}</p>
+                          <p className="text-xs text-slate-500">{m.label}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Ranking Mensal */}
+              {repRanking.some(r => r.monthlyTotal > 0) && (
+                <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Trophy className="w-5 h-5 text-amber-500" />
+                      Ranking de Vendas — {monthName}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {repRanking.map((rep, idx) => {
+                        const RankIcon = idx < 3 ? rankIcons[idx] : null;
+                        const rankBg = idx < 3 ? rankColors[idx] : 'bg-slate-100';
+                        const rankText = idx < 3 ? 'text-white' : 'text-slate-500';
+                        return (
+                          <div key={rep.id} className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-white/60">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${rankBg} ${rankText}`}>
+                              {RankIcon ? <RankIcon className="w-4 h-4" /> : idx + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-slate-800 text-sm truncate">{rep.name}</p>
+                              <p className="text-xs text-slate-400">{rep.monthlyCount} venda{rep.monthlyCount !== 1 ? 's' : ''} no mês</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="font-bold text-amber-700 text-sm">R$ {rep.monthlyTotal.toFixed(2).replace('.', ',')}</p>
+                              <p className="text-xs text-slate-400">em comissões</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Comissões Pendentes */}
+              {pendingCommissions.length > 0 && (
+                <Card className="border-amber-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Clock className="w-5 h-5 text-amber-500" />
+                      Comissões Pendentes de Baixa ({pendingCommissions.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {pendingCommissions.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)).map(c => {
+                        const repName = reps.find(r => r.id === c.representative_id)?.name || c.representative_name;
+                        return (
+                          <div key={c.id} className="flex items-center justify-between gap-3 py-2 px-3 bg-white rounded-lg border">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm text-slate-800">{repName}</span>
+                                <span className="text-xs text-slate-400">·</span>
+                                <span className="text-xs text-slate-500 truncate">{c.customer_email}</span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
+                                <span>{({user:'Usuário',stander:'Stander',lojista:'Lojista',partner:'Parceiro'})[c.subscription_type] || c.subscription_type}</span>
+                                <span>·</span>
+                                <span>R$ {c.subscription_price?.toFixed(2).replace('.', ',')}</span>
+                                {c.created_date && (<><span>·</span><span>{new Date(c.created_date).toLocaleDateString('pt-BR')}</span></>)}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="font-bold text-amber-600 text-sm">R$ {c.commission_amount.toFixed(2).replace('.', ',')}</span>
+                              <Button size="sm" onClick={() => markCommPaid(c)} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 text-xs">
+                                <CheckCircle className="w-3 h-3 mr-1" /> Dar Baixa
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Lista de Representantes */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Representantes ({reps.length})</CardTitle>
+                    <Button size="sm" onClick={() => setRepFormOpen(true)} className="bg-violet-600 hover:bg-violet-700 h-8 text-xs">
+                      <Plus className="w-3 h-3 mr-1" /> Novo
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {repsLoading ? (
+                    <div className="p-4 space-y-3">
+                      {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+                    </div>
+                  ) : reps.length === 0 ? (
+                    <div className="py-12 text-center text-slate-400">Nenhum representante cadastrado</div>
+                  ) : (
+                    <div className="divide-y">
+                      {reps.map(rep => {
+                        const rc = repCommissions.filter(c => c.representative_id === rep.id);
+                        const rcPaid = rc.filter(c => c.status === 'paid').reduce((s, c) => s + c.commission_amount, 0);
+                        return (
+                          <div key={rep.id} className={`px-4 py-3 ${!rep.is_active ? 'opacity-50' : ''}`}>
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-xs font-bold text-violet-700 flex-shrink-0">
+                                  {rep.name?.charAt(0)?.toUpperCase() || '?'}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="font-semibold text-sm text-slate-800 truncate">{rep.name}</p>
+                                    <Badge variant={rep.is_active ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
+                                      {rep.is_active ? 'Ativo' : 'Inativo'}
+                                    </Badge>
+                                    {rep.total_sales > 0 && (
+                                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-emerald-600 border-emerald-300">
+                                        {rep.total_sales} venda{rep.total_sales !== 1 ? 's' : ''}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-slate-500 truncate">{rep.email}{rep.phone ? ` · ${rep.phone}` : ''}</p>
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    <code className="text-[11px] bg-violet-50 text-violet-700 px-1.5 py-0.5 rounded font-mono">/rep/{rep.code}</code>
+                                    <button onClick={() => copyRepLink(rep.code)} className="text-slate-400 hover:text-violet-600">
+                                      {copiedCode === rep.code ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                                    </button>
+                                    <a href={`/rep/${rep.code}`} target="_blank" rel="noopener" className="text-slate-400 hover:text-violet-600">
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="text-right hidden sm:block">
+                                  <p className="text-xs text-slate-400">Comissões pagas</p>
+                                  <p className="font-bold text-emerald-600 text-sm">R$ {rcPaid.toFixed(2).replace('.', ',')}</p>
+                                </div>
+                                <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => handleToggleRep(rep)}>
+                                  {rep.is_active ? 'Desativar' : 'Ativar'}
+                                </Button>
+                                <Button variant="ghost" size="sm" className="h-7 text-xs text-red-500 hover:bg-red-50" onClick={() => handleDeleteRep(rep)}>
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            {rc.length > 0 && (
+                              <div className="mt-2 pt-2 border-t">
+                                <div className="space-y-1">
+                                  {rc.slice(0, 5).map(c => (
+                                    <div key={c.id} className="flex items-center justify-between gap-2 text-xs">
+                                      <span className="text-slate-600 truncate max-w-[160px]">{c.customer_email}</span>
+                                      <span className="text-slate-400 hidden sm:inline">{({user:'Usuário',stander:'Stander',lojista:'Lojista',partner:'Parceiro'})[c.subscription_type] || c.subscription_type}</span>
+                                      <span className="font-semibold text-emerald-600">R$ {c.commission_amount.toFixed(2).replace('.', ',')}</span>
+                                      <Badge variant={c.status === 'paid' ? 'default' : 'secondary'} className="text-[10px]">{c.status === 'paid' ? 'Pago' : 'Pendente'}</Badge>
+                                      {c.status === 'pending' ? (
+                                        <Button variant="ghost" size="sm" onClick={() => markCommPaid(c)} className="text-emerald-600 h-6 px-1 text-[11px]"><CheckCircle className="w-3 h-3 mr-0.5" />Baixa</Button>
+                                      ) : (
+                                        <Button variant="ghost" size="sm" onClick={() => markCommPending(c)} className="text-amber-600 h-6 px-1 text-[11px]">Estornar</Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  {rc.length > 5 && <p className="text-xs text-slate-400 text-center">+{rc.length - 5} comissões</p>}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialog: Novo Representante */}
+      <Dialog open={repFormOpen} onOpenChange={setRepFormOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo Representante</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Nome completo *</label>
+              <Input
+                value={newRep.name}
+                onChange={e => {
+                  const name = e.target.value;
+                  setNewRep(prev => ({ ...prev, name, code: prev.code || generateCode(name) }));
+                }}
+                placeholder="Ex: Marcos Silva"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Email *</label>
+              <Input
+                type="email"
+                value={newRep.email}
+                onChange={e => setNewRep(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="marcos@email.com"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">WhatsApp</label>
+              <Input
+                value={newRep.phone}
+                onChange={e => setNewRep(prev => ({ ...prev, phone: e.target.value }))}
+                placeholder="(21) 99999-9999"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Código do link *</label>
+              <Input
+                value={newRep.code}
+                onChange={e => setNewRep(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                placeholder="MARCOS10"
+              />
+              <p className="text-xs text-slate-400 mt-1">Link: /rep/{newRep.code || 'CODIGO'}</p>
+            </div>
+            <p className="text-sm text-slate-500 bg-violet-50 p-3 rounded-lg">
+              💰 Comissão padrão: <strong>50%</strong> sobre a 1ª mensalidade de cada venda
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRepFormOpen(false)}>Cancelar</Button>
+            <Button onClick={handleCreateRep} disabled={!newRep.name || !newRep.email || !newRep.code}
+              className="bg-violet-600 hover:bg-violet-700">
+              Criar Representante
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
