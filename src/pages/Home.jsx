@@ -252,7 +252,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link to={createPageUrl('Products')}>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/15 font-semibold text-base px-8">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white bg-transparent hover:bg-white/15 font-semibold text-base px-8">
                     Conhecer as Ofertas
                   </Button>
                 </Link>
