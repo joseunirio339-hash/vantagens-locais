@@ -209,7 +209,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <div className="relative overflow-hidden" style={{background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 40%, #ec4899 80%, #f97316 100%)'}}>
+      <div className="relative overflow-hidden" style={{background: 'linear-gradient(135deg, #FF9C45 0%, #FF527C 50%, #e04070 100%)'}}>
         {/* Decorative circles */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
@@ -220,15 +220,15 @@ export default function Home() {
             <div className="flex-1 text-center md:text-left">
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-5 border border-white/30">
                 <Sparkles className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm font-semibold text-white">🛍️ Descontos reais no comércio local</span>
+                <span className="text-sm font-semibold text-white">🛍️ Vantagens Locais</span>
               </div>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight leading-none">
-                <span className="text-white drop-shadow-lg">Clube Max</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight leading-tight">
+                <span className="text-white drop-shadow-lg">Descontos do</span>
                 <br />
-                <span className="text-yellow-300 drop-shadow-lg">conectando descontos a você</span>
+                <span className="text-yellow-300 drop-shadow-lg">Club Max</span>
               </h1>
               <p className="text-base md:text-lg text-white/90 max-w-xl mb-8 font-medium leading-relaxed">
-                Economize em restaurantes, beleza, moda e muito mais — tudo perto de você 🔥
+                Vantagens Locais reúne ofertas de lojistas parceiros. Encontre descontos e vouchers via CPF. Comerciantes divulgam produtos e gerenciam vendas.
               </p>
 
               {/* Stats bar */}
@@ -258,9 +258,9 @@ export default function Home() {
             <div className="flex-shrink-0 w-full md:w-72 lg:w-80">
               <div className="relative">
                 <img
-                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/e7d12a3df_generated_image.png"
-                  alt="Família feliz com compras"
-                  className="w-full h-56 md:h-72 object-cover rounded-3xl shadow-2xl border-4 border-white/30"
+                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/25b0beae9_image.png"
+                  alt="Vantagens Locais — Descontos do Club Max"
+                  className="w-full h-56 md:h-72 object-contain rounded-3xl"
                 />
                 {/* Floating badge */}
                 <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-2.5 shadow-xl border border-slate-100">
@@ -464,7 +464,7 @@ export default function Home() {
         {/* CTA Lojistas */}
         {!searchTerm && (
           <section className="mt-12">
-            <div className="relative overflow-hidden rounded-3xl" style={{background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%)'}}>
+            <div className="relative overflow-hidden rounded-3xl" style={{background: 'linear-gradient(135deg, #FF9C45 0%, #FF527C 100%)'}}>
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
               <div className="relative px-8 py-10 md:py-12 flex flex-col md:flex-row items-center gap-6 justify-between">
                 <div className="text-center md:text-left">

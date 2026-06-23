@@ -65,12 +65,14 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to={createPageUrl('Home')} className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-black text-lg tracking-tight">C</span>
-              </div>
+              <img
+                src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/25b0beae9_image.png"
+                alt="Descontos do Club Max"
+                className="w-10 h-10 rounded-xl object-cover shadow-md"
+              />
               <div className="hidden sm:flex flex-col leading-none">
-                <span className="font-black text-sm text-slate-800 tracking-tight">Clube Max</span>
-                <span className="text-xs text-slate-400 font-medium">Conectando descontos a você</span>
+                <span className="font-black text-sm text-slate-800 tracking-tight">Descontos do Club Max</span>
+                <span className="text-xs text-slate-400 font-medium">Vantagens Locais</span>
               </div>
             </Link>
 
@@ -266,16 +268,18 @@ export default function Layout({ children }) {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow">
-                  <span className="text-white font-black text-lg tracking-tight">C</span>
-                </div>
+                <img
+                  src="https://media.base44.com/images/public/6996317474c6e4e8fab2245f/25b0beae9_image.png"
+                  alt="Descontos do Club Max"
+                  className="w-10 h-10 rounded-xl object-cover shadow"
+                />
                 <div className="flex flex-col leading-none">
-                  <span className="font-black text-lg tracking-tight">Clube Max</span>
-                  <span className="text-xs text-slate-400">Conectando descontos a você</span>
+                  <span className="font-black text-lg tracking-tight">Descontos do Club Max</span>
+                  <span className="text-xs text-slate-400">Vantagens Locais</span>
                 </div>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Conectando consumidores aos melhores descontos do comércio local.
+                Vantagens Locais reúne ofertas de lojistas parceiros. Encontre descontos e vouchers via CPF.
               </p>
             </div>
             {/* Links */}
@@ -310,7 +314,7 @@ export default function Layout({ children }) {
           </div>
           <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Clube Max de Desconto. Todos os direitos reservados.
+              © {new Date().getFullYear()} Vantagens Locais — Descontos do Club Max. Todos os direitos reservados.
             </p>
             <div className="flex gap-4">
               <Link to="/PrivacyPolicy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
