@@ -67,10 +67,16 @@ export default function PartnerDashboard() {
       const partnerData = (requestedId && partners.find(p => p.id === requestedId)) || partners[0];
       setPartner(partnerData);
 
-      const subs = await base44.entities.Subscription.filter({
+      // Busca assinatura de parceiro (lojista = premium, partner = legado)
+      const subsPartner = await base44.entities.Subscription.filter({
+        user_email: currentUser.email,
+        type: 'lojista'
+      });
+      const subsLegacy = await base44.entities.Subscription.filter({
         user_email: currentUser.email,
         type: 'partner'
       });
+      const subs = subsPartner.length > 0 ? subsPartner : subsLegacy;
 
       if (subs.length > 0) {
         const sub = subs[0];
@@ -112,6 +118,7 @@ export default function PartnerDashboard() {
   });
 
   const isBlocked = subscription?.status !== 'active';
+  const isPremium = subscription?.type === 'lojista' && subscription?.status === 'active';
 
   if (loading) {
     return (
@@ -306,10 +313,12 @@ export default function PartnerDashboard() {
               <QrCode className="w-4 h-4" />
               Ler QR Code
             </TabsTrigger>
+            {isPremium && (
             <TabsTrigger value="raffles" className="flex items-center gap-2">
               <Gift className="w-4 h-4" />
               Sorteios
             </TabsTrigger>
+            )}
             <TabsTrigger value="appointments" className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
               Agendamentos
@@ -380,9 +389,11 @@ export default function PartnerDashboard() {
             />
           </TabsContent>
 
+          {isPremium && (
           <TabsContent value="raffles">
             <RaffleManager partner={partner} />
           </TabsContent>
+          )}
 
           <TabsContent value="appointments">
             <AppointmentsCalendar partnerId={partner?.id} />

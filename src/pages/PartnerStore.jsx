@@ -95,6 +95,21 @@ export default function PartnerStore() {
     enabled: !!partnerId
   });
 
+  const { data: partnerSubscription } = useQuery({
+    queryKey: ['partnerSubscription', partner?.owner_email],
+    queryFn: async () => {
+      const subs = await base44.entities.Subscription.filter({
+        user_email: partner?.owner_email,
+        type: 'lojista',
+        status: 'active'
+      });
+      return subs.length > 0 ? subs[0] : null;
+    },
+    enabled: !!partner?.owner_email
+  });
+
+  const isPartnerPremium = !!partnerSubscription;
+
   const { data: userVouchers = [] } = useQuery({
     queryKey: ['userVouchers', user?.email, partnerId],
     queryFn: () => base44.entities.Voucher.filter({ user_email: user.email, partner_id: partnerId }),
@@ -264,8 +279,8 @@ export default function PartnerStore() {
         )}
       </div>
 
-      {/* Raffles Section */}
-      {raffles.length > 0 && (
+      {/* Raffles Section — somente plano premium */}
+      {isPartnerPremium && raffles.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 pb-4">
           <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-violet-600" />
