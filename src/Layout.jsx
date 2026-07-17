@@ -194,6 +194,12 @@ export default function Layout({ children }) {
                         Loja de Fidelidade
                       </DropdownMenuItem>
                     </Link>
+                    <Link to="/RepresentativePortal">
+                      <DropdownMenuItem className="cursor-pointer text-violet-700 font-medium">
+                        <Store className="w-4 h-4 mr-2" />
+                        Portal do Representante
+                      </DropdownMenuItem>
+                    </Link>
 
                     <Link to={createPageUrl('PurchaseHistory')}>
                       <DropdownMenuItem className="cursor-pointer">

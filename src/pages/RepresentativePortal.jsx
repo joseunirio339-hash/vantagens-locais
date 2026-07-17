@@ -207,7 +207,7 @@ export default function RepresentativePortal() {
     csv += [commissions.length, (totalEarned + totalPending).toFixed(2).replace('.', ','), totalEarned.toFixed(2).replace('.', ','), totalPending.toFixed(2).replace('.', ',')].join(sep) + '\n\n';
 
     csv += 'DETALHAMENTO POR VENDA\n';
-    csv += ['Data', 'Cliente', 'Plano', 'Valor Plano', 'Comissão (5%)', 'Status'].join(sep) + '\n';
+    csv += ['Data', 'Cliente', 'Plano', 'Valor 1ª Mensalidade', 'Comissão (50%)', 'Status'].join(sep) + '\n';
     commissions.forEach(c => {
       const date = c.created_date ? new Date(c.created_date).toLocaleDateString('pt-BR') : '-';
       const price = (c.subscription_price || 0).toFixed(2).replace('.', ',');
@@ -360,7 +360,7 @@ export default function RepresentativePortal() {
               <div className="flex-1">
                 <h3 className="font-semibold text-slate-800">🔗 Seu link de vendas</h3>
                 <p className="text-sm text-slate-500">
-                  Compartilhe com seus clientes. A cada assinatura, você recebe <strong className="text-violet-700">5%</strong> de comissão.
+                  Compartilhe com seus clientes. A cada assinatura, você recebe <strong className="text-violet-700">50% da 1ª mensalidade</strong> como comissão.
                 </p>
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
@@ -557,7 +557,7 @@ export default function RepresentativePortal() {
               <div>
                 <h3 className="font-semibold text-slate-800">💵 Extrato de Comissões</h3>
                 <p className="text-sm text-slate-500">
-                  5% de comissão sobre cada venda fechada pelo seu link
+                  50% de comissão sobre a 1ª mensalidade de cada venda fechada pelo seu link
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -577,6 +577,51 @@ export default function RepresentativePortal() {
                 )}
               </div>
             </div>
+
+            {/* Resumo de desempenho por plano */}
+            {commissions.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                {(() => {
+                  const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Parceiro' };
+                  const planColors = {
+                    user: 'bg-blue-50 border-blue-200 text-blue-700',
+                    stander: 'bg-violet-50 border-violet-200 text-violet-700',
+                    lojista: 'bg-amber-50 border-amber-200 text-amber-700',
+                    partner: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+                  };
+                  const plans = ['user', 'stander', 'lojista', 'partner'];
+                  return plans.map(plan => {
+                    const planComms = commissions.filter(c => c.subscription_type === plan);
+                    if (planComms.length === 0) {
+                      return (
+                        <Card key={plan} className="border-dashed border-slate-200 bg-slate-50/50">
+                          <CardContent className="p-3 text-center">
+                            <p className="text-xs text-slate-400 font-medium">{planNames[plan]}</p>
+                            <p className="text-lg font-bold text-slate-300 mt-1">0</p>
+                            <p className="text-[10px] text-slate-400">nenhuma venda</p>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+                    const paid = planComms.filter(c => c.status === 'paid');
+                    const pending = planComms.filter(c => c.status === 'pending');
+                    const totalComm = planComms.reduce((s, c) => s + (c.commission_amount || 0), 0);
+                    return (
+                      <Card key={plan} className={`border ${planColors[plan]}`}>
+                        <CardContent className="p-3">
+                          <p className="text-xs font-medium">{planNames[plan]}</p>
+                          <p className="text-2xl font-bold mt-0.5">{planComms.length}</p>
+                          <p className="text-[10px] opacity-80">
+                            {paid.length} pago{paid.length !== 1 ? 's' : ''} · {pending.length} pendente{pending.length !== 1 ? 's' : ''}
+                          </p>
+                          <p className="text-xs font-semibold mt-1">R$ {totalComm.toFixed(2).replace('.', ',')}</p>
+                        </CardContent>
+                      </Card>
+                    );
+                  });
+                })()}
+              </div>
+            )}
 
             {loadingCommissions ? (
               <div className="space-y-2">
@@ -631,7 +676,7 @@ export default function RepresentativePortal() {
                                 <span className="font-medium text-slate-700">R$ {subscriptionPrice.toFixed(2).replace('.', ',')}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-slate-500">Comissão (5%)</span>
+                                <span className="text-slate-500">Comissão (50% · 1ª mensalidade)</span>
                                 <span className="font-medium text-slate-700">R$ {commissionValue.toFixed(2).replace('.', ',')}</span>
                               </div>
                               <div className="border-t pt-1.5 mt-1.5 flex justify-between">
