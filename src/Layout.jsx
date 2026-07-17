@@ -237,6 +237,12 @@ export default function Layout({ children }) {
                             Representantes
                           </DropdownMenuItem>
                         </Link>
+                        <Link to={createPageUrl('VendedorApp')}>
+                          <DropdownMenuItem className="cursor-pointer text-amber-700 font-medium">
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            App do Vendedor
+                          </DropdownMenuItem>
+                        </Link>
                       </>
                     )}
                     <DropdownMenuSeparator />

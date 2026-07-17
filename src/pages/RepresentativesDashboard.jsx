@@ -21,8 +21,9 @@ export default function RepresentativesDashboard() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [newRep, setNewRep] = useState({ name: '', email: '', phone: '', code: '' });
+  const [newRep, setNewRep] = useState({ name: '', email: '', phone: '', code: '', is_seller: true });
   const [copiedCode, setCopiedCode] = useState(null);
+  const [groupFilter, setGroupFilter] = useState('all');
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -67,9 +68,10 @@ export default function RepresentativesDashboard() {
       phone: newRep.phone,
       code: newRep.code,
       commission_percentage: 50,
+      is_seller: newRep.is_seller,
     });
     setFormOpen(false);
-    setNewRep({ name: '', email: '', phone: '', code: '' });
+    setNewRep({ name: '', email: '', phone: '', code: '', is_seller: true });
     queryClient.invalidateQueries({ queryKey: ['representatives'] });
   };
 
@@ -114,6 +116,14 @@ export default function RepresentativesDashboard() {
   const totalSales = reps.reduce((sum, r) => sum + (r.total_sales || 0), 0);
   const totalEarned = reps.reduce((sum, r) => sum + (r.total_earned || 0), 0);
 
+  // Filtro de grupo (Todos | Vendedores | Representantes)
+  const filteredReps = reps.filter(r => {
+    if (groupFilter === 'sellers') return r.is_seller === true;
+    if (groupFilter === 'reps') return !r.is_seller;
+    return true;
+  });
+  const sellersCount = reps.filter(r => r.is_seller === true).length;
+
   // Ranking mensal: comissões do mês atual por representante
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -141,9 +151,28 @@ export default function RepresentativesDashboard() {
           </h1>
           <p className="text-slate-500 text-sm">Gerencie representantes e acompanhe comissões</p>
         </div>
-        <Button onClick={() => setFormOpen(true)} className="bg-violet-600 hover:bg-violet-700">
-          <Plus className="w-4 h-4 mr-2" /> Novo Representante
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-white border rounded-lg p-1">
+            {[
+              { key: 'all', label: `Todos (${reps.length})` },
+              { key: 'sellers', label: `Vendedores (${sellersCount})` },
+              { key: 'reps', label: `Representantes (${reps.length - sellersCount})` },
+            ].map(opt => (
+              <button
+                key={opt.key}
+                onClick={() => setGroupFilter(opt.key)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  groupFilter === opt.key ? 'bg-violet-100 text-violet-700' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <Button onClick={() => setFormOpen(true)} className="bg-violet-600 hover:bg-violet-700">
+            <Plus className="w-4 h-4 mr-2" /> Novo Representante
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -304,9 +333,16 @@ export default function RepresentativesDashboard() {
             </Button>
           </CardContent>
         </Card>
+      ) : filteredReps.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <p className="text-slate-500">Nenhum registro neste grupo</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {reps.map(rep => {
+          {filteredReps.map(rep => {
             const repCommissions = getRepCommissions(rep.id);
             return (
               <Card key={rep.id} className={!rep.is_active ? 'opacity-60' : ''}>
@@ -315,6 +351,9 @@ export default function RepresentativesDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-bold text-slate-800">{rep.name}</h3>
+                        {rep.is_seller && (
+                          <Badge className="bg-amber-100 text-amber-700 text-xs">Vendedor</Badge>
+                        )}
                         <Badge variant={rep.is_active ? 'default' : 'secondary'} className="text-xs">
                           {rep.is_active ? 'Ativo' : 'Inativo'}
                         </Badge>
@@ -446,6 +485,20 @@ export default function RepresentativesDashboard() {
               />
               <p className="text-xs text-slate-400 mt-1">
                 Link: app.clubemaxdescontos.com.br/rep/{newRep.code || 'CODIGO'}
+              </p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newRep.is_seller}
+                  onChange={e => setNewRep(prev => ({ ...prev, is_seller: e.target.checked }))}
+                  className="w-4 h-4 rounded"
+                />
+                É vendedor (grupo do App do Vendedor)
+              </label>
+              <p className="text-xs text-slate-400 mt-1 ml-6">
+                Vendedores acessam o app de vendas e ganham 50% da 1ª mensalidade.
               </p>
             </div>
             <p className="text-sm text-slate-500 bg-violet-50 p-3 rounded-lg">

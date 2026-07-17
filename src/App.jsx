@@ -13,6 +13,7 @@ import LoyaltyStore from './pages/LoyaltyStore';
 import SystemReport from './pages/SystemReport';
 import RepresentativeLanding from './pages/RepresentativeLanding';
 import RepresentativePortal from './pages/RepresentativePortal';
+import VendedorApp from './pages/VendedorApp';
 import { CartProvider } from '@/context/CartContext';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -86,6 +87,7 @@ function App() {
           <Routes>
             <Route path="/rep/:code" element={<RepresentativeLanding />} />
             <Route path="/RepresentativePortal" element={<RepresentativePortal />} />
+            <Route path="/VendedorApp" element={<VendedorApp />} />
             <Route path="*" element={<AuthenticatedApp />} />
           </Routes>
         </Router>
