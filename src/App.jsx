@@ -11,6 +11,7 @@ import UserProfile from './pages/UserProfile';
 import Cart from './pages/Cart';
 import LoyaltyStore from './pages/LoyaltyStore';
 import SystemReport from './pages/SystemReport';
+import PlanoFinalizacao from './pages/PlanoFinalizacao';
 import RepresentativeLanding from './pages/RepresentativeLanding';
 import RepresentativePortal from './pages/RepresentativePortal';
 import VendedorApp from './pages/VendedorApp';
@@ -70,6 +71,7 @@ const AuthenticatedApp = () => {
       <Route path="/Cart" element={<LayoutWrapper currentPageName="Cart"><Cart /></LayoutWrapper>} />
       <Route path="/LoyaltyStore" element={<LayoutWrapper currentPageName="LoyaltyStore"><LoyaltyStore /></LayoutWrapper>} />
       <Route path="/SystemReport" element={<LayoutWrapper currentPageName="SystemReport"><SystemReport /></LayoutWrapper>} />
+      <Route path="/PlanoFinalizacao" element={<LayoutWrapper currentPageName="PlanoFinalizacao"><PlanoFinalizacao /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

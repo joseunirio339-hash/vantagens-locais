@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { 
   Home, Store, Tag, Ticket, User, LogOut, Menu, X,
   CreditCard, LayoutDashboard, ChevronDown, Sparkles, ShieldAlert, ShoppingCart, Gift, Users,
-  MessageCircle, Mail, Camera, Search, Heart
+  MessageCircle, Mail, Camera, Search, Heart, FileText
 } from 'lucide-react';
 import UserNotificationBell from '@/components/notifications/UserNotificationBell';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -247,6 +247,12 @@ export default function Layout({ children }) {
                           <DropdownMenuItem className="cursor-pointer text-amber-700 font-medium">
                             <ShoppingCart className="w-4 h-4 mr-2" />
                             App do Vendedor
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link to="/PlanoFinalizacao">
+                          <DropdownMenuItem className="cursor-pointer text-amber-700 font-medium">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Plano de Finalização (PDF)
                           </DropdownMenuItem>
                         </Link>
                       </>
