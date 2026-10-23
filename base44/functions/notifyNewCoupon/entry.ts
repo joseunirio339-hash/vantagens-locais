@@ -5,6 +5,16 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // A URL é pública: só admin (ou a automação, que age como admin) pode disparar.
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await req.json();
 
     // Support both direct calls (partner_id, product_name) and entity automation payload

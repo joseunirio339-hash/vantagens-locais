@@ -155,15 +155,19 @@ Deno.serve(async (req) => {
   </div>
 </div>`;
 
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: partner.owner_email,
-        subject: `📊 Resumo Mensal de ${monthLabel} — ${partner.business_name}`,
-        body,
-        from_name: 'Clube Max Descontos'
-      });
-
-      console.log(`Resumo mensal enviado para ${partner.business_name} (${partner.owner_email})`);
-      sent++;
+      // Um destinatário com problema não pode derrubar o resumo dos demais.
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: partner.owner_email,
+          subject: `📊 Resumo Mensal de ${monthLabel} — ${partner.business_name}`,
+          body,
+          from_name: 'Clube Max Descontos'
+        });
+        console.log(`Resumo mensal enviado para ${partner.business_name} (${partner.owner_email})`);
+        sent++;
+      } catch (err) {
+        console.error(`Falha ao enviar resumo mensal para ${partner.owner_email}:`, err.message);
+      }
     }
 
     return Response.json({ success: true, sent, month: monthLabel });

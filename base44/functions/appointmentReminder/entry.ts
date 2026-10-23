@@ -96,12 +96,17 @@ Deno.serve(async (req) => {
   </div>
 </div>`;
 
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: appt.user_email,
-          subject: `⏰ Lembrete: seu agendamento em ${partnerName} é em 2 horas!`,
-          body: clientHtml,
-          from_name: 'Clube Max Descontos'
-        });
+        // Falha de envio não pode derrubar os lembretes dos demais agendamentos.
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: appt.user_email,
+            subject: `⏰ Lembrete: seu agendamento em ${partnerName} é em 2 horas!`,
+            body: clientHtml,
+            from_name: 'Clube Max Descontos'
+          });
+        } catch (err) {
+          console.error(`Falha ao enviar lembrete para o cliente ${appt.user_email}:`, err.message);
+        }
       }
 
       // --- Notify partner via in-app notification ---
@@ -146,12 +151,16 @@ Deno.serve(async (req) => {
   </div>
 </div>`;
 
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: partner.owner_email,
-          subject: `⏰ Cliente chega em 2h: ${appt.user_name || appt.user_email} — ${appt.time_slot}`,
-          body: partnerHtml,
-          from_name: 'Clube Max Descontos'
-        });
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: partner.owner_email,
+            subject: `⏰ Cliente chega em 2h: ${appt.user_name || appt.user_email} — ${appt.time_slot}`,
+            body: partnerHtml,
+            from_name: 'Clube Max Descontos'
+          });
+        } catch (err) {
+          console.error(`Falha ao enviar aviso para o parceiro ${partner.owner_email}:`, err.message);
+        }
       }
 
       sent++;
