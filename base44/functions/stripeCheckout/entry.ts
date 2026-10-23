@@ -3,10 +3,11 @@ import Stripe from 'npm:stripe@14.25.0';
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
+// Preços em BRL (o app exibe em R$; antes eram cobrados em USD)
 const PRICE_MAP = {
-  user: "price_1UTqAOLsB3SzuNJIDZB2VNbC",
-  stander: "price_1TlVAZLsB3SzuNJINp3y63jX",
-  lojista: "price_1TlVAZLsB3SzuNJI9WCkdyNW"
+  user: "price_1UTqaiLsB3SzuNJIu39eafrY",
+  stander: "price_1UTqaiLsB3SzuNJIliWw9GeB",
+  lojista: "price_1UTqaiLsB3SzuNJINVHkAFJP"
 };
 
 Deno.serve(async (req) => {

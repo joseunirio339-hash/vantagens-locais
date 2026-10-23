@@ -30,7 +30,14 @@ const subscriptionStatusConfig = {
 };
 
 const planLabels = {
+  // Preços atuais (BRL)
+  'price_1UTqaiLsB3SzuNJIu39eafrY': 'Plano Usuário',
+  'price_1UTqaiLsB3SzuNJIliWw9GeB': 'Plano Stander',
+  'price_1UTqaiLsB3SzuNJINVHkAFJP': 'Plano Premium',
+  // Preços antigos, mantidos para o histórico de quem já assinou
   'price_1UTqAOLsB3SzuNJIDZB2VNbC': 'Plano Usuário',
+  'price_1TlVAZLsB3SzuNJINp3y63jX': 'Plano Stander',
+  'price_1TlVAZLsB3SzuNJI9WCkdyNW': 'Plano Premium',
   'price_1TY8efLsB3SzuNJItliAzOIn': 'Plano Usuário',
   'price_1TY8efLsB3SzuNJIgs5Hw2ka': 'Plano Lojista',
   'price_1TY8efLsB3SzuNJIjd10iAOn': 'Plano Empreendedor',

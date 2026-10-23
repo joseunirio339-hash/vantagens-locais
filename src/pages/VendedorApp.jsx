@@ -495,7 +495,7 @@ export default function VendedorApp() {
                 <Select value={newSale.plan} onValueChange={v => setNewSale(prev => ({ ...prev, plan: v }))}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">Plano Usuário — R$ 19,99/mês</SelectItem>
+                    <SelectItem value="user">Plano Usuário — R$ 4,99/mês</SelectItem>
                     <SelectItem value="stander">Plano Stander — R$ 99,99/mês</SelectItem>
                   </SelectContent>
                 </Select>
