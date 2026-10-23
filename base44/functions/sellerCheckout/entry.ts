@@ -24,15 +24,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Email do cliente é obrigatório' }, { status: 400 });
     }
 
-    let origin = req.headers.get('origin') || Deno.env.get("BASE44_APP_URL") || '';
-    if (origin && !origin.startsWith('http')) {
-      origin = 'https://' + origin.replace(/^\/+/, '');
-    }
-    if (!origin) origin = 'https://app.base44.com';
-
-    const isIframe = req.headers.get('x-iframe-request') === 'true';
-    if (isIframe) {
-      return Response.json({ error: 'Abra o checkout em uma nova janela', isIframe: true }, { status: 400 });
+    // URL de retorno vem do cabeçalho definido pelo servidor: vale tanto no app
+    // publicado quanto no editor, e não pode ser escolhida por quem chama.
+    const appUrl = req.headers.get('X-Base44-App-Url');
+    if (!appUrl) {
+      console.error('sellerCheckout: cabeçalho X-Base44-App-Url ausente');
+      return Response.json({ error: 'App URL not available' }, { status: 500 });
     }
 
     // Valida o código do vendedor (opcional, mas recomendado)
@@ -54,14 +51,15 @@ Deno.serve(async (req) => {
       customer_email,
       subscription_data: {
         metadata: {
+          base44_app_id: Deno.env.get("BASE44_APP_ID"),
           user_email: customer_email,
           subscription_type: subscriptionType,
           representative_code: representative_code || '',
           customer_origin: 'vendedor_app'
         }
       },
-      success_url: `${origin}/Subscription?session_id={CHECKOUT_SESSION_ID}&from=vendedor`,
-      cancel_url: `${origin}/Subscription`,
+      success_url: `${appUrl}/Subscription?session_id={CHECKOUT_SESSION_ID}&from=vendedor`,
+      cancel_url: `${appUrl}/Subscription`,
       metadata: {
         base44_app_id: Deno.env.get("BASE44_APP_ID"),
         customer_email,
