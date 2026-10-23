@@ -72,13 +72,13 @@ export default function VendedorApp() {
     setLoading(true);
     setError('');
     try {
-      const reps = await base44.entities.Representative.filter({
+      const res = await base44.functions.invoke('repPortal', {
+        action: 'login',
         email: email.trim().toLowerCase(),
-        is_active: true,
-        is_seller: true
+        seller_only: true
       });
-      if (reps.length > 0) {
-        setRep(reps[0]);
+      if (res.data?.rep) {
+        setRep(res.data.rep);
       } else {
         setError('Vendedor não encontrado, inativo ou sem perfil de vendedor. Verifique com o administrador.');
       }
@@ -94,13 +94,13 @@ export default function VendedorApp() {
 
   const { data: commissions = [], isLoading: loadingCommissions } = useQuery({
     queryKey: ['seller-commissions', rep?.id],
-    queryFn: () => base44.entities.RepresentativeCommission.filter({ representative_id: rep?.id }, '-created_date', 50),
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions', email: rep.email, rep_id: rep.id })).data?.commissions || [],
     enabled: !!rep,
   });
 
   const { data: clients = [], isLoading: loadingClients } = useQuery({
     queryKey: ['seller-clients', rep?.id],
-    queryFn: () => base44.entities.Client.filter({ representative_id: rep?.id }, '-created_date', 100),
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients', email: rep.email, rep_id: rep.id })).data?.clients || [],
     enabled: !!rep,
   });
 
@@ -130,14 +130,17 @@ export default function VendedorApp() {
     setGenerating(true);
     try {
       // Cria/atualiza o cliente no funil
-      await base44.entities.Client.create({
-        name: newSale.name,
-        email: newSale.email,
-        phone: newSale.phone,
-        representative_id: rep.id,
-        representative_name: rep.name,
-        status: 'contacted',
-        plan_interest: newSale.plan
+      await base44.functions.invoke('repPortal', {
+        action: 'save_client',
+        email: rep.email,
+        rep_id: rep.id,
+        client: {
+          name: newSale.name,
+          email: newSale.email,
+          phone: newSale.phone,
+          status: 'contacted',
+          plan_interest: newSale.plan
+        }
       });
 
       // Gera link de checkout do Stripe com o email do cliente e código do vendedor

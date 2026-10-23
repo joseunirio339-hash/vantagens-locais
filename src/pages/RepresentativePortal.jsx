@@ -52,9 +52,9 @@ export default function RepresentativePortal() {
     setLoading(true);
     setError('');
     try {
-      const reps = await base44.entities.Representative.filter({ email: email.trim().toLowerCase(), is_active: true });
-      if (reps.length > 0) {
-        setRep(reps[0]);
+      const res = await base44.functions.invoke('repPortal', { action: 'login', email: email.trim().toLowerCase() });
+      if (res.data?.rep) {
+        setRep(res.data.rep);
       } else {
         setError('Representante não encontrado ou conta inativa. Verifique o email.');
       }
@@ -82,13 +82,13 @@ export default function RepresentativePortal() {
 
   const { data: commissions = [], isLoading: loadingCommissions } = useQuery({
     queryKey: ['rep-commissions', rep?.id],
-    queryFn: () => base44.entities.RepresentativeCommission.filter({ representative_id: rep?.id }, '-created_date', 50),
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions', email: rep.email, rep_id: rep.id })).data?.commissions || [],
     enabled: !!rep,
   });
 
   const { data: clients = [], isLoading: loadingClients } = useQuery({
     queryKey: ['rep-clients', rep?.id],
-    queryFn: () => base44.entities.Client.filter({ representative_id: rep?.id }, '-created_date', 100),
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients', email: rep.email, rep_id: rep.id })).data?.clients || [],
     enabled: !!rep,
   });
 
@@ -126,17 +126,13 @@ export default function RepresentativePortal() {
   const handleSaveClient = async () => {
     if (!newClient.name) return;
     try {
-      if (editingClient) {
-        await base44.entities.Client.update(editingClient.id, newClient);
-        toast.success('Cliente atualizado!');
-      } else {
-        await base44.entities.Client.create({
-          ...newClient,
-          representative_id: rep.id,
-          representative_name: rep.name,
-        });
-        toast.success('Cliente cadastrado!');
-      }
+      await base44.functions.invoke('repPortal', {
+        action: 'save_client',
+        email: rep.email,
+        rep_id: rep.id,
+        client: { ...newClient, id: editingClient?.id },
+      });
+      toast.success(editingClient ? 'Cliente atualizado!' : 'Cliente cadastrado!');
       setClientFormOpen(false);
       resetClientForm();
       queryClient.invalidateQueries({ queryKey: ['rep-clients', rep?.id] });
@@ -147,7 +143,7 @@ export default function RepresentativePortal() {
 
   const handleDeleteClient = async (client) => {
     if (!confirm(`Remover ${client.name} da lista?`)) return;
-    await base44.entities.Client.delete(client.id);
+    await base44.functions.invoke('repPortal', { action: 'delete_client', email: rep.email, rep_id: rep.id, client_id: client.id });
     queryClient.invalidateQueries({ queryKey: ['rep-clients', rep?.id] });
     toast.success('Cliente removido.');
   };

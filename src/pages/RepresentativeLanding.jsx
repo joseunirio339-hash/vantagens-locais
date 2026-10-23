@@ -23,11 +23,11 @@ export default function RepresentativeLanding() {
 
   useEffect(() => {
     const loadRep = async () => {
-      const reps = await base44.entities.Representative.filter({ code: code?.toUpperCase(), is_active: true });
-      if (reps.length > 0) {
-        setRep(reps[0]);
+      const res = await base44.functions.invoke('repPortal', { action: 'login', code: code?.toUpperCase() });
+      if (res.data?.rep) {
+        setRep(res.data.rep);
         // Track visit
-        base44.analytics.track({ eventName: 'rep_landing_visit', properties: { rep_code: code, rep_name: reps[0].name } });
+        base44.analytics.track({ eventName: 'rep_landing_visit', properties: { rep_code: code, rep_name: res.data.rep.name } });
       } else {
         setNotFound(true);
       }
