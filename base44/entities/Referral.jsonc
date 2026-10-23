@@ -47,5 +47,52 @@
   "required": [
     "referrer_email",
     "referrer_code"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.referrer_email": "{{user.email}}"
+        },
+        {
+          "data.referred_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.referrer_email": "{{user.email}}"
+        },
+        {
+          "data.referred_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.referrer_email": "{{user.email}}"
+        },
+        {
+          "data.referred_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

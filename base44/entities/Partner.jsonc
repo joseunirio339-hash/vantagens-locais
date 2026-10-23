@@ -112,5 +112,33 @@
   "required": [
     "business_name",
     "owner_email"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "data.owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

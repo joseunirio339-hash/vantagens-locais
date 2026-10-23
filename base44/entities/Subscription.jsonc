@@ -60,5 +60,59 @@
     "user_email",
     "type",
     "status"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.type": "lojista",
+          "data.status": "active"
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

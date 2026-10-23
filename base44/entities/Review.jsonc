@@ -36,5 +36,44 @@
     "partner_id",
     "user_email",
     "rating"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

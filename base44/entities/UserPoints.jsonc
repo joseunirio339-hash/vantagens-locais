@@ -44,5 +44,44 @@
   "required": [
     "user_email",
     "referral_code"
-  ]
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }
