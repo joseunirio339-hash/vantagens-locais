@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       <p style="margin:0;font-size:14px;color:#991b1b;"><strong>⚠️ Atenção:</strong> Após o vencimento, seus produtos ficarão indisponíveis no app e você perderá acesso ao painel do parceiro.</p>
     </div>
     <div style="text-align:center;margin:28px 0;">
-      <a href="${Deno.env.get('BASE44_APP_URL') || '#'}/Subscription" style="background:#dc2626;color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">Renovar Assinatura Agora →</a>
+      <a href="https://vantagens-locais-app.base44.app/Subscription" style="background:#dc2626;color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">Renovar Assinatura Agora →</a>
     </div>
     <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">Clube Max Descontos — Vantagens Locais 🛍️</p>
   </div>
