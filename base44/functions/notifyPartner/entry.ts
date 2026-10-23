@@ -6,6 +6,16 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // A URL é pública: só admin (ou a automação, que age como admin) pode disparar.
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await req.json();
 
     const { event, data } = body;
@@ -38,23 +48,27 @@ Deno.serve(async (req) => {
 
       // E-mail notification
       if (partner?.owner_email) {
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: partner.owner_email,
-          subject: `✅ Voucher resgatado em ${partner.business_name}`,
-          body: `
-            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
-              <h2 style="color:#059669">✅ Voucher Resgatado!</h2>
-              <p>Um cliente acabou de resgatar um voucher na sua loja <strong>${partner.business_name}</strong>.</p>
-              <table style="width:100%;border-collapse:collapse;margin:16px 0">
-                <tr><td style="padding:8px;background:#f1faf5;border-radius:6px;font-size:13px"><strong>Produto:</strong> ${voucher.product_name || '—'}</td></tr>
-                <tr><td style="padding:8px;font-size:13px"><strong>Código:</strong> <code>${voucher.code}</code></td></tr>
-                <tr><td style="padding:8px;background:#f1faf5;border-radius:6px;font-size:13px"><strong>Cliente:</strong> ${voucher.user_name || 'Não identificado'}</td></tr>
-                <tr><td style="padding:8px;font-size:13px"><strong>Valor:</strong> R$ ${voucher.discount_price?.toFixed(2).replace('.', ',') || '—'}</td></tr>
-              </table>
-              <p style="color:#6b7280;font-size:12px">Acesse o Painel do Parceiro para ver todos os detalhes.</p>
-            </div>
-          `
-        });
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: partner.owner_email,
+            subject: `✅ Voucher resgatado em ${partner.business_name}`,
+            body: `
+              <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+                <h2 style="color:#059669">✅ Voucher Resgatado!</h2>
+                <p>Um cliente acabou de resgatar um voucher na sua loja <strong>${partner.business_name}</strong>.</p>
+                <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                  <tr><td style="padding:8px;background:#f1faf5;border-radius:6px;font-size:13px"><strong>Produto:</strong> ${voucher.product_name || '—'}</td></tr>
+                  <tr><td style="padding:8px;font-size:13px"><strong>Código:</strong> <code>${voucher.code}</code></td></tr>
+                  <tr><td style="padding:8px;background:#f1faf5;border-radius:6px;font-size:13px"><strong>Cliente:</strong> ${voucher.user_name || 'Não identificado'}</td></tr>
+                  <tr><td style="padding:8px;font-size:13px"><strong>Valor:</strong> R$ ${voucher.discount_price?.toFixed(2).replace('.', ',') || '—'}</td></tr>
+                </table>
+                <p style="color:#6b7280;font-size:12px">Acesse o Painel do Parceiro para ver todos os detalhes.</p>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error(`Falha ao enviar e-mail para ${partner.owner_email}:`, emailError.message);
+        }
       }
 
       console.log(`notifyPartner: voucher_used notification sent for partner ${partnerId}`);
@@ -84,22 +98,26 @@ Deno.serve(async (req) => {
 
       // E-mail notification
       if (partner?.owner_email) {
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: partner.owner_email,
-          subject: `⭐ Nova avaliação em ${partner.business_name}`,
-          body: `
-            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
-              <h2 style="color:#d97706">⭐ Nova Avaliação Recebida!</h2>
-              <p>Sua loja <strong>${partner.business_name}</strong> recebeu uma nova avaliação.</p>
-              <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;margin:16px 0">
-                <p style="margin:0 0 8px;font-weight:600">${review.user_name || 'Usuário anônimo'}</p>
-                <p style="margin:0 0 8px;font-size:20px;letter-spacing:2px;color:#f59e0b">${stars}</p>
-                ${review.comment ? `<p style="margin:0;color:#374151;font-size:14px">"${review.comment}"</p>` : ''}
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: partner.owner_email,
+            subject: `⭐ Nova avaliação em ${partner.business_name}`,
+            body: `
+              <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+                <h2 style="color:#d97706">⭐ Nova Avaliação Recebida!</h2>
+                <p>Sua loja <strong>${partner.business_name}</strong> recebeu uma nova avaliação.</p>
+                <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;margin:16px 0">
+                  <p style="margin:0 0 8px;font-weight:600">${review.user_name || 'Usuário anônimo'}</p>
+                  <p style="margin:0 0 8px;font-size:20px;letter-spacing:2px;color:#f59e0b">${stars}</p>
+                  ${review.comment ? `<p style="margin:0;color:#374151;font-size:14px">"${review.comment}"</p>` : ''}
+                </div>
+                <p style="color:#6b7280;font-size:12px">Acesse o Painel do Parceiro para responder e ver todas as avaliações.</p>
               </div>
-              <p style="color:#6b7280;font-size:12px">Acesse o Painel do Parceiro para responder e ver todas as avaliações.</p>
-            </div>
-          `
-        });
+            `
+          });
+        } catch (emailError) {
+          console.error(`Falha ao enviar e-mail para ${partner.owner_email}:`, emailError.message);
+        }
       }
 
       console.log(`notifyPartner: new_review notification sent for partner ${partnerId}`);

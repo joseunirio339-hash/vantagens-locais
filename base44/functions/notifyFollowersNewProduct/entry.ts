@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
                 </p>
               </div>
               <div style="text-align: center; margin-top: 20px;">
-                <a href="https://app.clubemaxdescontos.com.br/Partners"
+                <a href="https://clubemaxdescontos.com.br/Partners"
                    style="background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px;">
                   Ver Desconto Agora →
                 </a>

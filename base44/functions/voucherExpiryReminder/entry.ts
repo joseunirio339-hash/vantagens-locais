@@ -55,15 +55,23 @@ Clube Max Descontos — Conectando descontos a você
           `.trim()
         });
 
-        // Registra notificação no sistema
-        await base44.asServiceRole.entities.UserNotification.create({
+        // Registra notificação no sistema (sem duplicar o aviso de 3 dias)
+        const jaAvisado = await base44.asServiceRole.entities.UserNotification.filter({
           user_email: voucher.user_email,
           type: 'voucher_expiring',
-          title: '⏰ Voucher vencendo amanhã!',
-          message: `Seu voucher de "${productName}" vence amanhã. Use antes que expire!`,
-          reference_id: voucher.id,
-          is_read: false
+          reference_id: voucher.id
         });
+
+        if (jaAvisado.length === 0) {
+          await base44.asServiceRole.entities.UserNotification.create({
+            user_email: voucher.user_email,
+            type: 'voucher_expiring',
+            title: '⏰ Voucher vencendo amanhã!',
+            message: `Seu voucher de "${productName}" vence amanhã. Use antes que expire!`,
+            reference_id: voucher.id,
+            is_read: false
+          });
+        }
 
         sent++;
         console.log(`Lembrete enviado para ${voucher.user_email} - voucher ${voucher.code}`);
