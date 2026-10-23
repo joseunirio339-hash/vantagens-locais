@@ -96,6 +96,7 @@ export default function QRScanner({ partner, onValidated }) {
 
       await base44.entities.Notification.create({
         partner_id: partner.id,
+        partner_owner_email: partner.owner_email,
         type: 'voucher_used',
         title: '✅ Voucher Validado via QR Code!',
         message: `Voucher ${voucher.code} para "${voucher.product_name}" foi validado com sucesso via QR Code.`,

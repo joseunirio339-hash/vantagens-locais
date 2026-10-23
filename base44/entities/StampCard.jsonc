@@ -10,6 +10,10 @@
       "type": "string",
       "description": "ID do parceiro"
     },
+    "partner_owner_email": {
+      "type": "string",
+      "description": "Email do dono da loja (para o parceiro ver os cart\u00f5es do seu neg\u00f3cio)"
+    },
     "partner_name": {
       "type": "string",
       "description": "Nome do parceiro (snapshot)"
@@ -57,5 +61,64 @@
     "user_email",
     "partner_id",
     "partner_name"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "data.partner_owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "data.partner_owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "data.partner_owner_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
 }

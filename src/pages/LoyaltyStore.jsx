@@ -44,6 +44,7 @@ function RedeemDialog({ reward, partner, userPoints, user, onSuccess, onClose })
       user_email: user.email,
       reward_id: reward.id,
       partner_id: partner.id,
+      partner_owner_email: partner.owner_email,
       points_spent: reward.points_required,
       redemption_code: code,
       status: 'pending',
@@ -69,6 +70,7 @@ function RedeemDialog({ reward, partner, userPoints, user, onSuccess, onClose })
     // Notify partner
     await base44.entities.Notification.create({
       partner_id: partner.id,
+      partner_owner_email: partner.owner_email,
       type: 'new_voucher',
       title: 'Novo Resgate de Fidelidade!',
       message: `${user.full_name || user.email} resgatou: "${reward.title}" — Código: ${code}`,

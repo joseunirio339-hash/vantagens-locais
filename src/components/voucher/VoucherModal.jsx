@@ -58,6 +58,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
         code: generateVoucherCode(),
         product_id: product.id,
         partner_id: partner.id,
+        partner_owner_email: partner.owner_email,
         user_cpf: cleanCPF,
         user_name: user?.full_name || '',
         user_email: user?.email || '',
@@ -74,6 +75,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
           code: generateVoucherCode(),
           product_id: product.id,
           partner_id: partner.id,
+          partner_owner_email: partner.owner_email,
           user_cpf: cleanCPF,
           user_name: user?.full_name || '',
           user_email: user?.email || '',
@@ -89,6 +91,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
 
     await base44.entities.Notification.create({
       partner_id: partner.id,
+      partner_owner_email: partner.owner_email,
       type: 'new_voucher',
       title: 'Novo Voucher Gerado!',
       message: `${user?.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
@@ -155,6 +158,7 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
           card = await base44.entities.StampCard.create({
             user_email: user.email,
             partner_id: partner.id,
+            partner_owner_email: partner.owner_email,
             partner_name: partner.business_name,
             stamps_count: 0,
             stamps_goal: cfg.stamps_goal,

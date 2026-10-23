@@ -84,6 +84,7 @@ export default function EntrepreneurVoucherModal({
         code: generateVoucherCode(),
         product_id: product.id,
         partner_id: partner.id,
+        partner_owner_email: partner.owner_email,
         user_cpf: cleanCPF,
         user_name: user?.full_name || '',
         user_email: user?.email || '',
@@ -100,6 +101,7 @@ export default function EntrepreneurVoucherModal({
           code: generateVoucherCode(),
           product_id: product.id,
           partner_id: partner.id,
+          partner_owner_email: partner.owner_email,
           user_cpf: cleanCPF,
           user_name: user?.full_name || '',
           user_email: user?.email || '',
@@ -115,6 +117,7 @@ export default function EntrepreneurVoucherModal({
 
     await base44.entities.Notification.create({
       partner_id: partner.id,
+      partner_owner_email: partner.owner_email,
       type: 'new_voucher',
       title: '🎉 Nova venda de desconto!',
       message: `${user?.full_name || 'Um cliente'} gerou ${useUnified ? 'voucher único' : `${quantity} vouchers`} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,

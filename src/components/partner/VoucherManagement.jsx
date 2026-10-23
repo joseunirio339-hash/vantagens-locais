@@ -47,6 +47,7 @@ export default function VoucherManagement({ vouchers, products, onUpdate }) {
     // Notify partner about used voucher
     await base44.entities.Notification.create({
       partner_id: voucher.partner_id,
+      partner_owner_email: voucher.partner_owner_email,
       type: 'voucher_used',
       title: 'Voucher Utilizado!',
       message: `Voucher ${voucher.code} para "${voucher.product_name}" foi validado com sucesso.`,

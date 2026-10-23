@@ -204,6 +204,7 @@ export default function Home() {
     await base44.entities.ProductView.create({
       product_id: product.id,
       partner_id: product.partner_id,
+      partner_owner_email: partners.find(p => p.id === product.partner_id)?.owner_email,
       user_email: user.email
     });
 

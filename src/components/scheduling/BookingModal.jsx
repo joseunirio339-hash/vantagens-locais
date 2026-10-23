@@ -42,22 +42,25 @@ export default function BookingModal({ open, onClose, partner, voucher, user }) 
 
   const dateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null;
 
-  // Busca agendamentos já feitos para a data selecionada neste parceiro
-  const { data: existingAppointments = [] } = useQuery({
-    queryKey: ['appointments', partner?.id, dateStr],
-    queryFn: () => base44.entities.Appointment.filter({ partner_id: partner.id, date: dateStr }),
+  // Horários já ocupados nesta data (vêm do servidor, sem expor os dados dos outros clientes)
+  const { data: takenSlots = [] } = useQuery({
+    queryKey: ['appointmentSlots', partner?.id, dateStr],
+    queryFn: async () => {
+      const res = await base44.functions.invoke('getPartnerAvailability', {
+        partner_id: partner.id,
+        date: dateStr
+      });
+      return res.data?.taken_slots || [];
+    },
     enabled: !!partner?.id && !!dateStr,
   });
-
-  const takenSlots = existingAppointments
-    .filter(a => a.status !== 'cancelled')
-    .map(a => a.time_slot);
 
   const handleSubmit = async () => {
     if (!selectedDate || !selectedTime) return;
     setSubmitting(true);
     await base44.entities.Appointment.create({
       partner_id: partner.id,
+      partner_owner_email: partner.owner_email,
       user_email: user.email,
       user_name: user.full_name,
       voucher_id: voucher?.id,
@@ -68,7 +71,7 @@ export default function BookingModal({ open, onClose, partner, voucher, user }) 
       notes: notes.trim() || undefined,
       status: 'pending',
     });
-    queryClient.invalidateQueries({ queryKey: ['appointments', partner.id] });
+    queryClient.invalidateQueries({ queryKey: ['appointmentSlots', partner.id] });
     setDone(true);
     setSubmitting(false);
   };
