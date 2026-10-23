@@ -1,5 +1,16 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 
+// Busca um cliente do próprio representante, sem estourar erro se o id for inválido.
+async function findOwnedClient(base44, repId, clientId) {
+  if (!clientId) return null;
+  try {
+    const record = await base44.asServiceRole.entities.Client.get(clientId);
+    return record && record.representative_id === repId ? record : null;
+  } catch (error) {
+    return null;
+  }
+}
+
 // Acesso do Portal do Representante e do App do Vendedor.
 // O representante se identifica pelo email (ou pelo código do link) e o servidor
 // devolve apenas os dados daquele representante: comissões, clientes do funil e
@@ -71,8 +82,8 @@ export default async function (req) {
       }
 
       if (client.id) {
-        const existing = await base44.asServiceRole.entities.Client.filter({ id: client.id, representative_id: rep.id });
-        if (!existing[0]) {
+        const owned = await findOwnedClient(base44, rep.id, client.id);
+        if (!owned) {
           return Response.json({ error: 'Cliente não encontrado.' }, { status: 404 });
         }
         const updated = await base44.asServiceRole.entities.Client.update(client.id, data);
@@ -84,11 +95,8 @@ export default async function (req) {
     }
 
     if (action === 'delete_client') {
-      const existing = await base44.asServiceRole.entities.Client.filter({
-        id: body.client_id,
-        representative_id: rep.id,
-      });
-      if (!existing[0]) {
+      const owned = await findOwnedClient(base44, rep.id, body.client_id);
+      if (!owned) {
         return Response.json({ error: 'Cliente não encontrado.' }, { status: 404 });
       }
       await base44.asServiceRole.entities.Client.delete(body.client_id);
