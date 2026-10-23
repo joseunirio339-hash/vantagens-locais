@@ -1,15 +1,13 @@
 {
-  "name": "Relat\u00f3rio Semanal de Vendas \u2014 Parceiros",
-  "description": "Envia um resumo semanal de vendas por e-mail para cada parceiro ativo toda segunda-feira \u00e0s 8h",
   "trigger": {
     "condition": null,
     "config": {
       "trigger_type": "scheduled",
       "events": [],
       "schedule_mode": "recurring",
-      "cron_expression": "0 11 * * 1",
+      "cron_expression": "0 8 * * 1",
       "one_time_date": null,
-      "timezone": "UTC",
+      "timezone": "America/Sao_Paulo",
       "interval_value": null,
       "interval_unit": null,
       "interval_anchor": null,
@@ -33,11 +31,17 @@
             "function_name": "weeklyPartnerReport",
             "args": {}
           },
-          "then": "end"
+          "then": "end",
+          "x-base44": {
+            "title": "Gerar e enviar relat\u00f3rio semanal",
+            "description": "Resumo de vendas por parceiro ativo"
+          }
         }
       }
     ]
   },
+  "name": "Relat\u00f3rio Semanal de Vendas \u2014 Parceiros",
+  "description": "Envia um resumo semanal de vendas por e-mail para cada parceiro ativo toda segunda-feira \u00e0s 8h",
   "x-base44-migrated-from-automation": {
     "legacy_payload_function": "weeklyPartnerReport"
   }

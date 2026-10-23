@@ -4,13 +4,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Apenas admins ou chamada interna (automação)
-    const isAuth = await base44.auth.isAuthenticated();
-    if (isAuth) {
-      const user = await base44.auth.me();
-      if (user?.role !== 'admin') {
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
-      }
+    // A URL é pública: a chamada interna (automação) age como admin, mas anônimo não entra.
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const now = new Date();
@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
     });
 
     let sent = 0;
+    const failed = [];
 
     for (const partner of partners) {
       if (!partner.owner_email) continue;
@@ -116,18 +117,23 @@ Deno.serve(async (req) => {
   </div>
 </div>`;
 
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: partner.owner_email,
-        subject: `📊 Relatório Semanal — ${partner.business_name} (${weekLabel})`,
-        body,
-        from_name: 'Clube Max Descontos'
-      });
-
-      sent++;
+      // Um destinatário com problema não pode derrubar o relatório dos demais.
+      try {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: partner.owner_email,
+          subject: `📊 Relatório Semanal — ${partner.business_name} (${weekLabel})`,
+          body,
+          from_name: 'Clube Max Descontos'
+        });
+        sent++;
+      } catch (err) {
+        failed.push({ email: partner.owner_email, error: err.message });
+        console.error(`Falha ao enviar relatório para ${partner.owner_email}:`, err.message);
+      }
     }
 
-    console.log(`Relatório semanal enviado para ${sent} parceiros.`);
-    return Response.json({ success: true, sent });
+    console.log(`Relatório semanal: ${sent} enviados, ${failed.length} falhas.`);
+    return Response.json({ success: true, sent, failed });
   } catch (error) {
     console.error('Erro no relatório semanal:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
