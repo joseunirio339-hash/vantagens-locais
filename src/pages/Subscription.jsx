@@ -109,11 +109,24 @@ export default function Subscription() {
     setSelectedPlan(planType);
     setLoading(true);
 
+    // Em preview o app roda dentro de um iframe: a aba do checkout precisa ser
+    // aberta agora, de forma sincrona, senao o navegador bloqueia o pop-up.
+    const isFramed = window.self !== window.top;
+    const checkoutTab = isFramed ? window.open('', '_blank') : null;
+    if (checkoutTab) checkoutTab.opener = null;
+
+    if (isFramed && !checkoutTab) {
+      setLoading(false);
+      toast.error('Permita pop-ups no navegador para concluir o pagamento');
+      return;
+    }
+
     const isFreeTrialEligible = planType === 'user' && !existingSubscriptions.find(s => s.type === 'user') && !hasUsedTrial;
 
     try {
       // Se é trial gratuito do plano user, ativa sem Stripe
       if (isFreeTrialEligible) {
+        checkoutTab?.close();
         const startsAt = new Date();
         const expiresAt = new Date();
         expiresAt.setMonth(expiresAt.getMonth() + 1);
@@ -140,18 +153,18 @@ export default function Subscription() {
         ...(representativeCode ? { representative_code: representativeCode } : {})
       });
 
-      if (response.data.isIframe) {
-        setLoading(false);
-        toast.error('Abra o checkout em uma nova janela (pop-up)');
-        return;
-      }
-
-      if (response.data.url) {
-        window.location.href = response.data.url;
-      } else {
+      const url = response.data?.url;
+      if (!url) {
         throw new Error('Falha ao gerar link de checkout');
       }
+
+      if (checkoutTab) {
+        checkoutTab.location.replace(url);
+      } else {
+        window.location.assign(url);
+      }
     } catch (error) {
+      checkoutTab?.close();
       setLoading(false);
       toast.error('Erro ao processar assinatura');
       console.error(error);

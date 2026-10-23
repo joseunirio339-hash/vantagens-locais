@@ -2,7 +2,25 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import Stripe from 'npm:stripe@14.25.0';
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
-const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
+// Durante a troca dos endpoints do Stripe dois segredos podem estar ativos.
+const webhookSecrets = [
+  Deno.env.get("STRIPE_WEBHOOK_SECRET"),
+  Deno.env.get("STRIPE_WEBHOOK_SECRET_2"),
+].filter(Boolean) as string[];
+
+async function constructEvent(body: string, signature: string) {
+  let lastError: unknown = null;
+  for (const secret of webhookSecrets) {
+    try {
+      return await stripe.webhooks.constructEventAsync(body, signature, secret);
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  console.error('Webhook signature verification failed for all secrets');
+  throw lastError instanceof Error ? lastError : new Error('Invalid webhook signature');
+}
 
 Deno.serve(async (req) => {
   try {
@@ -16,7 +34,7 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.text();
-    const event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    const event = await constructEvent(body, signature);
 
     const base44 = createClientFromRequest(req);
 
