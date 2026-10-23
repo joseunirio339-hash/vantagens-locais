@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 const planLabels = {
+  'price_1UTqAOLsB3SzuNJIDZB2VNbC': 'Plano Usuário',
   'price_1TY8efLsB3SzuNJItliAzOIn': 'Plano Usuário',
   'price_1TY8efLsB3SzuNJIgs5Hw2ka': 'Plano Lojista',
   'price_1TY8efLsB3SzuNJIjd10iAOn': 'Plano Empreendedor',
