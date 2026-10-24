@@ -4,7 +4,21 @@
   "properties": {
     "user_email": {
       "type": "string",
-      "description": "Email do usu\u00e1rio que ganhou a badge"
+      "description": "Email do usu\u00e1rio que ganhou a badge",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
     },
     "badge_id": {
       "type": "string",

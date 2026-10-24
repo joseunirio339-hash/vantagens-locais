@@ -4,7 +4,21 @@
   "properties": {
     "user_email": {
       "type": "string",
-      "description": "Email do usu\u00e1rio"
+      "description": "Email do usu\u00e1rio",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
     },
     "total_points": {
       "type": "number",
@@ -60,16 +74,9 @@
       ]
     },
     "update": {
-      "$or": [
-        {
-          "data.user_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "$or": [

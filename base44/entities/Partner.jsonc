@@ -101,7 +101,25 @@
     },
     "owner_email": {
       "type": "string",
-      "description": "Email do propriet\u00e1rio"
+      "description": "Email do propriet\u00e1rio",
+      "rls": {
+        "read": {
+          "$or": [
+            {
+              "created_by_id": "{{user.id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "owner_ref": {
+      "type": "string",
+      "description": "Identificador interno do dono da loja (usado para vincular agendas e visualiza\u00e7\u00f5es ao painel do parceiro)"
     },
     "monthly_report_email": {
       "type": "boolean",

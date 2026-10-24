@@ -10,6 +10,10 @@
       "type": "string",
       "description": "Email do dono da loja (para o parceiro acessar a agenda do seu neg\u00f3cio)"
     },
+    "partner_owner_ref": {
+      "type": "string",
+      "description": "Identificador interno do dono da loja (vincula a agenda ao painel do parceiro)"
+    },
     "user_email": {
       "type": "string",
       "description": "Email do usu\u00e1rio"
@@ -71,6 +75,9 @@
           "data.partner_owner_email": "{{user.email}}"
         },
         {
+          "data.partner_owner_ref": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -101,6 +108,9 @@
           "data.partner_owner_email": "{{user.email}}"
         },
         {
+          "data.partner_owner_ref": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -114,6 +124,9 @@
         },
         {
           "data.partner_owner_email": "{{user.email}}"
+        },
+        {
+          "data.partner_owner_ref": "{{user.id}}"
         },
         {
           "user_condition": {
