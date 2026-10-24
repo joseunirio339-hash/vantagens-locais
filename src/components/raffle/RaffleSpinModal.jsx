@@ -1,58 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Gift, Ticket, Trophy, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 import SpinWheel from './SpinWheel';
 import confetti from 'canvas-confetti';
 
 export default function RaffleSpinModal({ open, onClose, raffle, partner, user, availableVouchers }) {
   const [spinning, setSpinning] = useState(false);
   const [prize, setPrize] = useState(null);
-  const [usedVoucher, setUsedVoucher] = useState(null);
+  const [prizeIndex, setPrizeIndex] = useState(null);
 
   const needed = raffle?.vouchers_per_spin || 1;
   const eligibleVouchers = availableVouchers.filter(v =>
     v.partner_id === partner?.id && v.status === 'used'
   );
 
-  // Vouchers already used for spins (to avoid reuse)
+  // Vouchers que já participaram de um giro ficam gravados no banco — a tela lê
+  // do servidor, e é o servidor que impede o mesmo voucher participar duas vezes.
   const [spentVoucherIds, setSpentVoucherIds] = useState([]);
   const spendableVouchers = eligibleVouchers.filter(v => !spentVoucherIds.includes(v.id));
   const canSpin = spendableVouchers.length >= needed && !spinning;
 
-  const handleSpin = () => {
+  useEffect(() => {
+    if (!open || !raffle?.id || !partner?.id || !user?.email) return;
+    let cancelled = false;
+    const loadSpent = async () => {
+      const spins = await base44.entities.RaffleSpin.filter({
+        partner_id: partner.id,
+        user_email: user.email
+      });
+      if (!cancelled) setSpentVoucherIds(spins.map(s => s.voucher_id));
+    };
+    loadSpent();
+    return () => { cancelled = true; };
+  }, [open, raffle?.id, partner?.id, user?.email]);
+
+  const handleSpin = async () => {
     if (!canSpin) return;
     const voucher = spendableVouchers[0];
-    setUsedVoucher(voucher);
     setPrize(null);
+    setPrizeIndex(null);
     setSpinning(true);
+
+    // Sorteio, gasto do voucher e gravação do giro acontecem no servidor
+    try {
+      const res = await base44.functions.invoke('spinRaffle', {
+        raffle_id: raffle.id,
+        voucher_id: voucher.id
+      });
+      if (res.data?.success !== true) {
+        throw new Error(res.data?.error || 'Não foi possível girar a roleta.');
+      }
+      setSpentVoucherIds(prev => [...prev, voucher.id]);
+      setPrizeIndex(res.data.prize_index);
+    } catch (err) {
+      setSpinning(false);
+      toast.error(err?.response?.data?.error || err?.message || 'Não foi possível girar a roleta.');
+    }
   };
 
-  const handleSpinEnd = async (prizeIdx) => {
+  const handleSpinEnd = () => {
     setSpinning(false);
-    const wonPrize = raffle.prizes[prizeIdx];
-    setPrize(wonPrize);
-    setSpentVoucherIds(prev => [...prev, usedVoucher.id]);
-
-    // Save spin record
-    await base44.entities.RaffleSpin.create({
-      raffle_id: raffle.id,
-      partner_id: partner.id,
-      user_email: user.email,
-      voucher_id: usedVoucher.id,
-      prize_won: wonPrize.label
-    });
-
-    // Confetti!
+    setPrize(raffle.prizes[prizeIndex]);
     confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
   };
 
   const handleClose = () => {
     setPrize(null);
+    setPrizeIndex(null);
     setSpinning(false);
-    setUsedVoucher(null);
     onClose();
   };
 
@@ -82,6 +101,7 @@ export default function RaffleSpinModal({ open, onClose, raffle, partner, user, 
           <SpinWheel
             prizes={raffle.prizes || []}
             spinning={spinning}
+            targetIndex={prizeIndex}
             onSpinEnd={handleSpinEnd}
           />
         </div>

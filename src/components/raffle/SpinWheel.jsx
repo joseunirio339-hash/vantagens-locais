@@ -5,7 +5,7 @@ const DEFAULT_COLORS = [
   '#2563EB', '#DC2626', '#7C3AED', '#0891B2'
 ];
 
-export default function SpinWheel({ prizes, spinning, onSpinEnd }) {
+export default function SpinWheel({ prizes, spinning, targetIndex, onSpinEnd }) {
   const canvasRef = useRef(null);
   const currentRotRef = useRef(0);
   const animRef = useRef(null);
@@ -72,16 +72,11 @@ export default function SpinWheel({ prizes, spinning, onSpinEnd }) {
   }, [prizes]);
 
   useEffect(() => {
+    // O prêmio já vem decidido pelo servidor: aqui só animamos até ele.
     if (!spinning || isAnimating || numPrizes === 0) return;
+    if (targetIndex == null || targetIndex < 0 || targetIndex >= numPrizes) return;
 
-    // Pick prize by weight
-    const totalWeight = prizes.reduce((s, p) => s + (p.weight || 1), 0);
-    let rand = Math.random() * totalWeight;
-    let targetIdx = 0;
-    for (let i = 0; i < prizes.length; i++) {
-      rand -= prizes[i].weight || 1;
-      if (rand <= 0) { targetIdx = i; break; }
-    }
+    const targetIdx = targetIndex;
 
     setIsAnimating(true);
 
@@ -112,7 +107,7 @@ export default function SpinWheel({ prizes, spinning, onSpinEnd }) {
     animRef.current = requestAnimationFrame(animate);
 
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, [spinning]);
+  }, [spinning, targetIndex]);
 
   return (
     <div className="flex flex-col items-center">
