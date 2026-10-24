@@ -127,19 +127,12 @@ export default function Subscription() {
       // Se é trial gratuito do plano user, ativa sem Stripe
       if (isFreeTrialEligible) {
         checkoutTab?.close();
-        const startsAt = new Date();
-        const expiresAt = new Date();
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
 
-        await base44.entities.Subscription.create({
-          user_email: user.email,
-          type: 'user',
-          status: 'active',
-          price: 0,
-          is_trial: true,
-          starts_at: startsAt.toISOString().split('T')[0],
-          expires_at: expiresAt.toISOString().split('T')[0]
-        });
+        // A ativação é decidida no servidor: o navegador não cria mais a assinatura
+        const res = await base44.functions.invoke('activateTrial', {});
+        if (res.data?.success !== true) {
+          throw new Error(res.data?.error || 'Não foi possível ativar o teste gratuito.');
+        }
 
         setLoading(false);
         toast.success('🎁 Período de teste gratuito ativado por 1 mês!');
@@ -166,7 +159,7 @@ export default function Subscription() {
     } catch (error) {
       checkoutTab?.close();
       setLoading(false);
-      toast.error('Erro ao processar assinatura');
+      toast.error(error?.response?.data?.error || error?.message || 'Erro ao processar assinatura');
       console.error(error);
     }
   };

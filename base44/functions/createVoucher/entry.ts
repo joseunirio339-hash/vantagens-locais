@@ -50,6 +50,21 @@ export default async function (req) {
       return Response.json({ error: 'Este produto não tem desconto ativo.' }, { status: 400 });
     }
 
+    // Limite: um voucher ativo por produto e por usuário. Sem isso dá para gerar
+    // vouchers sem parar e acumular pontos, selos e códigos de desconto.
+    const today = new Date().toISOString().split('T')[0];
+    const activeVouchers = await base44.asServiceRole.entities.Voucher.filter({
+      user_email: user.email,
+      product_id: product.id,
+      status: 'pending',
+      expires_at: { $gte: today }
+    });
+    if (activeVouchers.length > 0) {
+      return Response.json({
+        error: 'Você já tem um voucher ativo para este produto. Use-o ou aguarde a validade antes de gerar outro.'
+      }, { status: 429 });
+    }
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
     const expires_at = expiresAt.toISOString().split('T')[0];
