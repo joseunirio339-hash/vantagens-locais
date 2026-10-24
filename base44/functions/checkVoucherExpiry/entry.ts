@@ -4,8 +4,15 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Esta função é chamada via automação agendada (sem usuário logado)
-    // Usa apenas service role
+    // Esta função é chamada via automação agendada (que age como admin)
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const today = new Date();
     const in3Days = new Date(today);
     in3Days.setDate(today.getDate() + 3);

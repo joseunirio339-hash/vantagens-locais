@@ -4,6 +4,15 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
+    // Chamada pela automação agendada: só admin (ou a automação, que age como admin) pode disparar
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     // Calcula a janela: vouchers que vencem entre 23h e 25h a partir de agora
     const now = new Date();
     const in23h = new Date(now.getTime() + 23 * 60 * 60 * 1000);
