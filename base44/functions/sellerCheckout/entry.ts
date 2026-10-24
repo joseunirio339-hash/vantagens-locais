@@ -13,7 +13,12 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // App público: não exige login, mas vendedores autenticados usam seus próprios dados.
+    // Somente o próprio vendedor logado pode gerar links de venda
+    const user = await base44.auth.me();
+    if (!user || !user.email) {
+      return Response.json({ error: 'Faça login para gerar o link de venda.' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { subscriptionType, representative_code, customer_email } = body;
 
@@ -32,16 +37,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'App URL not available' }, { status: 500 });
     }
 
-    // Valida o código do vendedor (opcional, mas recomendado)
-    if (representative_code) {
-      try {
-        const reps = await base44.asServiceRole.entities.Representative.filter({ code: representative_code, is_seller: true, is_active: true });
-        if (reps.length === 0) {
-          console.warn('sellerCheckout: código de vendedor inválido/inativo ->', representative_code);
-        }
-      } catch (e) {
-        console.warn('sellerCheckout: falha ao validar vendedor ->', e.message);
-      }
+    // O código do vendedor precisa existir, estar ativo e pertencer à conta logada
+    if (!representative_code) {
+      return Response.json({ error: 'Código de vendedor é obrigatório' }, { status: 400 });
+    }
+    const reps = await base44.asServiceRole.entities.Representative.filter({
+      code: representative_code,
+      is_seller: true,
+      is_active: true
+    });
+    const rep = reps[0];
+    if (!rep || (rep.email || '').trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+      console.error('sellerCheckout: código de vendedor inválido para', user.email);
+      return Response.json({ error: 'Código de vendedor inválido para esta conta' }, { status: 403 });
     }
 
     const session = await stripe.checkout.sessions.create({

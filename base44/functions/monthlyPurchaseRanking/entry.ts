@@ -6,6 +6,12 @@ export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
 
+    // Ranking visível apenas para quem está logado (evita varreduras anônimas da base)
+    const user = await base44.auth.me();
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Get start and end of current month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];

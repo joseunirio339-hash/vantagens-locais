@@ -4,13 +4,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Permite chamada por automação (sem auth) ou por admin
-    const isAuth = await base44.auth.isAuthenticated();
-    if (isAuth) {
-      const user = await base44.auth.me();
-      if (user?.role !== 'admin') {
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
-      }
+    // Chamada apenas pela automação agendada (que age como admin)
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Define o mês anterior
