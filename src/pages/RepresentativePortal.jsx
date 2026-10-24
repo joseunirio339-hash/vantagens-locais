@@ -93,7 +93,7 @@ export default function RepresentativePortal() {
   });
 
   const copyLink = (code) => {
-    const link = `https://vantagens-locais-app.base44.app/rep/${code}`;
+    const link = `https://clubemaxdescontos.com.br/rep/${code}`;
     navigator.clipboard.writeText(link);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(null), 2000);
@@ -362,7 +362,7 @@ export default function RepresentativePortal() {
               <div className="flex gap-2 w-full sm:w-auto">
                 <Input
                   readOnly
-                  value={`https://vantagens-locais-app.base44.app/rep/${rep.code}`}
+                  value={`https://clubemaxdescontos.com.br/rep/${rep.code}`}
                   className="font-mono text-sm flex-1 sm:w-80"
                 />
                 <Button onClick={() => copyLink(rep.code)} variant="default" className="bg-violet-600 hover:bg-violet-700">

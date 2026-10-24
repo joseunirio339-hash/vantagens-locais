@@ -195,7 +195,7 @@ export default function AdminDashboard() {
   };
 
   const copyRepLink = (code) => {
-    const link = `https://vantagens-locais-app.base44.app/rep/${code}`;
+    const link = `https://clubemaxdescontos.com.br/rep/${code}`;
     navigator.clipboard.writeText(link);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);

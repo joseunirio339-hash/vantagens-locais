@@ -97,7 +97,7 @@ export default function RepresentativesDashboard() {
   };
 
   const copyLink = (code) => {
-    const link = `https://vantagens-locais-app.base44.app/rep/${code}`;
+    const link = `https://clubemaxdescontos.com.br/rep/${code}`;
     navigator.clipboard.writeText(link);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
@@ -484,7 +484,7 @@ export default function RepresentativesDashboard() {
                 placeholder="MARCOS10"
               />
               <p className="text-xs text-slate-400 mt-1">
-                Link: vantagens-locais-app.base44.app/rep/{newRep.code || 'CODIGO'}
+                Link: clubemaxdescontos.com.br/rep/{newRep.code || 'CODIGO'}
               </p>
             </div>
             <div>

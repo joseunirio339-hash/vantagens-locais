@@ -221,7 +221,7 @@ export default function VendedorApp() {
               <p className="text-xs text-slate-500">{rep.name} · Código {rep.code}</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => copyLink(`https://vantagens-locais-app.base44.app/rep/${rep.code}`, 'link')}>
+          <Button variant="outline" size="sm" onClick={() => copyLink(`https://clubemaxdescontos.com.br/rep/${rep.code}`, 'link')}>
             {copiedCode === 'link' ? <Check className="w-4 h-4 text-emerald-500 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
             Meu Link
           </Button>

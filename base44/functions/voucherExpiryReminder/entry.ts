@@ -48,7 +48,7 @@ Seu voucher está prestes a vencer. Não perca essa oportunidade!
 
 Apresente este código na loja para aproveitar seu desconto antes que expire.
 
-Acesse seus vouchers em: https://vantagens-locais-app.base44.app/MyVouchers
+Acesse seus vouchers em: https://clubemaxdescontos.com.br/MyVouchers
 
 ---
 Clube Max Descontos — Conectando descontos a você

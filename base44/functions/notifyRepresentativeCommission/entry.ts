@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
     const commissionPercentage = rep.commission_percentage || 50;
     const commissionValue = commission.commission_amount?.toFixed(2).replace('.', ',') || '0,00';
     const planPrice = commission.subscription_price?.toFixed(2).replace('.', ',') || '0,00';
-    const portalUrl = 'https://vantagens-locais-app.base44.app/RepresentativePortal';
+    const portalUrl = 'https://clubemaxdescontos.com.br/RepresentativePortal';
 
     // Enviar e-mail para o representante
     const emailBody = `
