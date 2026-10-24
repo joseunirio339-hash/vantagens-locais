@@ -428,7 +428,7 @@ Deno.serve(async (req) => {
     doc.setTextColor(156, 163, 175);
     doc.text('Clube Max de Desconto — Conectando descontos a voce', 105, y, { align: 'center' });
     y += 5;
-    doc.text('clubemaxdescontos@gmail.com | (35) 98839-7979 | @clubemaxdescontos', 105, y, { align: 'center' });
+    doc.text('clubemaxdescontos@gmail.com | (21) 99791-4496 | @clubemaxdescontos', 105, y, { align: 'center' });
 
     const pdfBytes = doc.output('arraybuffer');
     return new Response(pdfBytes, {

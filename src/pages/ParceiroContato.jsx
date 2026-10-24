@@ -274,14 +274,14 @@ Mensagem: ${form.mensagem || '(sem mensagem)'}
           {/* Canais diretos */}
           <div className="mt-8 grid sm:grid-cols-3 gap-4 text-center">
             <a
-              href="https://wa.me/5535988397979"
+              href="https://wa.me/5521997914496"
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-4 bg-emerald-50 rounded-2xl hover:bg-emerald-100 transition-colors border border-emerald-200"
             >
               <MessageCircle className="w-7 h-7 text-emerald-600" />
               <span className="text-sm font-semibold text-emerald-700">WhatsApp</span>
-              <span className="text-xs text-emerald-600">(35) 98839-7979</span>
+              <span className="text-xs text-emerald-600">(21) 99791-4496</span>
             </a>
             <a
               href="mailto:clubemaxdescontos@gmail.com"
