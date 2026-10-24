@@ -386,6 +386,17 @@ export default function Layout({ children }) {
           <div className="border-t border-stone-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-stone-500">
               © {new Date().getFullYear()} Descontos do Club Max · Feito com carinho pra você economizar
+              <span className="hidden sm:inline"> · </span>
+              <br className="sm:hidden" />
+              Desenvolvido por{' '}
+              <a
+                href="https://carolinebrandstudio.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-stone-400 hover:text-amber-400 transition-colors underline-offset-2 hover:underline"
+              >
+                Caroline Brand Studio
+              </a>
             </p>
             <div className="flex gap-5">
               <Link to="/PrivacyPolicy" className="text-xs text-stone-500 hover:text-stone-300 transition-colors">
