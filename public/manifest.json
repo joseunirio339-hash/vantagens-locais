@@ -1,0 +1,19 @@
+{
+  "name": "Descontos do Club Max",
+  "short_name": "Club Max",
+  "description": "Ofertas, cupons e vouchers de lojistas parceiros perto de você.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF9C45",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6996317474c6e4e8fab2245f/188f1bafc_clubemax.png",
+      "sizes": "956x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -51,7 +51,7 @@ export default function ProductCard({ product, partner, onClick, showViews = fal
             <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
               <Tag className="w-6 h-6 text-amber-400" />
             </div>
-            <span className="text-xs font-medium text-amber-300/80">Em breve</span>
+            <span className="text-xs font-medium text-amber-300/80">Sem foto</span>
           </div>
         )}
 
