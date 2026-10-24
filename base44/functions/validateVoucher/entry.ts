@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml } from '../../shared/security.ts';
 
 // Validação de voucher pelo QR Code, feita no servidor.
 // O dono da loja é identificado pela sessão e só ele pode marcar o voucher como usado.
@@ -66,8 +67,8 @@ export default async function (req) {
               <h1 style="color: #fafafa; margin: 0; font-size: 22px;">✅ Voucher validado</h1>
             </div>
             <div style="background: #fefcf8; border: 1px solid #e5e7eb; padding: 24px; border-radius: 0 0 16px 16px;">
-              <p style="color: #334155; font-size: 15px; margin: 0 0 8px;">O voucher <strong>${voucher.code}</strong> foi validado com sucesso.</p>
-              <p style="color: #64748b; font-size: 13px; margin: 0;">Produto: ${voucher.product_name || '-'} · Cliente: ${voucher.user_name || 'não informado'} · Valor: R$ ${Number(voucher.discount_price || 0).toFixed(2).replace('.', ',')}</p>
+              <p style="color: #334155; font-size: 15px; margin: 0 0 8px;">O voucher <strong>${escapeHtml(voucher.code)}</strong> foi validado com sucesso.</p>
+              <p style="color: #64748b; font-size: 13px; margin: 0;">Produto: ${escapeHtml(voucher.product_name) || '-'} · Cliente: ${escapeHtml(voucher.user_name) || 'não informado'} · Valor: R$ ${Number(voucher.discount_price || 0).toFixed(2).replace('.', ',')}</p>
             </div>
           </div>
         `

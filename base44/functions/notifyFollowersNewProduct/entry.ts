@@ -1,12 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml } from '../../shared/security.ts';
 
 // Avisa os seguidores de um parceiro quando ele cadastra um produto com desconto.
 // Roda apenas pela automação/admin e sempre relê o produto e o parceiro do banco
 // (o que chega no corpo da requisição não é usado como fonte de verdade).
-const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-}[c]));
-
 export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);

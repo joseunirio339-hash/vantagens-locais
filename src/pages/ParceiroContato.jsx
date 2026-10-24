@@ -38,23 +38,21 @@ export default function ParceiroContato() {
     }
     setEnviando(true);
 
-    await base44.integrations.Core.SendEmail({
-      to: 'joseunirio339@gmail.com',
-      subject: `[Clube Max] Novo interesse de parceiro: ${form.negocio}`,
-      body: `
-Novo interesse de lojista parceiro:
-
-Nome: ${form.nome}
-Negócio: ${form.negocio}
-Telefone: ${form.telefone}
-Cidade: ${form.cidade}
-Mensagem: ${form.mensagem || '(sem mensagem)'}
-      `.trim()
-    });
-
-    setEnviado(true);
-    setEnviando(false);
-    toast.success('Mensagem enviada! Entraremos em contato em breve.');
+    try {
+      await base44.functions.invoke('partnerContactRequest', {
+        nome: form.nome,
+        negocio: form.negocio,
+        telefone: form.telefone,
+        cidade: form.cidade,
+        mensagem: form.mensagem
+      });
+      setEnviado(true);
+      toast.success('Mensagem enviada! Entraremos em contato em breve.');
+    } catch (error) {
+      toast.error('Não conseguimos enviar agora. Tente novamente ou fale pelo WhatsApp.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   if (enviado) {

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { secureCode } from '../../shared/security.ts';
 
 // Triggered by entity automation when a Voucher is updated to status=used
 // Also callable directly: { user_email }
@@ -114,7 +115,7 @@ Deno.serve(async (req) => {
         });
       } else {
         const namePart = userEmail.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').substring(0, 4).toUpperCase();
-        const randPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const randPart = secureCode(6);
         const newRecord = await base44.asServiceRole.entities.UserPoints.create({
           user_email: userEmail,
           total_points: pointsToAdd,

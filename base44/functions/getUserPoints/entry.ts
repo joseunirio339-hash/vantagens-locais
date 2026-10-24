@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { secureCode } from '../../shared/security.ts';
 
 // Returns or creates a UserPoints record for the authenticated user
 Deno.serve(async (req) => {
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
       .replace(/[^a-zA-Z0-9]/g, '')
       .substring(0, 4)
       .toUpperCase();
-    const randPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const randPart = secureCode(6);
     const referral_code = `${namePart}${randPart}`;
 
     const newRecord = await base44.entities.UserPoints.create({

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml } from '../../shared/security.ts';
 
 Deno.serve(async (req) => {
   try {
@@ -77,29 +78,29 @@ Deno.serve(async (req) => {
     <p style="color: #e9d5ff; margin: 8px 0 0; font-size: 14px;">Lembrete de Agendamento</p>
   </div>
   <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px;">
-    <p style="color: #374151; font-size: 16px;">Olá, <strong>${appt.user_name || 'Cliente'}</strong>! 👋</p>
+    <p style="color: #374151; font-size: 16px;">Olá, <strong>${escapeHtml(appt.user_name) || 'Cliente'}</strong>! 👋</p>
     <p style="color: #6b7280; font-size: 14px;">Seu agendamento está chegando! Não se esqueça:</p>
     <div style="background: #f5f3ff; border: 2px solid #7c3aed; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
       <p style="font-size: 32px; margin: 0 0 8px;">⏰</p>
       <p style="font-size: 22px; font-weight: 900; color: #5b21b6; margin: 0;">Em 2 horas!</p>
-      <p style="color: #6d28d9; font-size: 15px; margin: 8px 0 0;">${dateFormatted} às <strong>${appt.time_slot}</strong></p>
+      <p style="color: #6d28d9; font-size: 15px; margin: 8px 0 0;">${dateFormatted} às <strong>${escapeHtml(appt.time_slot)}</strong></p>
     </div>
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
       <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Estabelecimento</td>
-        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${partnerName}</td>
+        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${escapeHtml(partnerName)}</td>
       </tr>
       ${appt.product_name ? `<tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Serviço</td>
-        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${appt.product_name}</td>
+        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${escapeHtml(appt.product_name)}</td>
       </tr>` : ''}
       <tr>
         <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Endereço</td>
-        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${partner.address || 'Ver no app'}</td>
+        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${escapeHtml(partner.address) || 'Ver no app'}</td>
       </tr>
     </table>
     ${appt.notes ? `<div style="background: #fef9c3; border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 6px; margin-top: 16px;">
-      <p style="margin: 0; font-size: 13px; color: #92400e;">📝 <strong>Observações:</strong> ${appt.notes}</p>
+      <p style="margin: 0; font-size: 13px; color: #92400e;">📝 <strong>Observações:</strong> ${escapeHtml(appt.notes)}</p>
     </div>` : ''}
     <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 28px;">Clube Max Descontos — Bom atendimento! 🛒</p>
   </div>
@@ -137,24 +138,24 @@ Deno.serve(async (req) => {
     <p style="color: #a7f3d0; margin: 8px 0 0; font-size: 14px;">Lembrete de Agendamento</p>
   </div>
   <div style="background: white; padding: 32px; border-radius: 0 0 12px 12px;">
-    <p style="color: #374151; font-size: 16px;">Olá, <strong>${partnerName}</strong>! 👋</p>
+    <p style="color: #374151; font-size: 16px;">Olá, <strong>${escapeHtml(partnerName)}</strong>! 👋</p>
     <p style="color: #6b7280; font-size: 14px;">Um cliente chega em <strong>2 horas</strong>. Prepare-se para o atendimento:</p>
     <div style="background: #ecfdf5; border: 2px solid #059669; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
-      <p style="font-size: 28px; font-weight: 900; color: #065f46; margin: 0;">${appt.user_name || 'Cliente'}</p>
-      <p style="color: #6b7280; font-size: 14px; margin: 6px 0 0;">${dateFormatted} às <strong>${appt.time_slot}</strong></p>
+      <p style="font-size: 28px; font-weight: 900; color: #065f46; margin: 0;">${escapeHtml(appt.user_name) || 'Cliente'}</p>
+      <p style="color: #6b7280; font-size: 14px; margin: 6px 0 0;">${dateFormatted} às <strong>${escapeHtml(appt.time_slot)}</strong></p>
     </div>
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
       ${appt.product_name ? `<tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">Serviço</td>
-        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${appt.product_name}</td>
+        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${escapeHtml(appt.product_name)}</td>
       </tr>` : ''}
       <tr>
         <td style="padding: 10px 0; color: #6b7280; font-size: 14px;">E-mail do cliente</td>
-        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${appt.user_email}</td>
+        <td style="padding: 10px 0; font-weight: 600; color: #111827; font-size: 14px; text-align: right;">${escapeHtml(appt.user_email)}</td>
       </tr>
     </table>
     ${appt.notes ? `<div style="background: #fef9c3; border-left: 4px solid #f59e0b; padding: 14px 16px; border-radius: 6px; margin-top: 16px;">
-      <p style="margin: 0; font-size: 13px; color: #92400e;">📝 <strong>Observações do cliente:</strong> ${appt.notes}</p>
+      <p style="margin: 0; font-size: 13px; color: #92400e;">📝 <strong>Observações do cliente:</strong> ${escapeHtml(appt.notes)}</p>
     </div>` : ''}
     <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 28px;">Clube Max Descontos — Boas vendas! 🚀</p>
   </div>

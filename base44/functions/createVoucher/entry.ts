@@ -1,13 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { escapeHtml, secureCode, secureIndex } from '../../shared/security.ts';
 
 // Geração de vouchers feita no servidor.
 // O produto, o parceiro e os preços vêm do banco; pontos e selos só existem aqui,
 // então o navegador não consegue mais inventar saldo nem alterar valores.
 const VOUCHER_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const PRIZE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-const randomCode = (length, chars) =>
-  Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
 const money = (value) => Number(value || 0).toFixed(2).replace('.', ',');
 
@@ -70,7 +68,7 @@ export default async function (req) {
     if (useSingleVoucher) {
       records.push({
         ...base,
-        code: randomCode(8, VOUCHER_CHARS),
+        code: secureCode(8, VOUCHER_CHARS),
         product_id: product.id,
         product_name: `${product.name} (${quantity}x)`,
         original_price: originalPrice * quantity,
@@ -80,7 +78,7 @@ export default async function (req) {
       for (let i = 0; i < quantity; i++) {
         records.push({
           ...base,
-          code: randomCode(8, VOUCHER_CHARS),
+          code: secureCode(8, VOUCHER_CHARS),
           product_id: product.id,
           product_name: product.name,
           original_price: originalPrice,
@@ -126,9 +124,9 @@ export default async function (req) {
               <h1 style="color: #fafafa; margin: 0; font-size: 22px;">🎫 Seu voucher está pronto!</h1>
             </div>
             <div style="background: #fefcf8; border: 1px solid #e5e7eb; padding: 24px; border-radius: 0 0 16px 16px;">
-              <p style="color: #334155; font-size: 15px; margin: 0 0 12px;">Olá ${user.full_name || 'cliente'}! Use o código abaixo na loja:</p>
-              <p style="font-size: 26px; font-weight: bold; letter-spacing: 3px; color: #7322c3; text-align: center; margin: 16px 0;">${created[0].code}</p>
-              <p style="color: #334155; font-size: 15px; margin: 0 0 4px;"><strong>${product.name}</strong> em ${partner.business_name || 'parceiro'}</p>
+              <p style="color: #334155; font-size: 15px; margin: 0 0 12px;">Olá ${escapeHtml(user.full_name) || 'cliente'}! Use o código abaixo na loja:</p>
+              <p style="font-size: 26px; font-weight: bold; letter-spacing: 3px; color: #7322c3; text-align: center; margin: 16px 0;">${escapeHtml(created[0].code)}</p>
+              <p style="color: #334155; font-size: 15px; margin: 0 0 4px;"><strong>${escapeHtml(product.name)}</strong> em ${escapeHtml(partner.business_name) || 'parceiro'}</p>
               <p style="color: #64748b; font-size: 13px; margin: 0 0 12px;">De R$ ${money(originalPrice * quantity)} por R$ ${money(totalDiscount)} · válido até ${new Date(expires_at + 'T12:00:00').toLocaleDateString('pt-BR')}</p>
               <div style="text-align: center; margin-top: 20px;">
                 <a href="https://clubemaxdescontos.com.br/MyVouchers" style="background: #7322c3; color: #fafafa; padding: 12px 28px; border-radius: 16px; text-decoration: none; font-weight: bold; font-size: 15px;">Ver meus vouchers</a>
@@ -148,7 +146,7 @@ export default async function (req) {
                   <h1 style="color: #fafafa; margin: 0; font-size: 22px;">🎉 Novo voucher gerado</h1>
                 </div>
                 <div style="background: #fefcf8; border: 1px solid #e5e7eb; padding: 24px; border-radius: 0 0 16px 16px;">
-                  <p style="color: #334155; font-size: 15px; margin: 0 0 8px;">${user.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}".</p>
+                  <p style="color: #334155; font-size: 15px; margin: 0 0 8px;">${escapeHtml(user.full_name) || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${escapeHtml(product.name)}".</p>
                   <p style="color: #334155; font-size: 15px; margin: 0;">Total com desconto: <strong>R$ ${money(totalDiscount)}</strong></p>
                 </div>
               </div>
@@ -212,14 +210,14 @@ export default async function (req) {
 
           if (newCount >= goal) {
             const options = cfg.discount_options?.length ? cfg.discount_options : ['10% OFF'];
-            stampPrize = options[Math.floor(Math.random() * options.length)];
+            stampPrize = options[secureIndex(options.length)];
 
             await base44.asServiceRole.entities.StampCard.update(card.id, {
               stamps_count: newCount - goal,
               stamps_goal: goal,
               total_completed: (card.total_completed || 0) + 1,
               discount_revealed: stampPrize,
-              reward_code: 'SELO-' + randomCode(6, PRIZE_CHARS),
+              reward_code: 'SELO-' + secureCode(6, PRIZE_CHARS),
               reward_status: 'unlocked'
             });
           } else {
