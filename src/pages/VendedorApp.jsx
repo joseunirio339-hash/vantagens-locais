@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -54,9 +53,6 @@ const SELLER_PLANS = [
 const planNames = { user: 'Usuário', stander: 'Stander', lojista: 'Lojista', partner: 'Parceiro' };
 
 export default function VendedorApp() {
-  const [searchParams] = useSearchParams();
-  const emailParam = searchParams.get('email');
-  const [email, setEmail] = useState(emailParam || '');
   const [rep, setRep] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -68,19 +64,22 @@ export default function VendedorApp() {
   const queryClient = useQueryClient();
 
   const handleLogin = async () => {
-    if (!email) return;
     setLoading(true);
     setError('');
     try {
+      const authed = await base44.auth.isAuthenticated();
+      if (!authed) {
+        base44.auth.redirectToLogin('/VendedorApp');
+        return;
+      }
       const res = await base44.functions.invoke('repPortal', {
         action: 'login',
-        email: email.trim().toLowerCase(),
         seller_only: true
       });
       if (res.data?.rep) {
         setRep(res.data.rep);
       } else {
-        setError('Vendedor não encontrado, inativo ou sem perfil de vendedor. Verifique com o administrador.');
+        setError('Não encontramos um perfil de vendedor ativo para o email da sua conta.');
       }
     } catch (e) {
       setError('Erro ao buscar dados. Tente novamente.');
@@ -89,18 +88,18 @@ export default function VendedorApp() {
   };
 
   useEffect(() => {
-    if (emailParam) handleLogin();
+    handleLogin();
   }, []);
 
   const { data: commissions = [], isLoading: loadingCommissions } = useQuery({
     queryKey: ['seller-commissions', rep?.id],
-    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions', email: rep.email, rep_id: rep.id })).data?.commissions || [],
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions' })).data?.commissions || [],
     enabled: !!rep,
   });
 
   const { data: clients = [], isLoading: loadingClients } = useQuery({
     queryKey: ['seller-clients', rep?.id],
-    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients', email: rep.email, rep_id: rep.id })).data?.clients || [],
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients' })).data?.clients || [],
     enabled: !!rep,
   });
 
@@ -132,8 +131,6 @@ export default function VendedorApp() {
       // Cria/atualiza o cliente no funil
       await base44.functions.invoke('repPortal', {
         action: 'save_client',
-        email: rep.email,
-        rep_id: rep.id,
         client: {
           name: newSale.name,
           email: newSale.email,
@@ -175,20 +172,13 @@ export default function VendedorApp() {
             <p className="text-sm text-slate-500">Acesse seu painel de vendas e comissões</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Email cadastrado</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            <p className="text-sm text-slate-500 text-center">
+              Entre com a conta do seu email de vendedor para acessar suas vendas e comissões.
+            </p>
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
             <Button
               onClick={handleLogin}
-              disabled={!email || loading}
+              disabled={loading}
               className="w-full bg-amber-500 hover:bg-amber-600"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}

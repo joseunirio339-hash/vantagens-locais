@@ -74,61 +74,29 @@ export default function EntrepreneurVoucherModal({
     }
 
     setLoading(true);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    const createdVouchers = [];
-
-    if (useUnified) {
-      const v = await base44.entities.Voucher.create({
-        code: generateVoucherCode(),
+    try {
+      const res = await base44.functions.invoke('createVoucher', {
         product_id: product.id,
-        partner_id: partner.id,
-        partner_owner_email: partner.owner_email,
-        user_cpf: cleanCPF,
-        user_name: user?.full_name || '',
-        user_email: user?.email || '',
-        product_name: `${product.name} (x${quantity})`,
-        original_price: product.original_price * quantity,
-        discount_price: product.discount_price * quantity,
-        status: 'pending',
-        expires_at: expiresAt.toISOString().split('T')[0]
+        cpf: cleanCPF,
+        quantity,
+        single_voucher: useUnified,
+        source: 'entrepreneur'
       });
-      createdVouchers.push(v);
-    } else {
-      for (let i = 0; i < quantity; i++) {
-        const v = await base44.entities.Voucher.create({
-          code: generateVoucherCode(),
-          product_id: product.id,
-          partner_id: partner.id,
-          partner_owner_email: partner.owner_email,
-          user_cpf: cleanCPF,
-          user_name: user?.full_name || '',
-          user_email: user?.email || '',
-          product_name: product.name,
-          original_price: product.original_price,
-          discount_price: product.discount_price,
-          status: 'pending',
-          expires_at: expiresAt.toISOString().split('T')[0]
-        });
-        createdVouchers.push(v);
+
+      const createdVouchers = res.data?.vouchers || [];
+      if (createdVouchers.length === 0) {
+        toast.error(res.data?.error || 'Não foi possível gerar o voucher.');
+        setLoading(false);
+        return;
       }
+
+      setVouchers(createdVouchers);
+      toast.success(useUnified ? 'Voucher único gerado com sucesso!' : `${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''}!`);
+      onSuccess?.(createdVouchers[0]);
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Não foi possível gerar o voucher.');
     }
-
-    await base44.entities.Notification.create({
-      partner_id: partner.id,
-      partner_owner_email: partner.owner_email,
-      type: 'new_voucher',
-      title: '🎉 Nova venda de desconto!',
-      message: `${user?.full_name || 'Um cliente'} gerou ${useUnified ? 'voucher único' : `${quantity} vouchers`} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
-      is_read: false,
-      reference_id: createdVouchers[0].id
-    });
-
-    setVouchers(createdVouchers);
     setLoading(false);
-    toast.success(useUnified ? 'Voucher único gerado com sucesso!' : `${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''}!`);
-    onSuccess?.(createdVouchers[0]);
   };
 
   const handleClose = () => {

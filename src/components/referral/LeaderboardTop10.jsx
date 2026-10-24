@@ -44,8 +44,7 @@ export default function LeaderboardTop10() {
           topUsers.map((u, i) => {
             const rank = i + 1;
             const medal = medalEmoji(rank);
-            const maskedEmail = u.user_email?.replace(/(.{2})(.*)(@.*)/, '$1***$3') || '---';
-            const initial = u.user_email?.charAt(0).toUpperCase() || '?';
+            const label = u.user_label || `Membro #${rank}`;
 
             return (
               <div key={u.id} className={`flex items-center gap-3 px-4 py-2.5 ${i < 3 ? 'bg-violet-50/40' : ''} border-b last:border-b-0`}>
@@ -57,9 +56,9 @@ export default function LeaderboardTop10() {
                   )}
                 </div>
                 <div className="w-7 h-7 bg-gradient-to-br from-violet-400 to-fuchsia-400 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs font-bold">{initial}</span>
+                  <span className="text-white text-xs font-bold">{rank}</span>
                 </div>
-                <p className="flex-1 text-sm text-slate-600 truncate">{maskedEmail}</p>
+                <p className="flex-1 text-sm text-slate-600 truncate">{label}</p>
                 <div className="flex items-center gap-1 text-violet-600 font-bold text-sm flex-shrink-0">
                   <Star className="w-3 h-3" />
                   {u.total_points}

@@ -54,8 +54,7 @@ function PodiumCard({ userPoint, rank, badges = [] }) {
     3: 'ring-amber-400',
   };
 
-  const initial = userPoint.user_email?.charAt(0).toUpperCase() || '?';
-  const maskedEmail = userPoint.user_email?.replace(/(.{2})(.*)(@.*)/, '$1***$3') || '---';
+  const label = userPoint.user_label || 'Membro';
   const tier = getTier(userPoint.total_points);
 
   return (
@@ -63,14 +62,14 @@ function PodiumCard({ userPoint, rank, badges = [] }) {
       {/* Avatar */}
       <div className="relative">
         <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br ${podiumColors[rank]} flex items-center justify-center ring-4 ${ringColors[rank]} ring-offset-2 shadow-xl`}>
-          <span className="text-white text-xl font-black">{initial}</span>
+          <span className="text-white text-xl font-black">{rank}</span>
         </div>
         <span className="absolute -bottom-1 -right-1 text-xl">{medals[rank]}</span>
       </div>
 
       {/* Info */}
       <div className="text-center">
-        <p className="text-xs font-semibold text-slate-700 max-w-[80px] truncate">{maskedEmail}</p>
+        <p className="text-xs font-semibold text-slate-700 max-w-[80px] truncate">{label}</p>
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tier.badge}`}>
           {tier.icon} {tier.label}
         </span>
@@ -93,8 +92,7 @@ function PodiumCard({ userPoint, rank, badges = [] }) {
 }
 
 function RankRow({ userPoint, rank, isCurrentUser, badges = [] }) {
-  const maskedEmail = userPoint.user_email?.replace(/(.{2})(.*)(@.*)/, '$1***$3') || '---';
-  const initial = userPoint.user_email?.charAt(0).toUpperCase() || '?';
+  const label = userPoint.user_label || 'Membro';
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
   const tier = getTier(userPoint.total_points);
 
@@ -115,13 +113,13 @@ function RankRow({ userPoint, rank, isCurrentUser, badges = [] }) {
 
       {/* Avatar */}
       <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-        <span className="text-white text-sm font-bold">{initial}</span>
+        <span className="text-white text-sm font-bold">{rank}</span>
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="font-semibold text-slate-700 text-sm truncate">{maskedEmail}</p>
+          <p className="font-semibold text-slate-700 text-sm truncate">{label}</p>
           {isCurrentUser && <Badge className="text-xs bg-violet-100 text-violet-700 px-1.5 py-0 h-4">Você</Badge>}
         </div>
         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -161,28 +159,17 @@ export default function Leaderboard() {
     }
   });
 
-  // Busca todas as badges dos usuários do ranking
-  const { data: allBadges = [] } = useQuery({
-    queryKey: ['leaderboard-badges', topUsers.map(u => u.user_email).join(',')],
-    queryFn: () => base44.entities.Badge.list('-created_date', 200),
-    enabled: topUsers.length > 0,
+  // As conquistas exibidas são apenas as do próprio usuário (o email dos outros é privado)
+  const { data: myBadges = [] } = useQuery({
+    queryKey: ['leaderboard-my-badges', currentUser?.email],
+    queryFn: () => base44.entities.Badge.filter({ user_email: currentUser.email }),
+    enabled: !!currentUser,
   });
 
-  // Mapeia email -> badges ganhas (top 3 mais raras)
-  const badgesByUser = useMemo(() => {
-    const map = {};
-    allBadges.forEach(b => {
-      if (!map[b.user_email]) map[b.user_email] = [];
-      map[b.user_email].push(b.badge_id);
-    });
-    // Ordena pela raridade (HIGHLIGHT_BADGES está do mais raro ao mais comum)
-    Object.keys(map).forEach(email => {
-      map[email] = map[email]
-        .sort((a, b) => HIGHLIGHT_BADGES.indexOf(a) - HIGHLIGHT_BADGES.indexOf(b))
-        .slice(0, 3);
-    });
-    return map;
-  }, [allBadges]);
+  const myBadgeIds = useMemo(() => myBadges
+    .map(b => b.badge_id)
+    .sort((a, b) => HIGHLIGHT_BADGES.indexOf(a) - HIGHLIGHT_BADGES.indexOf(b))
+    .slice(0, 3), [myBadges]);
 
   // Find current user's position
   const { data: myPoints } = useQuery({
@@ -192,7 +179,7 @@ export default function Leaderboard() {
     select: data => data[0]
   });
 
-  const myRank = myPoints ? topUsers.findIndex(u => u.user_email === currentUser?.email) + 1 : null;
+  const myRank = myPoints ? topUsers.findIndex(u => u.id === myPoints.id) + 1 : null;
   const podium = topUsers.slice(0, 3);
   const rest = topUsers.slice(3);
 
@@ -300,9 +287,9 @@ export default function Leaderboard() {
                 </CardHeader>
                 <CardContent className="pt-4 pb-6">
                   <div className="flex items-end justify-center gap-3 md:gap-8">
-                    {podium[1] && <PodiumCard userPoint={podium[1]} rank={2} badges={badgesByUser[podium[1].user_email] || []} />}
-                    {podium[0] && <PodiumCard userPoint={podium[0]} rank={1} badges={badgesByUser[podium[0].user_email] || []} />}
-                    {podium[2] && <PodiumCard userPoint={podium[2]} rank={3} badges={badgesByUser[podium[2].user_email] || []} />}
+                    {podium[1] && <PodiumCard userPoint={podium[1]} rank={2} badges={myPoints && podium[1].id === myPoints.id ? myBadgeIds : []} />}
+                    {podium[0] && <PodiumCard userPoint={podium[0]} rank={1} badges={myPoints && podium[0].id === myPoints.id ? myBadgeIds : []} />}
+                    {podium[2] && <PodiumCard userPoint={podium[2]} rank={3} badges={myPoints && podium[2].id === myPoints.id ? myBadgeIds : []} />}
                   </div>
                 </CardContent>
               </Card>
@@ -322,8 +309,8 @@ export default function Leaderboard() {
                     key={u.id}
                     userPoint={u}
                     rank={i + 1}
-                    isCurrentUser={currentUser && u.user_email === currentUser.email}
-                    badges={badgesByUser[u.user_email] || []}
+                    isCurrentUser={!!myPoints && u.id === myPoints.id}
+                    badges={myPoints && u.id === myPoints.id ? myBadgeIds : []}
                   />
                 ))}
               </CardContent>

@@ -24,12 +24,10 @@ export default function ReferralLanding() {
     // If already authenticated, register the referral immediately
     base44.auth.isAuthenticated().then(async (authed) => {
       if (authed && code) {
-        const me = await base44.auth.me();
         const storedCode = localStorage.getItem('referral_code');
         if (storedCode) {
           await base44.functions.invoke('referralRegister', {
             referral_code: storedCode,
-            referred_email: me.email,
           });
           localStorage.removeItem('referral_code');
           setRegistered(true);

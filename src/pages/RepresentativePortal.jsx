@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -33,9 +32,6 @@ const clientStatusMap = {
 };
 
 export default function RepresentativePortal() {
-  const [searchParams] = useSearchParams();
-  const emailParam = searchParams.get('email');
-  const [email, setEmail] = useState(emailParam || '');
   const [rep, setRep] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,15 +44,19 @@ export default function RepresentativePortal() {
   const queryClient = useQueryClient();
 
   const handleLogin = async () => {
-    if (!email) return;
     setLoading(true);
     setError('');
     try {
-      const res = await base44.functions.invoke('repPortal', { action: 'login', email: email.trim().toLowerCase() });
+      const authed = await base44.auth.isAuthenticated();
+      if (!authed) {
+        base44.auth.redirectToLogin('/RepresentativePortal');
+        return;
+      }
+      const res = await base44.functions.invoke('repPortal', { action: 'login' });
       if (res.data?.rep) {
         setRep(res.data.rep);
       } else {
-        setError('Representante não encontrado ou conta inativa. Verifique o email.');
+        setError('Não encontramos um cadastro de representante ativo para o email da sua conta.');
       }
     } catch (e) {
       setError('Erro ao buscar dados. Tente novamente.');
@@ -65,7 +65,7 @@ export default function RepresentativePortal() {
   };
 
   useEffect(() => {
-    if (emailParam) handleLogin();
+    handleLogin();
   }, []);
 
   const { data: products = [], isLoading: loadingProducts } = useQuery({
@@ -82,13 +82,13 @@ export default function RepresentativePortal() {
 
   const { data: commissions = [], isLoading: loadingCommissions } = useQuery({
     queryKey: ['rep-commissions', rep?.id],
-    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions', email: rep.email, rep_id: rep.id })).data?.commissions || [],
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'commissions' })).data?.commissions || [],
     enabled: !!rep,
   });
 
   const { data: clients = [], isLoading: loadingClients } = useQuery({
     queryKey: ['rep-clients', rep?.id],
-    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients', email: rep.email, rep_id: rep.id })).data?.clients || [],
+    queryFn: async () => (await base44.functions.invoke('repPortal', { action: 'clients' })).data?.clients || [],
     enabled: !!rep,
   });
 
@@ -128,8 +128,6 @@ export default function RepresentativePortal() {
     try {
       await base44.functions.invoke('repPortal', {
         action: 'save_client',
-        email: rep.email,
-        rep_id: rep.id,
         client: { ...newClient, id: editingClient?.id },
       });
       toast.success(editingClient ? 'Cliente atualizado!' : 'Cliente cadastrado!');
@@ -143,7 +141,7 @@ export default function RepresentativePortal() {
 
   const handleDeleteClient = async (client) => {
     if (!confirm(`Remover ${client.name} da lista?`)) return;
-    await base44.functions.invoke('repPortal', { action: 'delete_client', email: rep.email, rep_id: rep.id, client_id: client.id });
+    await base44.functions.invoke('repPortal', { action: 'delete_client', client_id: client.id });
     queryClient.invalidateQueries({ queryKey: ['rep-clients', rep?.id] });
     toast.success('Cliente removido.');
   };
@@ -235,24 +233,17 @@ export default function RepresentativePortal() {
             <p className="text-sm text-slate-500">Acesse seu painel de vendas, produtos e clientes</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Email cadastrado</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            <p className="text-sm text-slate-500 text-center">
+              Entre com a conta do seu email de representante para acessar seus clientes e comissões.
+            </p>
+            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
             <Button
               onClick={handleLogin}
-              disabled={!email || loading}
+              disabled={loading}
               className="w-full bg-violet-600 hover:bg-violet-700"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Entrar
+              Entrar com minha conta
             </Button>
           </CardContent>
         </Card>

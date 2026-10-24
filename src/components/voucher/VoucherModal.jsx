@@ -46,162 +46,33 @@ export default function VoucherModal({ open, onClose, product, partner, user, on
     }
 
     setLoading(true);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    const createdVouchers = [];
-    const isSingle = showSingleVoucherOption && useSingleVoucher;
-
-    if (isSingle) {
-      // 1 voucher único representando todas as unidades
-      const v = await base44.entities.Voucher.create({
-        code: generateVoucherCode(),
+    try {
+      const res = await base44.functions.invoke('createVoucher', {
         product_id: product.id,
-        partner_id: partner.id,
-        partner_owner_email: partner.owner_email,
-        user_cpf: cleanCPF,
-        user_name: user?.full_name || '',
-        user_email: user?.email || '',
-        product_name: `${product.name} (${quantity}x)`,
-        original_price: product.original_price * quantity,
-        discount_price: product.discount_price * quantity,
-        status: 'pending',
-        expires_at: expiresAt.toISOString().split('T')[0]
+        cpf: cleanCPF,
+        quantity,
+        single_voucher: showSingleVoucherOption && useSingleVoucher,
+        source: 'product'
       });
-      createdVouchers.push(v);
-    } else {
-      for (let i = 0; i < quantity; i++) {
-        const v = await base44.entities.Voucher.create({
-          code: generateVoucherCode(),
-          product_id: product.id,
-          partner_id: partner.id,
-          partner_owner_email: partner.owner_email,
-          user_cpf: cleanCPF,
-          user_name: user?.full_name || '',
-          user_email: user?.email || '',
-          product_name: product.name,
-          original_price: product.original_price,
-          discount_price: product.discount_price,
-          status: 'pending',
-          expires_at: expiresAt.toISOString().split('T')[0]
-        });
-        createdVouchers.push(v);
+
+      const createdVouchers = res.data?.vouchers || [];
+      if (createdVouchers.length === 0) {
+        toast.error(res.data?.error || 'Não foi possível gerar o voucher.');
+        setLoading(false);
+        return;
       }
-    }
 
-    await base44.entities.Notification.create({
-      partner_id: partner.id,
-      partner_owner_email: partner.owner_email,
-      type: 'new_voucher',
-      title: 'Novo Voucher Gerado!',
-      message: `${user?.full_name || 'Um cliente'} gerou ${quantity} voucher${quantity > 1 ? 's' : ''} para "${product.name}" — Total: R$ ${totalDesconto.toFixed(2).replace('.', ',')}`,
-      is_read: false,
-      reference_id: createdVouchers[0].id
-    });
-
-    // E-mail para o cliente
-    if (user?.email) {
-      base44.functions.invoke('sendEmailNotification', {
-        type: 'voucher_generated',
-        data: {
-          user_email: user.email,
-          user_name: user.full_name || 'Cliente',
-          voucher_code: createdVouchers[0].code,
-          product_name: createdVouchers[0].product_name,
-          partner_name: partner.business_name,
-          original_price: totalOriginal.toFixed(2).replace('.', ','),
-          discount_price: totalDesconto.toFixed(2).replace('.', ','),
-          expires_at: new Date(createdVouchers[0].expires_at).toLocaleDateString('pt-BR')
-        }
-      });
-    }
-
-    // E-mail para o parceiro (novo voucher gerado)
-    if (partner?.owner_email) {
-      base44.functions.invoke('sendEmailNotification', {
-        type: 'new_voucher_partner',
-        data: {
-          partner_email: partner.owner_email,
-          partner_name: partner.business_name,
-          user_name: user?.full_name || 'Não informado',
-          product_name: product.name,
-          quantity: quantity,
-          discount_price: totalDesconto.toFixed(2).replace('.', ',')
-        }
-      });
-    }
-
-    // Creditar pontos de fidelidade: 10 pts por voucher
-    if (user?.email) {
-      const pointsToAdd = createdVouchers.length * 10;
-      const pointsList = await base44.entities.UserPoints.filter({ user_email: user.email });
-      if (pointsList.length > 0) {
-        const up = pointsList[0];
-        await base44.entities.UserPoints.update(up.id, {
-          total_points: (up.total_points || 0) + pointsToAdd,
-          lifetime_points: (up.lifetime_points || 0) + pointsToAdd,
-          voucher_points: (up.voucher_points || 0) + pointsToAdd
-        });
+      if (res.data?.stamp_prize) {
+        toast.success(`🎉 Cartão completo! Você desbloqueou: ${res.data.stamp_prize}! Veja em Loja de Fidelidade.`, { duration: 6000 });
       }
+
+      setVouchers(createdVouchers);
+      toast.success(`${createdVouchers.length} voucher${createdVouchers.length > 1 ? 's' : ''} gerado${createdVouchers.length > 1 ? 's' : ''}! +${res.data?.points_added || 0} pontos de fidelidade 🪙`);
+      onSuccess?.(createdVouchers[0]);
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Não foi possível gerar o voucher.');
     }
-
-    // Selos de fidelidade: 1 selo por voucher (não por quantidade em lote)
-    if (user?.email && partner?.id) {
-      const stampConfigs = await base44.entities.StampCardConfig.filter({ partner_id: partner.id, is_active: true });
-      if (stampConfigs.length > 0) {
-        const cfg = stampConfigs[0];
-        const stampsToAdd = createdVouchers.length; // 1 selo por voucher individual
-        const existingCards = await base44.entities.StampCard.filter({ user_email: user.email, partner_id: partner.id });
-        
-        let card = existingCards.length > 0 ? existingCards[0] : null;
-        if (!card) {
-          card = await base44.entities.StampCard.create({
-            user_email: user.email,
-            partner_id: partner.id,
-            partner_owner_email: partner.owner_email,
-            partner_name: partner.business_name,
-            stamps_count: 0,
-            stamps_goal: cfg.stamps_goal,
-            total_completed: 0,
-            reward_status: 'none'
-          });
-        }
-
-        // Only add stamps if no pending prize
-        if (card.reward_status !== 'unlocked') {
-          const newCount = (card.stamps_count || 0) + stampsToAdd;
-          const goal = cfg.stamps_goal || 5;
-
-          if (newCount >= goal) {
-            // Unlock prize!
-            const options = cfg.discount_options || ['10% OFF'];
-            const prize = options[Math.floor(Math.random() * options.length)];
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            const code = 'SELO-' + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-
-            await base44.entities.StampCard.update(card.id, {
-              stamps_count: newCount - goal, // carry over extra stamps
-              stamps_goal: goal,
-              total_completed: (card.total_completed || 0) + 1,
-              discount_revealed: prize,
-              reward_code: code,
-              reward_status: 'unlocked'
-            });
-            toast.success(`🎉 Cartão completo! Você desbloqueou: ${prize}! Veja em Loja de Fidelidade.`, { duration: 6000 });
-          } else {
-            await base44.entities.StampCard.update(card.id, {
-              stamps_count: newCount,
-              stamps_goal: goal
-            });
-          }
-        }
-      }
-    }
-
-    setVouchers(createdVouchers);
     setLoading(false);
-    toast.success(`${quantity} voucher${quantity > 1 ? 's' : ''} gerado${quantity > 1 ? 's' : ''}! +${createdVouchers.length * 10} pontos de fidelidade 🪙`);
-    onSuccess?.(createdVouchers[0]);
   };
 
   const handleClose = () => {

@@ -60,7 +60,7 @@ export default function BookingModal({ open, onClose, partner, voucher, user }) 
     setSubmitting(true);
     await base44.entities.Appointment.create({
       partner_id: partner.id,
-      partner_owner_email: partner.owner_email,
+      partner_owner_ref: partner.owner_ref,
       user_email: user.email,
       user_name: user.full_name,
       voucher_id: voucher?.id,

@@ -119,19 +119,13 @@ export default function Products() {
     queryFn: () => base44.entities.Product.filter({ is_active: true })
   });
 
-  // Detect Premium partners (active lojista subscriptions)
-  const { data: premiumSubs = [] } = useQuery({
-    queryKey: ['premiumSubs'],
-    queryFn: () => base44.entities.Subscription.filter({ type: 'lojista', status: 'active' })
-  });
-
   const activePartnerIds = partners.map(p => p.id);
   const activeProducts = products.filter(p => activePartnerIds.includes(p.partner_id));
 
+  // Parceiros Premium: assinatura ativa no próprio cadastro do parceiro
   const premiumPartnerIds = useMemo(() => {
-    const premiumEmails = new Set(premiumSubs.map(s => s.user_email));
-    return new Set(partners.filter(p => premiumEmails.has(p.owner_email)).map(p => p.id));
-  }, [premiumSubs, partners]);
+    return new Set(partners.filter(p => p.subscription_status === 'active').map(p => p.id));
+  }, [partners]);
 
   const allCities = React.useMemo(() => getCitiesByState(stateFilter), [stateFilter]);
   const allNeighborhoods = React.useMemo(() => getNeighborhoods(cityFilter), [cityFilter]);
@@ -255,7 +249,7 @@ export default function Products() {
     await base44.entities.ProductView.create({
       product_id: product.id,
       partner_id: product.partner_id,
-      partner_owner_email: partners.find(p => p.id === product.partner_id)?.owner_email,
+      partner_owner_ref: partners.find(p => p.id === product.partner_id)?.owner_ref,
       user_email: user.email
     });
 

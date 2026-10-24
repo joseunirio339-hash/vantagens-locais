@@ -98,6 +98,7 @@ export default function PartnerSignup() {
     await base44.entities.Partner.create({
       ...form,
       owner_email: user.email,
+      owner_ref: user.id,
       subscription_status: 'pending',
     });
 

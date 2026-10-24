@@ -60,68 +60,20 @@ export default function QRScanner({ partner, onValidated }) {
   const handleVoucherCode = async (code) => {
     setLoading(true);
     try {
-      const vouchers = await base44.entities.Voucher.filter({ code });
+      const res = await base44.functions.invoke('validateVoucher', { code });
+      const data = res.data || {};
+      const success = !!data.success;
 
-      if (vouchers.length === 0) {
-        setResult({ success: false, message: 'Voucher não encontrado.' });
-        setLoading(false);
-        return;
-      }
-
-      const voucher = vouchers[0];
-
-      if (voucher.partner_id !== partner.id) {
-        setResult({ success: false, message: 'Este voucher não pertence ao seu estabelecimento.' });
-        setLoading(false);
-        return;
-      }
-
-      if (voucher.status === 'used') {
-        setResult({ success: false, voucher, message: 'Voucher já foi utilizado.' });
-        setLoading(false);
-        return;
-      }
-
-      if (voucher.status === 'expired') {
-        setResult({ success: false, voucher, message: 'Voucher expirado.' });
-        setLoading(false);
-        return;
-      }
-
-      // Validate voucher
-      await base44.entities.Voucher.update(voucher.id, {
-        status: 'used',
-        used_at: new Date().toISOString()
+      setResult({
+        success,
+        voucher: data.voucher,
+        message: data.message || (success ? 'Voucher validado com sucesso!' : 'Voucher não pôde ser validado.')
       });
 
-      await base44.entities.Notification.create({
-        partner_id: partner.id,
-        partner_owner_email: partner.owner_email,
-        type: 'voucher_used',
-        title: '✅ Voucher Validado via QR Code!',
-        message: `Voucher ${voucher.code} para "${voucher.product_name}" foi validado com sucesso via QR Code.`,
-        is_read: false,
-        reference_id: voucher.id
-      });
-
-      // E-mail para o parceiro (voucher usado)
-      if (partner?.owner_email) {
-        base44.functions.invoke('sendEmailNotification', {
-          type: 'voucher_used',
-          data: {
-            partner_email: partner.owner_email,
-            partner_name: partner.business_name,
-            voucher_code: voucher.code,
-            user_name: voucher.user_name || 'Não informado',
-            product_name: voucher.product_name,
-            discount_price: voucher.discount_price?.toFixed(2).replace('.', ',')
-          }
-        });
+      if (success) {
+        toast.success('✅ Voucher validado!');
+        if (onValidated) onValidated();
       }
-
-      setResult({ success: true, voucher, message: 'Voucher validado com sucesso!' });
-      toast.success('✅ Voucher validado!');
-      if (onValidated) onValidated();
     } catch (e) {
       setResult({ success: false, message: 'Erro ao validar voucher. Tente novamente.' });
     }

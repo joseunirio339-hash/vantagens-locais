@@ -23,7 +23,7 @@ export default function RepresentativeLanding() {
 
   useEffect(() => {
     const loadRep = async () => {
-      const res = await base44.functions.invoke('repPortal', { action: 'login', code: code?.toUpperCase() });
+      const res = await base44.functions.invoke('repPortal', { action: 'public_profile', code: code?.toUpperCase() });
       if (res.data?.rep) {
         setRep(res.data.rep);
         // Track visit

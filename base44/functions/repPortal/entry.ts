@@ -12,38 +12,45 @@ async function findOwnedClient(base44, repId, clientId) {
 }
 
 // Acesso do Portal do Representante e do App do Vendedor.
-// O representante se identifica pelo email (ou pelo código do link) e o servidor
-// devolve apenas os dados daquele representante: comissões, clientes do funil e
-// as ações de cadastrar/editar/remover cliente do próprio funil.
+// A identidade vem SEMPRE da sessão logada: ninguém consulta dados de outro
+// representante informando email ou id no corpo da requisição. A página pública
+// de indicação recebe apenas nome, código e telefone do representante.
 export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const body = await req.json();
-
+    const body = await req.json().catch(() => ({}));
     const action = body.action;
-    const email = (body.email || '').trim().toLowerCase();
-    const code = (body.code || '').trim().toUpperCase();
 
-    if (action === 'login') {
-      if (code) {
-        const byCode = await base44.asServiceRole.entities.Representative.filter({ code, is_active: true });
-        return Response.json({ rep: byCode[0] || null });
-      }
-      if (!email) {
-        return Response.json({ rep: null });
-      }
-      const query = { email, is_active: true };
-      if (body.seller_only) {
-        query.is_seller = true;
-      }
-      const reps = await base44.asServiceRole.entities.Representative.filter(query);
-      return Response.json({ rep: reps[0] || null });
+    // Perfil público (somente o necessário para a página de indicação)
+    if (action === 'public_profile') {
+      const code = (body.code || '').trim().toUpperCase();
+      if (!code) return Response.json({ rep: null });
+      const byCode = await base44.asServiceRole.entities.Representative.filter({ code, is_active: true });
+      const found = byCode[0];
+      return Response.json({
+        rep: found ? { name: found.name, code: found.code, phone: found.phone || '' } : null
+      });
     }
 
-    // As demais ações só valem para o representante ativo dono dos dados.
-    const reps = await base44.asServiceRole.entities.Representative.filter({ email, is_active: true });
+    const user = await base44.auth.me();
+    if (!user || !user.email) {
+      return Response.json({ error: 'Faça login para acessar o portal.', needs_login: true }, { status: 401 });
+    }
+
+    const email = user.email.trim().toLowerCase();
+    const query = { email, is_active: true };
+    if (body.seller_only) {
+      query.is_seller = true;
+    }
+
+    const reps = await base44.asServiceRole.entities.Representative.filter(query);
     const rep = reps[0];
-    if (!rep || rep.id !== body.rep_id) {
+
+    if (action === 'login') {
+      return Response.json({ rep: rep || null });
+    }
+
+    if (!rep) {
       return Response.json({ error: 'Acesso não autorizado para este representante.' }, { status: 403 });
     }
 

@@ -150,7 +150,7 @@ export default function PartnerStore() {
     await base44.entities.ProductView.create({
       product_id: product.id,
       partner_id: partnerId,
-      partner_owner_email: partner?.owner_email,
+      partner_owner_ref: partner?.owner_ref,
       user_email: user.email
     });
 

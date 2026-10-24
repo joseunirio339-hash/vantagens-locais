@@ -35,52 +35,20 @@ function RedeemDialog({ reward, partner, userPoints, user, onSuccess, onClose })
   const handleRedeem = async () => {
     if (!canAfford) return;
     setLoading(true);
-    const code = generateRedemptionCode();
-    const expires = new Date();
-    expires.setDate(expires.getDate() + 30);
-
-    // Create redemption record
-    const redemption = await base44.entities.LoyaltyRedemption.create({
-      user_email: user.email,
-      reward_id: reward.id,
-      partner_id: partner.id,
-      partner_owner_email: partner.owner_email,
-      points_spent: reward.points_required,
-      redemption_code: code,
-      status: 'pending',
-      reward_title: reward.title,
-      partner_name: partner.business_name,
-      expires_at: expires.toISOString().split('T')[0]
-    });
-
-    // Deduct points from user
-    const pointsList = await base44.entities.UserPoints.filter({ user_email: user.email });
-    if (pointsList.length > 0) {
-      const up = pointsList[0];
-      await base44.entities.UserPoints.update(up.id, {
-        total_points: Math.max(0, (up.total_points || 0) - reward.points_required)
-      });
+    try {
+      const res = await base44.functions.invoke('createRedemption', { reward_id: reward.id });
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'Não foi possível concluir o resgate.');
+        setLoading(false);
+        return;
+      }
+      const expires = new Date(res.data.expires_at + 'T12:00:00');
+      setDone({ code: res.data.code, expires });
+      onSuccess?.();
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Não foi possível concluir o resgate.');
     }
-
-    // Update reward redeemed count
-    await base44.entities.LoyaltyReward.update(reward.id, {
-      total_redeemed: (reward.total_redeemed || 0) + 1
-    });
-
-    // Notify partner
-    await base44.entities.Notification.create({
-      partner_id: partner.id,
-      partner_owner_email: partner.owner_email,
-      type: 'new_voucher',
-      title: 'Novo Resgate de Fidelidade!',
-      message: `${user.full_name || user.email} resgatou: "${reward.title}" — Código: ${code}`,
-      is_read: false,
-      reference_id: redemption.id
-    });
-
     setLoading(false);
-    setDone({ code, expires });
-    onSuccess?.();
   };
 
   if (!reward) return null;

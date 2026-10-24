@@ -50,11 +50,10 @@ export default function MonthlyPurchaseRanking() {
           ranking.map((u, i) => {
             const rank = i + 1;
             const medal = medalEmoji(rank);
-            const maskedEmail = u.user_email?.replace(/(.{2})(.*)(@.*)/, '$1***$3') || '---';
-            const initial = u.user_email?.charAt(0).toUpperCase() || '?';
+            const label = u.user_label || `Membro #${rank}`;
 
             return (
-              <div key={u.user_email} className={`flex items-center gap-3 px-4 py-3 ${i < 3 ? 'bg-emerald-50/40' : ''} border-b last:border-b-0`}>
+              <div key={u.user_label || i} className={`flex items-center gap-3 px-4 py-3 ${i < 3 ? 'bg-emerald-50/40' : ''} border-b last:border-b-0`}>
                 <div className="w-6 text-center flex-shrink-0">
                   {medal ? (
                     <span className="text-base">{medal}</span>
@@ -63,10 +62,10 @@ export default function MonthlyPurchaseRanking() {
                   )}
                 </div>
                 <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs font-bold">{initial}</span>
+                  <span className="text-white text-xs font-bold">{rank}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-700 font-medium truncate">{maskedEmail}</p>
+                  <p className="text-sm text-slate-700 font-medium truncate">{label}</p>
                   {u.last_product && (
                     <p className="text-xs text-slate-400 truncate">{u.last_product}</p>
                   )}

@@ -1,6 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-Deno.serve(async (req) => {
+// Ranking mensal de compras (público).
+// Devolve apenas rótulos anônimos: nenhum email ou dado pessoal sai daqui.
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
 
@@ -21,14 +23,12 @@ Deno.serve(async (req) => {
         100,
         skip
       );
-      // Filter manually for used_at within this month
       const monthVouchers = batch.filter(v => {
         if (!v.used_at) return false;
         return v.used_at >= startOfMonth && v.used_at <= endOfMonth;
       });
       allVouchers = allVouchers.concat(monthVouchers);
       skip += 100;
-      // Check if we got fewer than 100 or if the last result is older than this month
       if (batch.length < 100) {
         hasMore = false;
       } else {
@@ -37,17 +37,16 @@ Deno.serve(async (req) => {
           hasMore = false;
         }
       }
-      // Safety limit
       if (allVouchers.length >= 1000) hasMore = false;
     }
 
-    // Group by user_email and count
+    // Group by user internally (never exposed)
     const userCounts = {};
     for (const v of allVouchers) {
-      const email = v.user_email;
+      const email = (v.user_email || '').trim().toLowerCase();
       if (!email) continue;
       if (!userCounts[email]) {
-        userCounts[email] = { user_email: email, count: 0, total_saved: 0, partner_names: new Set() };
+        userCounts[email] = { count: 0, total_saved: 0, partner_names: new Set() };
       }
       userCounts[email].count += 1;
       const saved = (v.original_price || 0) - (v.discount_price || 0);
@@ -55,20 +54,20 @@ Deno.serve(async (req) => {
       if (v.product_name) userCounts[email].partner_names.add(v.product_name.split(' ').slice(0, 2).join(' '));
     }
 
-    // Convert to array, sort by count desc, top 10
+    // Anonymous ranking: only position, savings and products leave the server
     const ranking = Object.values(userCounts)
-      .map(u => ({
-        user_email: u.user_email,
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+      .map((u, index) => ({
+        user_label: `Membro #${index + 1}`,
         vouchers_used: u.count,
         total_saved: Math.round(u.total_saved * 100) / 100,
         last_product: [...u.partner_names].slice(0, 3).join(', ')
-      }))
-      .sort((a, b) => b.vouchers_used - a.vouchers_used)
-      .slice(0, 10);
+      }));
 
     return Response.json({ success: true, month: startOfMonth, ranking });
   } catch (error) {
     console.error('monthlyPurchaseRanking error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

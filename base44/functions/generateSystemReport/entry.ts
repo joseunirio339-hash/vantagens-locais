@@ -4,6 +4,10 @@ import { jsPDF } from 'npm:jspdf@4.0.0';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const admin = await base44.auth.me();
+    if (!admin || admin.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Fetch counts
     const [partners, products, vouchers, users, subscriptions] = await Promise.all([

@@ -1,14 +1,21 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Called when a new user registers via a referral link
-// Payload: { referral_code, referred_email }
-Deno.serve(async (req) => {
+// Registra a indicação quando o usuário entra pelo link de um amigo.
+// O email do indicado vem SEMPRE da sessão autenticada, nunca do cliente.
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const { referral_code, referred_email } = await req.json();
+    const user = await base44.auth.me();
+    if (!user || !user.email) {
+      return Response.json({ error: 'Faça login para registrar a indicação.' }, { status: 401 });
+    }
 
-    if (!referral_code || !referred_email) {
-      return Response.json({ error: 'referral_code and referred_email are required' }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const referral_code = (body.referral_code || '').trim().toUpperCase();
+    const referred_email = user.email.trim().toLowerCase();
+
+    if (!referral_code) {
+      return Response.json({ error: 'referral_code is required' }, { status: 400 });
     }
 
     // Find the referrer by code
@@ -17,7 +24,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Referral code not found' }, { status: 404 });
     }
     const referrerPoints = userPointsList[0];
-    const referrer_email = referrerPoints.user_email;
+    const referrer_email = (referrerPoints.user_email || '').trim().toLowerCase();
 
     // Avoid self-referral
     if (referrer_email === referred_email) {
@@ -50,7 +57,7 @@ Deno.serve(async (req) => {
       user_email: referrer_email,
       type: 'new_coupon',
       title: '🎉 Amigo cadastrado!',
-      message: `${referred_email} se cadastrou usando seu link! Quando assinar, você ganha 100 pontos.`,
+      message: 'Um amigo se cadastrou usando seu link! Quando assinar, você ganha 100 pontos.',
       is_read: false,
       reference_id: ''
     });
@@ -62,4 +69,4 @@ Deno.serve(async (req) => {
     console.error('[referralRegister] Error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

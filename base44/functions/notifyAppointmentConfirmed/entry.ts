@@ -1,25 +1,39 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Triggered by entity automation when Appointment status changes to 'confirmed' or 'cancelled'
-Deno.serve(async (req) => {
+// Avisa o cliente quando o parceiro confirma ou cancela o agendamento.
+// Roda apenas pela automação/admin: o destinatário vem do agendamento no banco.
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const body = await req.json();
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
-    let appointment_id, user_email, partner_id, product_name, time_slot, date, new_status;
+    const body = await req.json().catch(() => ({}));
 
-    if (body.event && body.data) {
-      // Entity automation payload
-      appointment_id = body.event.entity_id;
-      user_email = body.data.user_email;
-      partner_id = body.data.partner_id;
-      product_name = body.data.product_name;
-      time_slot = body.data.time_slot;
-      date = body.data.date;
-      new_status = body.data.status;
-    } else {
+    if (!body.event || !body.data) {
       return Response.json({ error: 'Only entity automation payload supported' }, { status: 400 });
     }
+
+    const appointment_id = body.event.entity_id || body.data.id;
+    if (!appointment_id) {
+      return Response.json({ error: 'Missing appointment id' }, { status: 400 });
+    }
+
+    // Relê o agendamento do banco (não confia no conteúdo recebido)
+    const found = await base44.asServiceRole.entities.Appointment.filter({ id: appointment_id });
+    const appointment = found[0];
+    if (!appointment) {
+      return Response.json({ error: 'Appointment not found' }, { status: 404 });
+    }
+
+    const user_email = appointment.user_email;
+    const partner_id = appointment.partner_id;
+    const product_name = appointment.product_name;
+    const time_slot = appointment.time_slot;
+    const date = appointment.date;
+    const new_status = appointment.status;
 
     if (!user_email || !partner_id) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
@@ -67,10 +81,9 @@ Deno.serve(async (req) => {
       reference_id: appointment_id
     });
 
-    console.log(`notifyAppointmentConfirmed: notified ${user_email} - status=${new_status}`);
     return Response.json({ success: true });
   } catch (error) {
-    console.error('notifyAppointmentConfirmed error:', error);
+    console.error('notifyAppointmentConfirmed error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

@@ -81,13 +81,11 @@ export default function Partners() {
     queryFn: () => base44.entities.Review.list()
   });
 
-  // Detect Premium partners
-  const { data: premiumSubs = [] } = useQuery({
-    queryKey: ['premiumSubscriptions'],
-    queryFn: () => base44.entities.Subscription.filter({ type: 'lojista', status: 'active' })
-  });
-
-  const premiumEmails = useMemo(() => new Set(premiumSubs.map(s => s.user_email)), [premiumSubs]);
+  // Premium: assinatura ativa no próprio cadastro do parceiro
+  const premiumPartnerIds = useMemo(
+    () => new Set(partners.filter(p => p.subscription_status === 'active').map(p => p.id)),
+    [partners]
+  );
 
   // Build avg rating map
   const avgRatings = {};
@@ -368,7 +366,7 @@ export default function Partners() {
                     isFavorite={favPartnerIds.has(partner.id)}
                     onToggleFavorite={user ? () => togglePartnerFav(partner.id) : undefined}
                     distanceKm={distKm}
-                    isPremium={premiumEmails.has(partner.owner_email)}
+                    isPremium={premiumPartnerIds.has(partner.id)}
                   />
                 </Link>
               );

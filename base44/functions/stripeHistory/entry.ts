@@ -1,9 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import Stripe from 'npm:stripe@14.25.0';
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
-
-Deno.serve(async (req) => {
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -12,10 +10,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
+
     const body = await req.json().catch(() => ({}));
     const { action, payment_intent_id } = body;
 
-    // Find Stripe customer by email
+    // Find Stripe customer by the signed-in user's email
     const customers = await stripe.customers.list({ email: user.email, limit: 5 });
 
     if (customers.data.length === 0) {
@@ -24,11 +24,14 @@ Deno.serve(async (req) => {
 
     const customerId = customers.data[0].id;
 
-    // Get receipt URL for a specific payment intent
+    // Get receipt URL for a specific payment intent — only from this user's own customer
     if (action === 'get_receipt' && payment_intent_id) {
       const charges = await stripe.charges.list({ payment_intent: payment_intent_id, limit: 1 });
-      const receiptUrl = charges.data[0]?.receipt_url || null;
-      return Response.json({ receipt_url: receiptUrl });
+      const charge = charges.data[0];
+      if (!charge || charge.customer !== customerId) {
+        return Response.json({ error: 'Recibo não encontrado.' }, { status: 404 });
+      }
+      return Response.json({ receipt_url: charge.receipt_url || null });
     }
 
     // Get all charges/payment history
@@ -45,7 +48,7 @@ Deno.serve(async (req) => {
       status: charge.status,
       description: charge.description,
       receipt_url: charge.receipt_url,
-      created: charge.created * 1000, // to ms
+      created: charge.created * 1000,
       failure_message: charge.failure_message,
     }));
 
@@ -68,4 +71,4 @@ Deno.serve(async (req) => {
     console.error('stripeHistory error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

@@ -1,17 +1,32 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Called when a referred user activates a subscription
-// Payload: { referred_email }
-Deno.serve(async (req) => {
+// Paga a recompensa de indicação quando o indicado assina.
+// Só roda para a automação/admin e exige assinatura ATIVA do indicado,
+// então ninguém consegue farmar pontos usando emails inventados.
+export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const body = await req.json();
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await req.json().catch(() => ({}));
 
     // Support both direct calls { referred_email } and entity automation payloads { data: { user_email } }
-    const referred_email = body.referred_email || body.data?.user_email;
+    const referred_email = (body.referred_email || body.data?.user_email || '').trim().toLowerCase();
 
     if (!referred_email) {
       return Response.json({ error: 'referred_email is required' }, { status: 400 });
+    }
+
+    // The referred person must really have an active subscription
+    const activeSubs = await base44.asServiceRole.entities.Subscription.filter({
+      user_email: referred_email,
+      status: 'active'
+    });
+    if (activeSubs.length === 0) {
+      return Response.json({ success: true, skipped: 'no_active_subscription' });
     }
 
     // Find pending referral for this user
@@ -52,7 +67,7 @@ Deno.serve(async (req) => {
       user_email: referral.referrer_email,
       type: 'level_up',
       title: '🏆 Você ganhou pontos!',
-      message: `Seu amigo ${referred_email} assinou o plano! Você ganhou ${POINTS_REWARD} pontos de indicação.`,
+      message: `Seu amigo assinou o plano! Você ganhou ${POINTS_REWARD} pontos de indicação.`,
       is_read: false,
       reference_id: referral.id
     });
@@ -96,11 +111,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`[referralReward] Rewarded ${referral.referrer_email} with ${POINTS_REWARD} points for referring ${referred_email} (total referrals: ${referralCount})`);
+    console.log(`[referralReward] Rewarded ${referral.referrer_email} with ${POINTS_REWARD} points (total referrals: ${referralCount})`);
     return Response.json({ success: true, points_earned: POINTS_REWARD, referrer: referral.referrer_email });
 
   } catch (error) {
     console.error('[referralReward] Error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}
